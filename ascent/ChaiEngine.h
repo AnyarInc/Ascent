@@ -63,7 +63,6 @@ namespace asc
          add(chaiscript::user_type<asc::State>(), "State");
          add(chaiscript::constructor<asc::State(state_t&)>(), "State");
          add(chaiscript::constructor<asc::State(state_t&, const value_t)>(), "State");
-         add(chaiscript::type_conversion<asc::State&, value_t&>());
          add(chaiscript::fun([](asc::State& state, const value_t y) { return state = y; }), "=");
          add(chaiscript::fun([](asc::State& state) { std::cout << state << '\n'; }), "print");
          add(chaiscript::fun([](asc::State& state) { return static_cast<value_t>(state); }), "value");
