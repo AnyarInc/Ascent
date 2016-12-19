@@ -1,8 +1,8 @@
-# Ascent 2
+# Ascent
 
-A modern, open source, C++ simulation engine and differential equation solver. Designed for maximum speed and flexibility.
+A fast and flexible C++ simulation engine and differential equation solver.
 
-Built from the ground up as a major advancement of [Ascent](http://anyarinc.github.io/ascent/)
+Built from the ground up as a major advancement of [Ascent-beta](https://github.com/AnyarInc/ascent-beta)
 
 ## Blazingly Fast
 
@@ -47,18 +47,18 @@ Ascent makes it easy to multi-thread systems and swap out systems, integrators, 
 - [ChaiScript](http://chaiscript.com/) Embedded Scripting Language (Optional for scripting)
 
 ***
-## *Why Version 2?*
-Version 1 of Ascent is currently a state of the art simulation engine, far surpassing the capabilities of many modern engines/ode solvers.
+## *Why A New Version of Ascent?*
+Ascent-beta is a state of the art simulation engine, far surpassing the capabilities of many modern engines/ode solvers.
 
-Ascent 2 takes the flexibility of Ascent to another level while providing the fastest performance in the world.
+But, this version takes the flexibility of Ascent-beta to another level while providing the fastest performance in the world.
 
-## How Ascent Version 2 Is Better
+## How This New Ascent Is Better
 - Header only
-- Much faster. With a simple spring-mass-damper simulation, Ascent 2 is twelve-times faster than version 1.
-- Cleaner code: Ascent 2 doesn't require as many specialed containers, doesn't use pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
-- State-space modeling: Ascent 2 allows state space modeling and allows it to be integrated with modular design. Odeint systems can also be directly solved in Ascent 2.
+- Much faster. With a simple spring-mass-damper simulation, Ascent is twelve-times faster than the beta version.
+- Cleaner code: Ascent doesn't require as many specialed containers, doesn't use pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
+- State-space modeling: Ascent allows state space modeling and allows it to be integrated with modular design. Odeint systems can also be directly solved in Ascent.
 - Module/Simulation abstraction: Modules are only simulation specific if they directly handle integration states. This means modules can easily be used across simulations even while running.
-- Easier, faster, and more powerful scripting: Scripting in Ascent 2 has almost no speed reduction compared with compiled code. Scripts are also easier to move to C++ if the user wants to compile simulation designs.
+- Easier, faster, and more powerful scripting: Scripting in Ascent has almost no speed reduction compared with compiled code. Scripts are also easier to move to C++ if the user wants to compile simulation designs.
 - More straightforward multi-threading
 
 
