@@ -67,6 +67,11 @@ namespace asc
          add(chaiscript::fun([](asc::State& state) { std::cout << state << '\n'; }), "print");
          add(chaiscript::fun([](asc::State& state) { return static_cast<value_t>(state); }), "value");
 
+         add(chaiscript::user_type<Vector>(), "StateVector");
+         add(chaiscript::constructor<Vector(state_t&, const size_t)>(), "StateVector");
+         add(chaiscript::fun([](Vector& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
+         add(chaiscript::fun([](Vector& v) { v.zero(); }), "zero");
+
          add(chaiscript::user_type<Sim>(), "Sim");
          add(chaiscript::constructor<Sim()>(), "Sim");
          add(chaiscript::base_class<Clock, Sim>());
