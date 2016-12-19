@@ -18,7 +18,7 @@ Ascent makes it easy to multi-thread systems and swap out systems, integrators, 
 
 ## Highlights
 - Header Only
-- Automatic vectorization: Ascent conforms to vectorization standards (such as Intel's) and is vectorized by default in MSVC and Xcode
+- Automatic Vectorization: Ascent conforms to vectorization standards (such as Intel's) and is vectorized by default in MSVC and Xcode
 - Free for open source and commercial applications (Apache License)
 - Modular
 - Variable Tracking: Optimized recording of variable time history
@@ -40,11 +40,11 @@ Ascent makes it easy to multi-thread systems and swap out systems, integrators, 
 - Control algorithms (e.g. robotics)
 
 ***
-## Prerequisites
+## Requirements
 - C++14 compliant compiler
 
-### Scripting
-- [ChaiScript](http://chaiscript.com/) Embedded Scripting Language (Optional for scripting)
+## Scripting Requirements
+- [ChaiScript](http://chaiscript.com/) Embedded Scripting Language
 
 ***
 ## *Why A New Version of Ascent?*
@@ -66,6 +66,6 @@ However, this new version of Ascent takes the flexibility of Ascent-beta to anot
 ### [odeint](https://github.com/boostorg/odeint)
 odeint is a C++ ordinary differential equation solver that is part of the boost library.  
 Ascent was partly inspired by the design of odeint, but Ascent is faster and more flexible.  
-Ascent can solve the same state-space systems as odeint (systems can be directly copied).  
-odeint was also not designed for modular simulations, which Ascent handles with ease.  
-Ascent is also significantly faster in Debug runs.
+Ascent is capable of solving the same state-space systems as odeint (systems can be directly copied).  
+However, Ascent is also designed to handle modular simulations, unlike odeint.  
+Ascent is also significantly faster than odeint in Debug runs.
