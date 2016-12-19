@@ -43,14 +43,14 @@ Ascent makes it easy to multi-thread systems and swap out systems, integrators, 
 ## Prerequisites
 - C++14 compliant compiler
 
-## Scripting
+### Scripting
 - [ChaiScript](http://chaiscript.com/) Embedded Scripting Language (Optional for scripting)
 
 ***
 ## *Why A New Version of Ascent?*
-Ascent-beta is a state of the art simulation engine, far surpassing the capabilities of many modern engines/ode solvers.
+Ascent-beta is still a state of the art simulation engine, far surpassing the capabilities of many modern engines/ode solvers.
 
-But, this version takes the flexibility of Ascent-beta to another level while providing the fastest performance in the world.
+However, this new version of Ascent takes the flexibility of Ascent-beta to another level while providing the fastest performance in the world.
 
 ## How This New Ascent Is Better
 - Header only
