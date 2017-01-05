@@ -20,25 +20,6 @@
 
 namespace asc
 {
-//   namespace core
-//   {
-//      // a specialized function to enable vectorization
-//      template <typename T, typename C>
-//      inline void propRK4(C& x, const T dt, const C& xd0, const C& xd1, const C& xd2, const C& xd3, const C& x0)
-//      {
-//         const size_t n = xd0.size();
-//         static constexpr T sixth = static_cast<T>(1.0 / 6.0);
-//         static constexpr T two = static_cast<T>(2.0);
-//#ifdef ASCENT_NO_FMA
-//         for (size_t i = 0; i < n; ++i)
-//            x[i] = sixth * dt * (xd0[i] + two * (xd1[i] + xd2[i]) + xd3[i]) + x0[i];
-//#else
-//         for (size_t i = 0; i < n; ++i)
-//            x[i] = fma(sixth * dt, xd0[i] + fma(two, xd1[i] + xd2[i], xd[i]), x0[i]);
-//#endif
-//      }
-//   }
-
    template <typename C>
    struct RK4T
    {
