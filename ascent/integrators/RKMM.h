@@ -25,8 +25,8 @@ namespace asc
       template <typename C>
       typename C::value_type maxAbsDiff(const C& x0, const C& x1)
       {
-         C::value_type maximum{};
-         C::value_type temp;
+         typename C::value_type maximum{};
+         typename C::value_type temp;
          const size_t n = x0.size();
          for (size_t i = 0; i < n; ++i)
          {
@@ -42,8 +42,10 @@ namespace asc
    template <typename C>
    struct RKMMT
    {
+      using value_t = typename C::value_type;
+
       // epsilon is the error tolerance
-      RKMMT(const typename C::value_type epsilon) : epsilon(epsilon), epsilon_64(epsilon / static_cast<typename C::value_type>(64.0)) {}
+      RKMMT(const value_t epsilon) : epsilon(epsilon), epsilon_64(epsilon / static_cast<value_t>(64.0)) {}
 
       template <typename Clock, typename System>
       void operator()(Clock& clock, C& x, System&& system)
@@ -144,18 +146,18 @@ namespace asc
       }
 
    private:
-      static constexpr typename C::value_type two = static_cast<typename C::value_type>(2.0);
-      static constexpr typename C::value_type fifth = static_cast<typename C::value_type>(1.0 / 5.0);
+      static constexpr auto two = static_cast<value_t>(2.0);
+      static constexpr auto fifth = static_cast<value_t>(1.0 / 5.0);
 
-      static constexpr typename C::value_type half = static_cast<typename C::value_type>(0.5);
-      static constexpr typename C::value_type third = static_cast<typename C::value_type>(1.0 / 3.0);
-      static constexpr typename C::value_type sixth = static_cast<typename C::value_type>(1.0 / 6.0);
-      static constexpr typename C::value_type eigth = static_cast<typename C::value_type>(1.0 / 8.0);
+      static constexpr auto half = static_cast<value_t>(0.5);
+      static constexpr auto third = static_cast<value_t>(1.0 / 3.0);
+      static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
+      static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 
-      typename C::value_type t0, dt, dt_2, dt_3, dt_6, dt_8;
+      value_t t0, dt, dt_2, dt_3, dt_6, dt_8;
       C x0, xd0, xd1, xd2, xd3, xd4;
-      typename C::value_type R;
-      const typename C::value_type epsilon, epsilon_64;
+      value_t R;
+      const value_t epsilon, epsilon_64;
       C x_estimate;
    };
 }

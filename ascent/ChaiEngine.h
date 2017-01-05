@@ -93,6 +93,7 @@ namespace asc
          add(chaiscript::constructor<T()>(), name);
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
+         add(chaiscript::fun([](T& integrator, Clock& clock, state_t& state, system_t& system) { integrator(clock, state, system); }), "step");
       }
 
       template <typename T>
@@ -102,6 +103,7 @@ namespace asc
          add(chaiscript::constructor<T(const value_t epsilon)>(), name);
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
+         add(chaiscript::fun([](T& integrator, Clock& clock, state_t& state, system_t& system) { integrator(clock, state, system); }), "step");
       }
    };
 }

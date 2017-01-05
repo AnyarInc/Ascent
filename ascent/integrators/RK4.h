@@ -23,6 +23,8 @@ namespace asc
    template <typename C>
    struct RK4T
    {
+      using value_t = typename C::value_type;
+
       template <typename Clock, typename System>
       void operator()(Clock& clock, C& x, System&& system)
       {
@@ -76,10 +78,10 @@ namespace asc
       }
 
    private:
-      static constexpr typename C::value_type two = static_cast<typename C::value_type>(2.0);
-      static constexpr typename C::value_type half = static_cast<typename C::value_type>(0.5);
-      static constexpr typename C::value_type sixth = static_cast<typename C::value_type>(1.0 / 6.0);
-      typename C::value_type t0, dt, dt_2;
+      static constexpr auto two = static_cast<value_t>(2.0);
+      static constexpr auto half = static_cast<value_t>(0.5);
+      static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
+      value_t t0, dt, dt_2;
       C x0, xd0, xd1, xd2, xd3;
    };
 }
