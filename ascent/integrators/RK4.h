@@ -30,6 +30,7 @@ namespace asc
       {
          t0 = t;
          dt_2 = half*dt;
+         dt_6 = sixth*dt;
 
          const size_t n = x.size();
          if (xd0.size() < n)
@@ -63,10 +64,10 @@ namespace asc
                system(x, xd3, t);
 #ifdef ASCENT_NO_FMA
                for (size_t i = 0; i < n; ++i)
-                  x[i] = sixth * dt * (xd0[i] + two * (xd1[i] + xd2[i]) + xd3[i]) + x0[i];
+                  x[i] = dt_6 * (xd0[i] + two * (xd1[i] + xd2[i]) + xd3[i]) + x0[i];
 #else
                for (size_t i = 0; i < n; ++i)
-                  x[i] = fma(sixth * dt, xd0[i] + fma(two, xd1[i] + xd2[i], xd[i]), x0[i]);
+                  x[i] = fma(dt_6, xd0[i] + fma(two, xd1[i] + xd2[i], xd[i]), x0[i]);
 #endif
                break;
             default:
@@ -79,7 +80,7 @@ namespace asc
       static constexpr auto two = static_cast<value_t>(2.0);
       static constexpr auto half = static_cast<value_t>(0.5);
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
-      value_t t0, dt_2;
+      value_t t0, dt_2, dt_6;
       C x0, xd0, xd1, xd2, xd3;
    };
 }

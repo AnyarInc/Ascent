@@ -37,9 +37,9 @@ namespace asc
       template <typename C>
       T& operator()(C& xd) const { return xd[index]; }
 
-	   // Returns true if this State is within a given state array
+      // Returns true if this State is within a given state array
       template <typename C>
-      bool within(C& vec) const
+      bool within(const C& vec) const
       {
          if (&x == &vec[index])
             return true;
