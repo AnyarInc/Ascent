@@ -39,7 +39,7 @@ namespace asc
       void run(System&& system, Integrator&& integrator)
       {
          while (t < t_end)
-            integrator(*this, x, system);
+            integrator(system, x, t, dt);
       }
 
       template <typename System, typename Integrator, typename Recorder>
@@ -48,7 +48,7 @@ namespace asc
          while (t < t_end)
          {
             recorder();
-            integrator(*this, x, system);
+            integrator(system, x, t, dt);
          }
       }
    };

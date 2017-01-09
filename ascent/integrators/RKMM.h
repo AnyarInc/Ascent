@@ -47,12 +47,10 @@ namespace asc
       // epsilon is the error tolerance
       RKMMT(const value_t epsilon) : epsilon(epsilon), epsilon_64(epsilon / static_cast<value_t>(64.0)) {}
 
-      template <typename Clock, typename System>
-      void operator()(Clock& clock, C& x, System&& system)
+      template <typename System>
+      void operator()(System&& system, C& x, value_t& t, value_t& dt)
       {
-         auto& t = clock.t;
-         t0 = clock.t;
-         dt = clock.dt;
+         t0 = t;
          dt_2 = half*dt;
          dt_3 = third*dt;
          dt_6 = sixth*dt;
@@ -130,13 +128,13 @@ namespace asc
 
                if (R > epsilon)
                {
-                  clock.dt *= half; // reduce the time step
-                  clock.t = t0;
+                  dt *= half; // reduce the time step
+                  t = t0;
                   x = x0;
-                  operator()(clock, x, system); // recompute the solution recursively
+                  operator()(system, x, t, dt); // recompute the solution recursively
                }
                else if (R <= epsilon_64)
-                  clock.dt *= two; // increase the time step for future steps
+                  dt *= two; // increase the time step for future steps
 
                break;
             default:
@@ -154,7 +152,7 @@ namespace asc
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 
-      value_t t0, dt, dt_2, dt_3, dt_6, dt_8;
+      value_t t0, dt_2, dt_3, dt_6, dt_8;
       C x0, xd0, xd1, xd2, xd3, xd4;
       value_t R;
       const value_t epsilon, epsilon_64;

@@ -22,6 +22,7 @@ namespace asc
 {
    struct ChaiEngine : public chaiscript::ChaiScript
    {
+      // Captures the systyem object by reference.
 	   template <typename T>
 	   void addSystem()
 	   {
@@ -67,10 +68,10 @@ namespace asc
          add(chaiscript::fun([](asc::State& state) { std::cout << state << '\n'; }), "print");
          add(chaiscript::fun([](asc::State& state) { return static_cast<value_t>(state); }), "value");
 
-         add(chaiscript::user_type<Vector>(), "StateVector");
-         add(chaiscript::constructor<Vector(state_t&, const size_t)>(), "StateVector");
-         add(chaiscript::fun([](Vector& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
-         add(chaiscript::fun([](Vector& v) { v.zero(); }), "zero");
+         add(chaiscript::user_type<StateVector>(), "StateVector");
+         add(chaiscript::constructor<StateVector(state_t&, const size_t)>(), "StateVector");
+         add(chaiscript::fun([](StateVector& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
+         add(chaiscript::fun([](StateVector& v) { v.zero(); }), "zero");
 
          add(chaiscript::user_type<Sim>(), "Sim");
          add(chaiscript::constructor<Sim()>(), "Sim");
@@ -93,7 +94,7 @@ namespace asc
          add(chaiscript::constructor<T()>(), name);
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
-         add(chaiscript::fun([](T& integrator, Clock& clock, state_t& state, system_t& system) { integrator(clock, state, system); }), "step");
+         add(chaiscript::fun([](T& integrator, system_t& system, state_t& state, value_t& t, const value_t dt) { integrator(system, state, t, dt); }), "step");
       }
 
       template <typename T>
@@ -103,7 +104,7 @@ namespace asc
          add(chaiscript::constructor<T(const value_t epsilon)>(), name);
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
          add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
-         add(chaiscript::fun([](T& integrator, Clock& clock, state_t& state, system_t& system) { integrator(clock, state, system); }), "step");
+         add(chaiscript::fun([](T& integrator, system_t& system, state_t& state, value_t& t, value_t& dt) { integrator(system, state, t, dt); }), "step");
       }
    };
 }

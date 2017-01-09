@@ -29,7 +29,7 @@
 #include "ascent/integrators/RKMM.h"
 
 // Linear Algebra
-#include "ascent/Vector.h"
+#include "ascent/StateVector.h"
 
 #include <deque>
 #include <string>

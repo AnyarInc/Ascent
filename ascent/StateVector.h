@@ -23,13 +23,13 @@
 namespace asc
 {
    template <typename T>
-   struct VectorT
+   struct StateVectorT
    {
       using It = typename std::vector<T>::iterator;
 
-      VectorT(const VectorT& vec) = default;
+      StateVectorT(const StateVectorT& vec) = default;
 
-      VectorT& operator=(const VectorT& v)
+      StateVectorT& operator=(const StateVectorT& v)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = v[i];
@@ -37,7 +37,7 @@ namespace asc
       }
 
       template <typename C>
-      VectorT& operator=(const C& c)
+      StateVectorT& operator=(const C& c)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = c[i];
@@ -45,7 +45,7 @@ namespace asc
       }
 
       template <typename C>
-      VectorT(C& c, const size_t n) : n(n), data_ptr(c.data() + c.size())
+      StateVectorT(C& c, const size_t n) : n(n), data_ptr(c.data() + c.size())
       {
          StateT<T>(c, T());
          i0 = --c.end() - c.begin();
@@ -55,7 +55,7 @@ namespace asc
       }
 
       template <typename C>
-      VectorT(C& c, std::initializer_list<T>&& list) : n(list.size()), data_ptr(c.data() + c.size())
+      StateVectorT(C& c, std::initializer_list<T>&& list) : n(list.size()), data_ptr(c.data() + c.size())
       {
          bool first_element{ true };
          for (T x : list)
@@ -72,12 +72,12 @@ namespace asc
       }
 
       // Constructor for selecting a specific section of allocated memory
-      VectorT(const size_t i0, const size_t n, T* data) : i0(i0), n(n), data_ptr(data) {}
+      StateVectorT(const size_t i0, const size_t n, T* data) : i0(i0), n(n), data_ptr(data) {}
 
       template <typename C>
-      VectorT operator()(C& xd) const
+      StateVectorT operator()(C& xd) const
       {
-         return VectorT(i0, n, xd.data() + i0);
+         return StateVectorT(i0, n, xd.data() + i0);
       }
 
       const T* begin() const { return data_ptr; }

@@ -44,5 +44,5 @@ namespace asc
    using RKMM = RKMMT<state_t>;
 
    // Linear Algebra
-   using Vector = VectorT<value_t>;
+   using StateVector = StateVectorT<value_t>;
 }

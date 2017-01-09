@@ -23,12 +23,11 @@ namespace asc
    template <typename C>
    struct EulerT
    {
-      template <typename Clock, typename System>
-      void operator()(Clock& clock, C& x, System&& system)
-      {
-         auto& t = clock.t;
-         dt = clock.dt;
+      using value_t = typename C::value_type;
 
+      template <typename System>
+      void operator()(System&& system, C& x, value_t& t, const value_t dt)
+      {
          n = x.size();
          if (xd.size() < n)
             xd.resize(n);
@@ -39,7 +38,6 @@ namespace asc
       }
 
    private:
-      typename C::value_type dt;
       size_t n;
       C xd;
    };

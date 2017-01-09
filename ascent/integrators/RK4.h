@@ -25,12 +25,10 @@ namespace asc
    {
       using value_t = typename C::value_type;
 
-      template <typename Clock, typename System>
-      void operator()(Clock& clock, C& x, System&& system)
+      template <typename System>
+      void operator()(System&& system, C& x, value_t& t, const value_t dt)
       {
-         auto& t = clock.t;
-         t0 = clock.t;
-         dt = clock.dt;
+         t0 = t;
          dt_2 = half*dt;
 
          const size_t n = x.size();
@@ -81,7 +79,7 @@ namespace asc
       static constexpr auto two = static_cast<value_t>(2.0);
       static constexpr auto half = static_cast<value_t>(0.5);
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
-      value_t t0, dt, dt_2;
+      value_t t0, dt_2;
       C x0, xd0, xd1, xd2, xd3;
    };
 }
