@@ -58,11 +58,10 @@ namespace asc
          if (xd0.size() < n)
          {
             xd0.resize(n);
-            xd1.resize(n);
             xd2.resize(n);
             xd3.resize(n);
-            xd4.resize(n);
             x_estimate.resize(n);
+            xd_temp.resize(n);
          }
 
          x0 = x;
@@ -71,9 +70,9 @@ namespace asc
             x[i] = dt_3 * xd0[i] + x0[i];
          t += dt_3;
 
-         system(x, xd1, t);
+         system(x, xd_temp, t);
          for (size_t i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + xd1[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + xd_temp[i]) + x0[i];
 
          system(x, xd2, t);
          for (size_t i = 0; i < n; ++i)
@@ -85,9 +84,9 @@ namespace asc
             x[i] = dt_2 * (xd0[i] - 3.0*xd2[i] + 4.0*xd3[i]) + x0[i];
          t = t0 + dt;
 
-         system(x, xd4, t);
+         system(x, xd_temp, t);
          for (size_t i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + 4.0*xd3[i] + xd4[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + 4.0*xd3[i] + xd_temp[i]) + x0[i];
 
          // Adaptive time stepping would probably be best handled by a constexpr if, because we want the handling to be determined at compile time, perhaps by a templated boolean
          // https://www.encyclopediaofmath.org/index.php/Kutta-Merson_method#Eq-2
@@ -117,7 +116,7 @@ namespace asc
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 
-      state_t x0, xd0, xd1, xd2, xd3, xd4;
+      state_t x0, xd0, xd2, xd3, xd_temp;
       const value_t epsilon, epsilon_64;
       state_t x_estimate;
    };
