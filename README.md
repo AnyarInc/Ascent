@@ -6,9 +6,9 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 ## Blazingly Fast
 
-For most simulations Ascent outperforms boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html)
+Ascent outperforms boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html)
 
-Ascent is automatically vectorized with standard containers (std::vector, std::array).
+Ascent is automatically vectorized by modern compilers
 
 ## Extremely Flexible
 
@@ -19,6 +19,10 @@ Ascent completely separates concepts of simulators, integrators, systems, module
 Ascent makes it easy to multi-thread systems and swap out systems, integrators, and more on the fly.
 
 Ascent solvers also handle odeint system syntax, allowing you to run odeint systems without changes.
+
+## Minimal Memory Footprint
+
+Most algorithms, like the four order Runge Kutta, are optimized for minimal memory use, which can have significant RAM savings for large systems.
 
 ## Highlights
 - Header Only
