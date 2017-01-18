@@ -14,31 +14,31 @@
 
 #pragma once
 
-#include "ascent/core/Propagate.h"
-
 // Simple Euler integration.
 
 namespace asc
 {
-   template <typename C>
+   template <typename state_t>
    struct EulerT
    {
-      using value_t = typename C::value_type;
+      using value_t = typename state_t::value_type;
 
       template <typename System>
-      void operator()(System&& system, C& x, value_t& t, const value_t dt)
+      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
-         n = x.size();
+         const size_t n = x.size();
          if (xd.size() < n)
             xd.resize(n);
 
          system(x, xd, t);
-         core::propagate(x, dt, xd, x);
+         for (size_t i = 0; i < n; ++i)
+         {
+            x[i] += dt * xd[i];
+         }
          t += dt;
       }
 
    private:
-      size_t n;
-      C xd;
+      state_t xd;
    };
 }

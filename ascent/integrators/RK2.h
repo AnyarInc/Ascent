@@ -14,52 +14,39 @@
 
 #pragma once
 
-#include "ascent/core/Propagate.h"
-
 // Second order, two pass Runge Kutta.
 
 namespace asc
 {
-   template <typename C>
+   template <typename state_t>
    struct RK2T
    {
-      using value_t = typename C::value_type;
+      using value_t = typename state_t::value_type;
 
       template <typename System>
-      void operator()(System&& system, C& x, value_t& t, const value_t dt)
+      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
-         t0 = t;
-         dt_2 = half*dt;
+         const value_t t0 = t;
+         const value_t dt_2 = half*dt;
 
-         n = x.size();
+         const size_t n = x.size();
          if (xd.size() < n)
             xd.resize(n);
 
-         for (size_t pass = 0; pass < 2; ++pass)
-         {
-            switch (pass)
-            {
-            case 0:
-               x0 = x;
-               system(x, xd, t);
-               core::propagate(x, dt_2, xd, x0);
-               t += dt_2;
-               break;
-            case 1:
-               system(x, xd, t);
-               core::propagate(x, dt, xd, x0);
-               t = t0 + dt;
-               break;
-            default:
-               break;
-            }
-         }
+         x0 = x;
+         system(x, xd, t);
+         for (size_t i = 0; i < n; ++i)
+            x[i] = dt_2 * xd[i] + x0[i];
+         t += dt_2;
+
+         system(x, xd, t);
+         for (size_t i = 0; i < n; ++i)
+            x[i] = dt * xd[i] + x0[i];
+         t = t0 + dt;
       }
 
    private:
       static constexpr auto half = static_cast<value_t>(0.5);
-      value_t t0, dt_2;
-      size_t n;
-      C x0, xd;
+      state_t x0, xd;
    };
 }

@@ -14,73 +14,59 @@
 
 #pragma once
 
-#include "ascent/core/Propagate.h"
-
 // Fourth order, four pass Runge Kutta.
 
 namespace asc
 {
-   template <typename C>
+   template <typename state_t>
    struct RK4T
    {
-      using value_t = typename C::value_type;
+      using value_t = typename state_t::value_type;
 
       template <typename System>
-      void operator()(System&& system, C& x, value_t& t, const value_t dt)
+      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
-         t0 = t;
-         dt_2 = half*dt;
-         dt_6 = sixth*dt;
+         const value_t t0 = t;
+         const value_t dt_2 = half*dt;
+         const value_t dt_6 = sixth*dt;
 
          const size_t n = x.size();
-         if (xd0.size() < n)
+         if (xd.size() < n)
          {
-            xd0.resize(n);
-            xd1.resize(n);
-            xd2.resize(n);
-            xd3.resize(n);
+            xd.resize(n);
+            xd_temp.resize(n);
          }
 
-         for (size_t pass = 0; pass < 4; ++pass)
+         x0 = x;
+         system(x, xd, t);
+         for (size_t i = 0; i < n; ++i)
+            x[i] = dt_2 * xd[i] + x0[i];
+         t += dt_2;
+
+         system(x, xd_temp, t);
+         for (size_t i = 0; i < n; ++i)
          {
-            switch (pass)
-            {
-            case 0:
-               x0 = x;
-               system(x, xd0, t);
-               core::propagate(x, dt_2, xd0, x0);
-               t += dt_2;
-               break;
-            case 1:
-               system(x, xd1, t);
-               core::propagate(x, dt_2, xd1, x0);
-               break;
-            case 2:
-               system(x, xd2, t);
-               core::propagate(x, dt, xd2, x0);
-               t = t0 + dt;
-               break;
-            case 3:
-               system(x, xd3, t);
-#ifdef ASCENT_NO_FMA
-               for (size_t i = 0; i < n; ++i)
-                  x[i] = dt_6 * (xd0[i] + two * (xd1[i] + xd2[i]) + xd3[i]) + x0[i];
-#else
-               for (size_t i = 0; i < n; ++i)
-                  x[i] = fma(dt_6, xd0[i] + fma(two, xd1[i] + xd2[i], xd[i]), x0[i]);
-#endif
-               break;
-            default:
-               break;
-            }
+            xd[i] += two * xd_temp[i];
+            x[i] = dt_2 * xd_temp[i] + x0[i];
          }
+
+         system(x, xd_temp, t);
+         for (size_t i = 0; i < n; ++i)
+         {
+            xd[i] += two * xd_temp[i];
+            x[i] = dt * xd_temp[i] + x0[i];
+         }
+         t = t0 + dt;
+
+         system(x, xd_temp, t);
+         for (size_t i = 0; i < n; ++i)
+            x[i] = dt_6 * (xd[i] + xd_temp[i]) + x0[i];
       }
 
    private:
       static constexpr auto two = static_cast<value_t>(2.0);
       static constexpr auto half = static_cast<value_t>(0.5);
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
-      value_t t0, dt_2, dt_6;
-      C x0, xd0, xd1, xd2, xd3;
+      state_t x0, xd, xd_temp;
    };
 }
