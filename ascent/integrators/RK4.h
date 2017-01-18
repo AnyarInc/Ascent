@@ -39,19 +39,20 @@ namespace asc
 
          x0 = x;
          system(x, xd, t);
-         for (size_t i = 0; i < n; ++i)
+         size_t i{};
+         for (; i < n; ++i)
             x[i] = dt_2 * xd[i] + x0[i];
          t += dt_2;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
          {
             xd[i] += two * xd_temp[i];
             x[i] = dt_2 * xd_temp[i] + x0[i];
          }
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
          {
             xd[i] += two * xd_temp[i];
             x[i] = dt * xd_temp[i] + x0[i];
@@ -59,7 +60,7 @@ namespace asc
          t = t0 + dt;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = dt_6 * (xd[i] + xd_temp[i]) + x0[i];
       }
 
