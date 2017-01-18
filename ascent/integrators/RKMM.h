@@ -66,33 +66,34 @@ namespace asc
 
          x0 = x;
          system(x, xd0, t);
-         for (size_t i = 0; i < n; ++i)
+         size_t i{};
+         for (; i < n; ++i)
             x[i] = dt_3 * xd0[i] + x0[i];
          t += dt_3;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = dt_6 * (xd0[i] + xd_temp[i]) + x0[i];
 
          system(x, xd2, t);
-         for (size_t i = 0; i < n; ++i)
-            x[i] = dt_8 * (xd0[i] + 3.0*xd2[i]) + x0[i];
+         for (i = 0; i < n; ++i)
+            x[i] = dt_8 * (xd0[i] + 3*xd2[i]) + x0[i];
          t = t0 + dt_2;
 
          system(x, xd3, t);
-         for (size_t i = 0; i < n; ++i)
-            x[i] = dt_2 * (xd0[i] - 3.0*xd2[i] + 4.0*xd3[i]) + x0[i];
+         for (i = 0; i < n; ++i)
+            x[i] = dt_2 * (xd0[i] - 3*xd2[i] + 4*xd3[i]) + x0[i];
          t = t0 + dt;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + 4.0*xd3[i] + xd_temp[i]) + x0[i];
+         for (i = 0; i < n; ++i)
+            x[i] = dt_6 * (xd0[i] + 4*xd3[i] + xd_temp[i]) + x0[i];
 
          // Adaptive time stepping would probably be best handled by a constexpr if, because we want the handling to be determined at compile time, perhaps by a templated boolean
          // https://www.encyclopediaofmath.org/index.php/Kutta-Merson_method#Eq-2
 
-         for (size_t i = 0; i < n; ++i)
-            x_estimate[i] = dt_2 * (xd0[i] - 3.0*xd2[i] + 4.0*xd3[i]) + x0[i];
+         for (i = 0; i < n; ++i)
+            x_estimate[i] = dt_2 * (xd0[i] - 3*xd2[i] + 4*xd3[i]) + x0[i];
 
          const value_t R = fifth * core::maxAbsDiff(x_estimate, x); // error estimate
 
@@ -104,15 +105,13 @@ namespace asc
             operator()(system, x, t, dt); // recompute the solution recursively
          }
          else if (R <= epsilon_64)
-            dt *= two; // increase the time step for future steps
+            dt *= 2; // increase the time step for future steps
       }
 
    private:
-      static constexpr auto two = static_cast<value_t>(2.0);
-      static constexpr auto fifth = static_cast<value_t>(1.0 / 5.0);
-
       static constexpr auto half = static_cast<value_t>(0.5);
       static constexpr auto third = static_cast<value_t>(1.0 / 3.0);
+      static constexpr auto fifth = static_cast<value_t>(1.0 / 5.0);
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 

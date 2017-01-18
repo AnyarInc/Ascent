@@ -35,12 +35,13 @@ namespace asc
 
          x0 = x;
          system(x, xd, t);
-         for (size_t i = 0; i < n; ++i)
+         size_t i{};
+         for (; i < n; ++i)
             x[i] = dt_2 * xd[i] + x0[i];
          t += dt_2;
 
          system(x, xd, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = dt * xd[i] + x0[i];
          t = t0 + dt;
       }

@@ -47,14 +47,14 @@ namespace asc
          system(x, xd_temp, t);
          for (i = 0; i < n; ++i)
          {
-            xd[i] += two * xd_temp[i];
+            xd[i] += 2 * xd_temp[i];
             x[i] = dt_2 * xd_temp[i] + x0[i];
          }
 
          system(x, xd_temp, t);
          for (i = 0; i < n; ++i)
          {
-            xd[i] += two * xd_temp[i];
+            xd[i] += 2 * xd_temp[i];
             x[i] = dt * xd_temp[i] + x0[i];
          }
          t = t0 + dt;
@@ -65,7 +65,6 @@ namespace asc
       }
 
    private:
-      static constexpr auto two = static_cast<value_t>(2.0);
       static constexpr auto half = static_cast<value_t>(0.5);
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       state_t x0, xd, xd_temp;
