@@ -1,6 +1,6 @@
 # Ascent
 
-A fast and flexible C++ simulation engine and differential equation solver.
+An extremely fast and flexible C++ simulation engine and differential equation solver.
 
 Built from the ground up as a major advancement of [Ascent-beta](https://github.com/AnyarInc/ascent-beta)
 
@@ -8,21 +8,15 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 Ascent outperforms boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html)
 
-Ascent is automatically vectorized by modern compilers
+Integration algorithms include automatical vectorization for std::vector and std::array
 
 ## Extremely Flexible
 
+Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)
+
 Ascent allows the user to solve complex, dynamic systems of differential equations in a modular, object-oriented manner.
 
-Ascent completely separates concepts of simulators, integrators, systems, modules, recorders, and more.
-
-Ascent makes it easy to multi-thread systems and swap out systems, integrators, and more on the fly.
-
-Ascent solvers also handle odeint system syntax, allowing you to run odeint systems without changes.
-
-## Minimal Memory Footprint
-
-Most algorithms, like the four order Runge Kutta, are optimized for minimal memory use, which can have significant RAM savings for large systems.
+Easily multi-thread systems, swap systems, and swap integrators on the fly.
 
 ## Highlights
 - Header Only
@@ -62,18 +56,20 @@ However, this new version of Ascent takes the flexibility of Ascent-beta to anot
 
 ## How This New Ascent Is Better
 - Header only
-- Much faster. With a simple spring-mass-damper simulation, the current version is twelve-times faster than the beta version.
+- Much, much faster. With a simple spring-mass-damper simulation, the current version is twelve-times faster than the beta version.
 - Cleaner code: Ascent doesn't require as many specialized containers, avoid pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
 - State-space modeling: Ascent allows state space modeling and allows it to be integrated with modular design.
 - Module/Simulation abstraction: Modules are only simulation specific if they directly handle integration states. This means modules can easily be used across simulations even while running.
 - Easier, faster, and more powerful scripting: Simulation loops can now be scripted in Ascent. Scripts are also easier to move to C++ if the user wants to compile simulation designs.
 - More straightforward multi-threading
+- This new version completely separates concepts of simulators, integrators, systems, modules, recorders, and more.
+- Integration algorithms have reduced memory footprints (RK4 uses less than half the memory as before)
 
 
 ## Alternatives
 ### [odeint](https://github.com/boostorg/odeint)
 odeint is a C++ ordinary differential equation solver that is part of the boost library.  
-Ascent was partly inspired by the design of odeint, but Ascent is faster and more flexible.  
+Ascent was partly inspired by the design of odeint, but improves upon it in speed and flexibility.  
 Ascent is capable of solving the same state-space systems as odeint (systems can be directly copied).  
 However, Ascent is also designed to solve object-oriented, modular simulations, which odeint cannot handle because of internal state handling design choices.  
 odeint still offers various solvers that Ascent currently does not support, so it is certainly worth checking out!
