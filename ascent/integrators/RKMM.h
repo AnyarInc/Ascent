@@ -18,25 +18,6 @@
 
 namespace asc
 {
-   namespace core
-   {
-      template <typename state_t>
-      typename state_t::value_type maxAbsDiff(const state_t& x0, const state_t& x1)
-      {
-         typename state_t::value_type maximum{};
-         typename state_t::value_type temp;
-         const size_t n = x0.size();
-         for (size_t i = 0; i < n; ++i)
-         {
-            temp = abs(x0[i] - x1[i]);
-            if (temp > maximum)
-               maximum = temp;
-         }
-
-         return maximum;
-      }
-   }
-
    template <typename state_t>
    struct RKMMT
    {
@@ -60,8 +41,7 @@ namespace asc
             xd0.resize(n);
             xd2.resize(n);
             xd3.resize(n);
-            x_estimate.resize(n);
-            xd_temp.resize(n);
+            temp.resize(n);
          }
 
          x0 = x;
@@ -71,9 +51,9 @@ namespace asc
             x[i] = dt_3 * xd0[i] + x0[i];
          t += dt_3;
 
-         system(x, xd_temp, t);
+         system(x, temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + xd_temp[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + temp[i]) + x0[i];
 
          system(x, xd2, t);
          for (i = 0; i < n; ++i)
@@ -85,17 +65,24 @@ namespace asc
             x[i] = dt_2 * (xd0[i] - 3*xd2[i] + 4*xd3[i]) + x0[i];
          t = t0 + dt;
 
-         system(x, xd_temp, t);
+         system(x, temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + 4*xd3[i] + xd_temp[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + 4*xd3[i] + temp[i]) + x0[i];
 
          // Adaptive time stepping would probably be best handled by a constexpr if, because we want the handling to be determined at compile time, perhaps by a templated boolean
          // https://www.encyclopediaofmath.org/index.php/Kutta-Merson_method#Eq-2
 
+         value_t abs_diff;
+         value_t max_abs_diff{};
          for (i = 0; i < n; ++i)
-            x_estimate[i] = dt_2 * (xd0[i] - 3*xd2[i] + 4*xd3[i]) + x0[i];
+         {
+            abs_diff = abs((dt_2 * (xd0[i] - 3 * xd2[i] + 4 * xd3[i]) + x0[i]) - x[i]); // absolute error estimate
 
-         const value_t R = fifth * core::maxAbsDiff(x_estimate, x); // error estimate
+            if (abs_diff > max_abs_diff)
+               max_abs_diff = abs_diff;
+         }
+
+         const value_t R = fifth * max_abs_diff;
 
          if (R > epsilon)
          {
@@ -115,8 +102,7 @@ namespace asc
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 
-      state_t x0, xd0, xd2, xd3, xd_temp;
+      state_t x0, xd0, xd2, xd3, temp;
       const value_t epsilon, epsilon_64;
-      state_t x_estimate;
    };
 }
