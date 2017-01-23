@@ -39,9 +39,10 @@ namespace asc
          if (xd0.size() < n)
          {
             xd0.resize(n);
-            xd2.resize(n);
-            xd3.resize(n);
-            temp.resize(n);
+            xd2_temp.resize(n);
+            xd3_temp.resize(n);
+            xd_temp.resize(n);
+            x3_temp.resize(n);
          }
 
          x0 = x;
@@ -51,23 +52,30 @@ namespace asc
             x[i] = dt_3 * xd0[i] + x0[i];
          t += dt_3;
 
-         system(x, temp, t);
+         system(x, xd_temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + temp[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + xd_temp[i]) + x0[i];
 
-         system(x, xd2, t);
+         system(x, xd2_temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_8 * (xd0[i] + 3*xd2[i]) + x0[i];
+         {
+            xd2_temp[i] *= 3; // all uses of xd2 are 3*xd2, so we perform this multiplication only once
+            x[i] = dt_8 * (xd0[i] + xd2_temp[i]) + x0[i];
+         } 
          t = t0 + dt_2;
 
-         system(x, xd3, t);
+         system(x, xd3_temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_2 * (xd0[i] - 3*xd2[i] + 4*xd3[i]) + x0[i];
+         {
+            xd3_temp[i] *= 4; // all uses of xd3 are 4*xd3, so we perform this multiplication only once
+            x[i] = dt_2 * (xd0[i] - xd2_temp[i] + xd3_temp[i]) + x0[i];
+         }
+         x3_temp = x; // used for error estimation
          t = t0 + dt;
 
-         system(x, temp, t);
+         system(x, xd_temp, t);
          for (i = 0; i < n; ++i)
-            x[i] = dt_6 * (xd0[i] + 4*xd3[i] + temp[i]) + x0[i];
+            x[i] = dt_6 * (xd0[i] + xd3_temp[i] + xd_temp[i]) + x0[i];
 
          // Adaptive time stepping would probably be best handled by a constexpr if, because we want the handling to be determined at compile time, perhaps by a templated boolean
          // https://www.encyclopediaofmath.org/index.php/Kutta-Merson_method#Eq-2
@@ -76,7 +84,7 @@ namespace asc
          value_t max_abs_diff{};
          for (i = 0; i < n; ++i)
          {
-            abs_diff = abs((dt_2 * (xd0[i] - 3 * xd2[i] + 4 * xd3[i]) + x0[i]) - x[i]); // absolute error estimate
+            abs_diff = abs(x3_temp[i] - x[i]); // absolute error estimate
 
             if (abs_diff > max_abs_diff)
                max_abs_diff = abs_diff;
@@ -102,7 +110,8 @@ namespace asc
       static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
 
-      state_t x0, xd0, xd2, xd3, temp;
+      state_t x0, xd0, xd2_temp, xd3_temp, xd_temp;
+      state_t x3_temp;
       const value_t epsilon, epsilon_64;
    };
 }

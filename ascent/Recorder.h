@@ -27,7 +27,6 @@ namespace asc
    struct RecorderT
    {
       inline void operator()(std::initializer_list<T>&& initializer) { history.emplace_back(std::move(initializer)); }
-      inline void emplace_back(std::vector<T>&& x) { history.emplace_back(std::move(x)); }
       inline void push_back(const std::vector<T>& x) { history.push_back(x); }
 
       void reserve(const size_t n) { history.reserve(n); }
