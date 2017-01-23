@@ -6,35 +6,32 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 ## Blazingly Fast
 
-Ascent outperforms boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html)
+Ascent's integration algorithms outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
 
-Integration algorithms include automatical vectorization for std::vector and std::array
+Integration algorithms are automatically vectorized when using std::vector
 
 ## Extremely Flexible
 
-Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)
+Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)  
+odeint solvers can also be used to run Ascent simulations, providing all flexibility of the odeint engine with Ascent's advanced simulation tools
 
-Ascent allows the user to solve complex, dynamic systems of differential equations in a modular, object-oriented manner.
+Ascent can solve complex, dynamics systems of differential equations in a modular, object-oriented manner
 
-Easily multi-thread systems, swap systems, and swap integrators on the fly.
+Easily multi-thread systems and change integrators on the fly
 
 ## Highlights
 - Header Only
-- Automatic Vectorization: Ascent conforms to vectorization standards (such as Intel's) and is vectorized by default in MSVC and Xcode
+- Automatic Vectorization: Ascent conforms to vectorization standards (such as Intel's)
 - Free for open source and commercial applications (Apache License)
 - Modular: solve systems in an object-oriented manner
 - Variable Tracking: Optimized recording of variable time history
 - Asynchronous Sampling and Event Scheduling
-- Integrators
-	- Euler
-	- Runge Kutta (2nd, 4th)
-	- Runge Kutta Merson's Method (with adaptive stepping)
-    - Dormand Prince (45, 87, with adaptive stepping)
-    - Multiple real-time predictor-correctors
+- Numerous Integration Algorithms: adaptive steppers, predictor-correctors, etc.
+- Use boost's odeint library as the numerical integration engine
 - Scripting Interface: Optional ChaiScript interface to easily script simulations
 
 ## Applications
-- Aerospace, multi-body physics, chemical reactions, economics, and much more
+- Aerospace, multi-body physics, chemical reactions, economics, circuits, and much more
 - As a game engine for synchronization and physics
 - Agent-based simulations
 - Complex systems of differential equations
@@ -66,10 +63,7 @@ However, this new version of Ascent takes the flexibility of Ascent-beta to anot
 - Integration algorithms have reduced memory footprints (RK4 uses less than half the memory as before)
 
 
-## Alternatives
-### [odeint](https://github.com/boostorg/odeint)
+### About [odeint](https://github.com/boostorg/odeint)
 odeint is a C++ ordinary differential equation solver that is part of the boost library.  
-Ascent was partly inspired by the design of odeint, but improves upon it in speed and flexibility.  
-Ascent is capable of solving the same state-space systems as odeint (systems can be directly copied).  
-However, Ascent is also designed to solve object-oriented, modular simulations, which odeint cannot handle because of internal state handling design choices.  
-odeint still offers various solvers that Ascent currently does not support, so it is certainly worth checking out!
+Ascent was partly inspired by the design of odeint, but Ascent offers better performance where comparisons can be made, this is especially true for solving object-oriented systems.  
+odeint offers various state types and solvers that Ascent integration algorithms currently do not support, so the odeint solvers are a viable option as the integration algorithm beneath an Ascent simulation.
