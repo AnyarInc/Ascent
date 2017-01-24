@@ -35,12 +35,6 @@ namespace asc
          add(chaiscript::vector_conversion<std::vector<std::string>>());
          add(chaiscript::bootstrap::standard_library::vector_type<state_t>("state_t"));
 
-         add(chaiscript::user_type<Clock>(), "Clock");
-         add(chaiscript::constructor<Clock()>(), "Clock");
-         add(chaiscript::fun(&Clock::dt), "dt");
-         add(chaiscript::fun(&Clock::t), "t");
-         add(chaiscript::fun(&Clock::t_end), "t_end");
-
          add(chaiscript::user_type<Recorder>(), "Recorder");
          add(chaiscript::constructor<Recorder()>(), "Recorder");
          add(chaiscript::fun(&Recorder::record), "record");
@@ -73,37 +67,27 @@ namespace asc
          add(chaiscript::fun([](StateVector& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
          add(chaiscript::fun([](StateVector& v) { v.zero(); }), "zero");
 
-         add(chaiscript::user_type<Sim>(), "Sim");
-         add(chaiscript::constructor<Sim()>(), "Sim");
-         add(chaiscript::base_class<Clock, Sim>());
-         add(chaiscript::fun(&Sim::x), "x");
-         add(chaiscript::type_conversion<Sim&, state_t&>()); 
-
          // Integrators
-         addIntegrator<Euler>("Euler");
-         addIntegrator<RK2>("RK2");
-         addIntegrator<RK4>("RK4");
-         addAdaptiveIntegrator<RKMM>("RKMM");
+         integrator<Euler>("Euler");
+         integrator<RK2>("RK2");
+         integrator<RK4>("RK4");
+         adaptiveIntegrator<RKMM>("RKMM");
       }
 
    private:
       template <typename T>
-      void addIntegrator(const std::string& name)
+      void integrator(const std::string& name)
       {
          add(chaiscript::user_type<T>(), name);
          add(chaiscript::constructor<T()>(), name);
-         add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
-         add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
          add(chaiscript::fun([](T& integrator, system_t& system, state_t& state, value_t& t, const value_t dt) { integrator(system, state, t, dt); }), "step");
       }
 
       template <typename T>
-      void addAdaptiveIntegrator(const std::string& name)
+      void adaptiveIntegrator(const std::string& name)
       {
          add(chaiscript::user_type<T>(), name);
          add(chaiscript::constructor<T(const value_t epsilon)>(), name);
-         add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator) { sim.run(system, integrator); }), "run");
-         add(chaiscript::fun([](Sim& sim, system_t& system, T& integrator, const std::function<void()>& recorder) { sim.run(system, integrator, recorder); }), "run");
          add(chaiscript::fun([](T& integrator, system_t& system, state_t& state, value_t& t, value_t& dt) { integrator(system, state, t, dt); }), "step");
       }
    };

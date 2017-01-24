@@ -15,11 +15,9 @@
 #pragma once
 
 #include "ascent/Recorder.h"
-#include "ascent/Sim.h"
 #include "ascent/State.h"
 
 // Timing
-#include "ascent/timing/Clock.h"
 #include "ascent/timing/Sampler.h"
 
 // Integrators

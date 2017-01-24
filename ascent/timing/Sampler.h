@@ -17,18 +17,15 @@
 namespace asc
 {
    // A Sampler resets the base time step when it goes out of scope. It is designed to be short-lived in a simulation loop.
-   template <typename T, typename Clock>
+   template <typename T>
    struct SamplerT
    {
-      SamplerT(Clock& clock) : clock(clock), dt_base(clock.dt) {}
+      SamplerT(T& t, T& dt) : t(t), dt(dt), dt_base(dt) {}
 
-      ~SamplerT() { clock.dt = dt_base; }
+      ~SamplerT() { dt = dt_base; }
 
       bool operator()(const T sample_rate)
       {
-         const auto t = clock.t;
-         auto& dt = clock.dt;
-
          const size_t n = static_cast<size_t>((t + eps) / sample_rate); // the number of sample time steps that have occured
          const T sample_time = (n + 1) * sample_rate; // the next sample time
          if (sample_time < t + dt - eps)
@@ -42,9 +39,6 @@ namespace asc
 
       bool event(const T event_time)
       {
-         const auto t = clock.t;
-         auto& dt = clock.dt;
-
          if (event_time < t + dt - eps && event_time >= t + eps)
             dt = event_time - t;
 
@@ -56,7 +50,8 @@ namespace asc
 
    private:
       static constexpr T eps = static_cast<T>(1.0e-10);
-      Clock& clock;
-      T dt_base;
+      const T t;
+      T& dt;
+      const T dt_base;
    };
 }

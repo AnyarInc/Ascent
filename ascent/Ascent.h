@@ -29,13 +29,10 @@ namespace asc
    // ------------------------------------------------
    using system_t = std::function<void(const state_t&, state_t&, const value_t)>;
 
-   using Clock = ClockT<value_t>;
    using Recorder = RecorderT<value_t>;
    using RecorderString = RecorderT<std::string>;
-   using Sampler = SamplerT<value_t, Clock>;
+   using Sampler = SamplerT<value_t>;
    using State = StateT<value_t>;
-
-   using Sim = SimT<state_t>;
 
    // Integrators
    using Euler = EulerT<state_t>;
