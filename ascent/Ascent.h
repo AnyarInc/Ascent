@@ -42,6 +42,7 @@ namespace asc
    using RK2 = RK2T<state_t>;
    using RK4 = RK4T<state_t>;
    using RKMM = RKMMT<state_t>;
+   using DOPRI45 = DOPRI45T<state_t>;
 
    // Linear Algebra
    using StateVector = StateVectorT<value_t>;
