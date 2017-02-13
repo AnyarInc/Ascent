@@ -13,9 +13,9 @@ Integration algorithms are automatically vectorized when using std::vector
 ## Extremely Flexible
 
 Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)  
-odeint solvers can also be used to run Ascent simulations, providing all flexibility of the odeint engine with Ascent's advanced simulation tools
+odeint solvers can also be used to run Ascent simulations, providing all flexibility of the odeint engine with Ascent's simulation framework
 
-Ascent can solve complex, dynamics systems of differential equations in a modular, object-oriented manner
+Ascent can solve complex, dynamic systems of differential equations in a modular, object-oriented manner
 
 Easily multi-thread systems and change integrators on the fly
 
@@ -46,12 +46,9 @@ Easily multi-thread systems and change integrators on the fly
 - [ChaiScript](http://chaiscript.com/) Embedded Scripting Language
 
 ***
-## *Why A New Version of Ascent?*
+## Why A New Version of Ascent?
 [Ascent-beta](https://github.com/AnyarInc/ascent-beta) still remains a state of the art simulation engine, far surpassing the capabilities of many modern engines/ode solvers.
-
-However, this new version of Ascent takes the flexibility of Ascent-beta to another level while providing (as far as we know) the best performance in the world.
-
-## How This New Ascent Is Better
+#### However, this new framework is...
 - Header only
 - Much, much faster. With a simple spring-mass-damper simulation, the current version is twelve-times faster than the beta version.
 - Cleaner code: Ascent doesn't require as many specialized containers, avoid pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
