@@ -24,8 +24,6 @@
 #include "ascent/integrators/Euler.h"
 #include "ascent/integrators/RK2.h"
 #include "ascent/integrators/RK4.h"
-#include "ascent/integrators/RKMM.h"
-#include "ascent/integrators/DOPRI45.h"
 
 // Linear Algebra
 #include "ascent/ParamV.h"

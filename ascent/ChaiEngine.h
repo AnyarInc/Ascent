@@ -55,23 +55,22 @@ namespace asc
          add(chaiscript::fun([](const RecorderString& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
          add(chaiscript::type_conversion<RecorderString&, std::function<void()>>([](RecorderString& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
 
-         add(chaiscript::user_type<asc::State>(), "State");
-         add(chaiscript::constructor<asc::State(state_t&)>(), "State");
-         add(chaiscript::constructor<asc::State(state_t&, const value_t)>(), "State");
-         add(chaiscript::fun([](asc::State& state, const value_t y) { return state = y; }), "=");
-         add(chaiscript::fun([](asc::State& state) { std::cout << state << '\n'; }), "print");
-         add(chaiscript::fun([](asc::State& state) { return static_cast<value_t>(state); }), "value");
+         add(chaiscript::user_type<asc::Param>(), "Param");
+         add(chaiscript::constructor<asc::Param(state_t&)>(), "Param");
+         add(chaiscript::constructor<asc::Param(state_t&, const value_t)>(), "Param");
+         add(chaiscript::fun([](asc::Param& param, const value_t y) { return param = y; }), "=");
+         add(chaiscript::fun([](asc::Param& param) { std::cout << param << '\n'; }), "print");
+         add(chaiscript::fun([](asc::Param& param) { return static_cast<value_t>(param); }), "value");
 
-         add(chaiscript::user_type<StateVector>(), "StateVector");
-         add(chaiscript::constructor<StateVector(state_t&, const size_t)>(), "StateVector");
-         add(chaiscript::fun([](StateVector& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
-         add(chaiscript::fun([](StateVector& v) { v.zero(); }), "zero");
+         add(chaiscript::user_type<ParamV>(), "ParamV");
+         add(chaiscript::constructor<ParamV(state_t&, const size_t)>(), "ParamV");
+         add(chaiscript::fun([](ParamV& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
+         add(chaiscript::fun([](ParamV& v) { v.zero(); }), "zero");
 
          // Integrators
          integrator<Euler>("Euler");
          integrator<RK2>("RK2");
          integrator<RK4>("RK4");
-         adaptiveIntegrator<RKMM>("RKMM");
       }
 
    private:
