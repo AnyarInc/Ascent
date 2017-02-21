@@ -15,7 +15,7 @@
 #pragma once
 
 #include "ascent/Recorder.h"
-#include "ascent/State.h"
+#include "ascent/Param.h"
 
 // Timing
 #include "ascent/timing/Sampler.h"
@@ -28,7 +28,7 @@
 #include "ascent/integrators/DOPRI45.h"
 
 // Linear Algebra
-#include "ascent/StateVector.h"
+#include "ascent/ParamV.h"
 
 #include <deque>
 #include <string>

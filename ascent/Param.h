@@ -14,6 +14,8 @@
 
 #pragma once
 
+// A Param is a reference to a memory location within the system's state
+
 namespace asc
 {
    namespace core
@@ -27,12 +29,12 @@ namespace asc
    }
 
    template <typename T>
-   struct StateT
+   struct ParamT
    {
       template <typename C>
-      StateT(C& c, const T x0 = T()) : index(c.size()), x(core::emplace_back_ref(c, x0)) {}
+      ParamT(C& c, const T x0 = T()) : index(c.size()), x(core::emplace_back_ref(c, x0)) {}
 
-      StateT(const StateT& state) : index(state.index), x(state.x) {}
+      ParamT(const ParamT& state) : index(state.index), x(state.x) {}
 
       template <typename C>
       T& operator()(C& xd) const { return xd[index]; }

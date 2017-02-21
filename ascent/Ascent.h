@@ -32,7 +32,7 @@ namespace asc
    using Recorder = RecorderT<value_t>;
    using RecorderString = RecorderT<std::string>;
    using Sampler = SamplerT<value_t>;
-   using State = StateT<value_t>;
+   using Param = ParamT<value_t>;
 
    // Integrators
    using Euler = EulerT<state_t>;
@@ -42,5 +42,5 @@ namespace asc
    using DOPRI45 = DOPRI45T<state_t>;
 
    // Linear Algebra
-   using StateVector = StateVectorT<value_t>;
+   using ParamV = ParamVT<value_t>;
 }

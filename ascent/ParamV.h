@@ -14,22 +14,24 @@
 
 #pragma once
 
-#include "State.h"
+#include "Param.h"
 #include <initializer_list>
 #include <array>
 #include <deque>
 #include <vector>
 
+// The ParamV behaves like a std::vector of Params
+
 namespace asc
 {
    template <typename T>
-   struct StateVectorT
+   struct ParamVT
    {
       using It = typename std::vector<T>::iterator;
 
-      StateVectorT(const StateVectorT& vec) = default;
+      ParamVT(const ParamVT& vec) = default;
 
-      StateVectorT& operator=(const StateVectorT& v)
+      ParamVT& operator=(const ParamVT& v)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = v[i];
@@ -37,7 +39,7 @@ namespace asc
       }
 
       template <typename C>
-      StateVectorT& operator=(const C& c)
+      ParamVT& operator=(const C& c)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = c[i];
@@ -45,22 +47,22 @@ namespace asc
       }
 
       template <typename C>
-      StateVectorT(C& c, const size_t n) : n(n), data_ptr(c.data() + c.size())
+      ParamVT(C& c, const size_t n) : n(n), data_ptr(c.data() + c.size())
       {
-         StateT<T>(c, T());
+         ParamT<T>(c, T());
          i0 = --c.end() - c.begin();
 
          for (size_t i = 1; i < n; ++i)
-            StateT<T>(c, T());
+            ParamT<T>(c, T());
       }
 
       template <typename C>
-      StateVectorT(C& c, std::initializer_list<T>&& list) : n(list.size()), data_ptr(c.data() + c.size())
+      ParamVT(C& c, std::initializer_list<T>&& list) : n(list.size()), data_ptr(c.data() + c.size())
       {
          bool first_element{ true };
          for (T x : list)
          {
-            StateT<T>(c, x);
+            ParamT<T>(c, x);
 
             if (first_element)
             {
@@ -72,12 +74,12 @@ namespace asc
       }
 
       // Constructor for selecting a specific section of allocated memory
-      StateVectorT(const size_t i0, const size_t n, T* data) : i0(i0), n(n), data_ptr(data) {}
+      ParamVT(const size_t i0, const size_t n, T* data) : i0(i0), n(n), data_ptr(data) {}
 
       template <typename C>
-      StateVectorT operator()(C& xd) const
+      ParamVT operator()(C& xd) const
       {
-         return StateVectorT(i0, n, xd.data() + i0);
+         return ParamVT(i0, n, xd.data() + i0);
       }
 
       const T* begin() const { return data_ptr; }
