@@ -26,7 +26,7 @@ Easily multi-thread systems and change integrators on the fly
 - Header Only
 - Automatic Vectorization: Ascent conforms to vectorization standards (such as Intel's)
 - Free for open source and commercial applications (Apache License)
-- Modular: solve systems in an object-oriented manner
+- Modular (Optional): solve systems in an object-oriented manner
 - Variable Tracking: Optimized recording of variable time history
 - Asynchronous Sampling and Event Scheduling
 - Numerous Integration Algorithms: adaptive steppers, predictor-correctors, etc.
