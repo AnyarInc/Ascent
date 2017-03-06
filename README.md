@@ -6,7 +6,7 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 ## Blazingly Fast
 
-Ascent's integration algorithms outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
+Ascent's integration algorithms are designed for speed, and outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
 
 <img src="https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG" width="400">
 
@@ -14,7 +14,8 @@ Integration algorithms are automatically vectorized when using std::vector
 
 ## Extremely Flexible
 
-Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)  
+Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)
+
 odeint solvers can also be used to run Ascent simulations, providing all flexibility of the odeint engine with Ascent's simulation framework
 
 Ascent can solve complex, dynamic systems of differential equations in a modular, object-oriented manner
