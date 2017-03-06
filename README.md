@@ -54,7 +54,7 @@ Easily multi-thread systems and change integrators on the fly
 #### However, this new framework is...
 - Header only
 - Much, much faster. With a simple spring-mass-damper simulation, the current version is twelve-times faster than the beta version.
-- Cleaner code: Ascent doesn't require as many specialized containers, avoid pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
+- Cleaner code: Ascent doesn't require as many specialized containers, avoids pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
 - State-space modeling: Ascent allows state space modeling and allows it to be integrated with modular design.
 - Module/Simulation abstraction: Modules are only simulation specific if they directly handle integration states. This means modules can easily be used across simulations even while running.
 - Easier, faster, and more powerful scripting: Simulation loops can now be scripted in Ascent. Scripts are also easier to move to C++ if the user wants to compile simulation designs.
