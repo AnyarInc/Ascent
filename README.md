@@ -29,7 +29,7 @@ Easily multi-thread systems and change integrators on the fly
 - Modular (Optional): solve systems in an object-oriented manner
 - Variable Tracking: Optimized recording of variable time history
 - Asynchronous Sampling and Event Scheduling
-- Numerous Integration Algorithms: adaptive steppers, predictor-correctors, etc.
+- Multiple Integration Algorithms (In Progress): adaptive steppers, predictor-correctors, etc.
 - Use boost's odeint library as the numerical integration engine
 - Scripting Interface: Optional ChaiScript interface to easily script simulations
 
