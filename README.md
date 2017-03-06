@@ -4,6 +4,8 @@ An extremely fast and flexible C++ simulation engine and differential equation s
 
 Built from the ground up as a major advancement of [Ascent-beta](https://github.com/AnyarInc/ascent-beta)
 
+See the [Ascent Wiki](https://github.com/AnyarInc/Ascent/wiki) for more examples and help
+
 ## Blazingly Fast
 
 Ascent's integration algorithms are designed for speed, and outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
