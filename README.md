@@ -4,15 +4,20 @@ An extremely fast and flexible C++ simulation engine and differential equation s
 
 Built from the ground up as a major advancement of [Ascent-beta](https://github.com/AnyarInc/ascent-beta)
 
+See the [Ascent Wiki](https://github.com/AnyarInc/Ascent/wiki) for more examples and help
+
 ## Blazingly Fast
 
-Ascent's integration algorithms outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
+Ascent's integration algorithms are designed for speed, and outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
+
+<img src="https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG" width="400">
 
 Integration algorithms are automatically vectorized when using std::vector
 
 ## Extremely Flexible
 
-Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)  
+Ascent solvers conform to the odeint system syntax, letting you run odeint system without changes (and with faster results!)
+
 odeint solvers can also be used to run Ascent simulations, providing all flexibility of the odeint engine with Ascent's simulation framework
 
 Ascent can solve complex, dynamic systems of differential equations in a modular, object-oriented manner
@@ -23,10 +28,10 @@ Easily multi-thread systems and change integrators on the fly
 - Header Only
 - Automatic Vectorization: Ascent conforms to vectorization standards (such as Intel's)
 - Free for open source and commercial applications (Apache License)
-- Modular: solve systems in an object-oriented manner
+- Modular (Optional): solve systems in an object-oriented manner
 - Variable Tracking: Optimized recording of variable time history
 - Asynchronous Sampling and Event Scheduling
-- Numerous Integration Algorithms: adaptive steppers, predictor-correctors, etc.
+- Multiple Integration Algorithms (In Progress): adaptive steppers, predictor-correctors, etc.
 - Use boost's odeint library as the numerical integration engine
 - Scripting Interface: Optional ChaiScript interface to easily script simulations
 
@@ -51,7 +56,7 @@ Easily multi-thread systems and change integrators on the fly
 #### However, this new framework is...
 - Header only
 - Much, much faster. With a simple spring-mass-damper simulation, the current version is twelve-times faster than the beta version.
-- Cleaner code: Ascent doesn't require as many specialized containers, avoid pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
+- Cleaner code: Ascent doesn't require as many specialized containers, avoids pointers, and takes advantage of more core C++. This makes it faster to write simulations, the code is more comprehensible, and it is easier to debug.
 - State-space modeling: Ascent allows state space modeling and allows it to be integrated with modular design.
 - Module/Simulation abstraction: Modules are only simulation specific if they directly handle integration states. This means modules can easily be used across simulations even while running.
 - Easier, faster, and more powerful scripting: Simulation loops can now be scripted in Ascent. Scripts are also easier to move to C++ if the user wants to compile simulation designs.
