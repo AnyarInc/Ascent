@@ -8,7 +8,7 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 Ascent's integration algorithms outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
 
-![](https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG)
+<img src="https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG" width="200">
 
 Integration algorithms are automatically vectorized when using std::vector
 
