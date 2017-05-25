@@ -29,15 +29,15 @@ namespace asc
          return (y.back() - y.front()) / (x.back() - x.front());
       else
       {
-         typename T0::value_type x2 = x[nx - 1];
-         typename T0::value_type x1 = x[nx - 2];
-         typename T0::value_type x0 = x[nx - 3];
+         const typename T0::value_type x2 = x[nx - 1];
+         const typename T0::value_type x1 = x[nx - 2];
+         const typename T0::value_type x0 = x[nx - 3];
 
-         typename T1::value_type y2 = y[ny - 1];
-         typename T1::value_type y1 = y[ny - 2];
-         typename T1::value_type y0 = y[ny - 3];
+         const typename T1::value_type y2 = y[ny - 1];
+         const typename T1::value_type y1 = y[ny - 2];
+         const typename T1::value_type y0 = y[ny - 3];
 
-         typename T0::value_type dydx = y0*(2.0 * xest - x1 - x2) / ((x0 - x1)*(x0 - x2)) + y1*(2.0 * xest - x0 - x2) / ((x1 - x0)*(x1 - x2)) + y2*(2.0 * xest - x0 - x1) / ((x2 - x0)*(x2 - x1));
+         const typename T0::value_type dydx = y0*(2.0 * xest - x1 - x2) / ((x0 - x1)*(x0 - x2)) + y1*(2.0 * xest - x0 - x2) / ((x1 - x0)*(x1 - x2)) + y2*(2.0 * xest - x0 - x1) / ((x2 - x0)*(x2 - x1));
 
          return dydx;
       }

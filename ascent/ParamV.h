@@ -29,7 +29,8 @@ namespace asc
    {
       using It = typename std::vector<T>::iterator;
 
-      ParamVT(const ParamVT& vec) = default;
+      ParamVT(ParamVT&&) = default;
+      ParamVT(const ParamVT&) = default;
 
       ParamVT& operator=(const ParamVT& v)
       {
