@@ -67,6 +67,13 @@ namespace asc
          add(chaiscript::fun([](ParamV& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
          add(chaiscript::fun([](ParamV& v) { v.zero(); }), "zero");
 
+         // System
+         add(chaiscript::user_type<System>(), "System");
+         add(chaiscript::constructor<System()>(), "System");
+         add(chaiscript::fun([](System& sys, const asc::state_t& x, asc::state_t& D, const asc::value_t t) { sys(x, D, t); }), "eval");
+         add(chaiscript::type_conversion<System&, asc::system_t>());
+         add(chaiscript::fun([](System& sys, const system_t& func) { sys.push_back(func);  }), "push_back");
+
          // Integrators
          integrator<Euler>("Euler");
          integrator<RK2>("RK2");

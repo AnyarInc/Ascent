@@ -29,6 +29,8 @@ namespace asc
    // ------------------------------------------------
    using system_t = std::function<void(const state_t&, state_t&, const value_t)>;
 
+   using System = SystemT<state_t, system_t>;
+
    using Recorder = RecorderT<value_t>;
    using RecorderString = RecorderT<std::string>;
    using Sampler = SamplerT<value_t>;

@@ -14,21 +14,25 @@
 
 #pragma once
 
-#include "ascent/Recorder.h"
-#include "ascent/Param.h"
+#include <functional>
+#include <vector>
 
-// Timing
-#include "ascent/timing/Sampler.h"
+namespace asc
+{
+   template <typename state_t, typename system_t>
+   struct SystemT
+   {
+      void push_back(const system_t& func)
+      {
+         functions.push_back(func);
+      }
 
-// Integrators
-#include "ascent/integrators/Euler.h"
-#include "ascent/integrators/RK2.h"
-#include "ascent/integrators/RK4.h"
+      void operator()(const state_t& x, state_t& xd, const double t)
+      {
+         for (auto& f : functions)
+            f(x, xd, t);
+      }
 
-// Linear Algebra
-#include "ascent/ParamV.h"
-
-#include "ascent/System.h"
-
-#include <deque>
-#include <string>
+      std::vector<system_t> functions;
+   };
+}
