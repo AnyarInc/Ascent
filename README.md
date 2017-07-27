@@ -6,6 +6,8 @@ Built from the ground up as a major advancement of [Ascent-beta](https://github.
 
 See the [Ascent Wiki](https://github.com/AnyarInc/Ascent/wiki) for more examples and help
 
+Study the [modular-spring-damper](https://github.com/AnyarInc/Ascent/wiki/modular-spring-damper) example to learn the basics of solving matrix free systems of ordinary differential equations in an object-oriented manner
+
 ## Blazingly Fast
 
 Ascent's integration algorithms are designed for speed, and outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
