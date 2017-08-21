@@ -58,32 +58,33 @@ namespace asc
             fsal_computed = false;
          }
 
-         for (size_t i = 0; i < n; ++i)
+         size_t i{};
+         for (; i < n; ++i)
             x[i] = x0[i] + dt_5 * xd0[i];
          t += dt_5;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = x0[i] + dt * (c10 * xd0[i] + c11 * xd_temp[i]);
          t = t0 + cx(3.0 / 10.0) * dt;
 
          system(x, xd2, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = x0[i] + dt * (c20 * xd0[i] + c21 * xd_temp[i] + c22 * xd2[i]);
          t = t0 + cx(4.0 / 5.0) * dt;
 
          system(x, xd3, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = x0[i] + dt * (c30 * xd0[i] + c31 * xd_temp[i] + c32 * xd2[i] + c33 * xd3[i]);
          t = t0 + cx(8.0 / 9.0) * dt;
 
          system(x, xd4, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = x0[i] + dt * (c40 * xd0[i] + c41 * xd_temp[i] + c42 * xd2[i] + c43 * xd3[i] + c44 * xd4[i]);
          t = t0 + dt;
 
          system(x, xd_temp, t);
-         for (size_t i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i)
             x[i] = x0[i] + dt * (c50 * xd0[i] + c52 * xd2[i] + c53 * xd3[i] + c54 * xd4[i] + c55 * xd_temp[i]);
       }
 
