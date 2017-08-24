@@ -14,21 +14,12 @@
 
 #pragma once
 
+#include "ascent/Utility.h"
+
 // Runge Kutta Dormand Prince 45
 
 namespace asc
 {
-   template <typename T>
-   struct AdaptiveT
-   {
-      T abs_tol = static_cast<T>(1.0); // absolute tolerance
-      T rel_tol = static_cast<T>(1.0); // relative tolerance
-      T safety_factor = static_cast<T>(0.9); // value < 1.0 reduces time step change aggressiveness
-   };
-
-   constexpr const value_t cx(long double v) { return static_cast<value_t>(v); }
-   constexpr const value_t operator"" _v(long double v) { return static_cast<value_t>(v); }
-
    template <typename state_t>
    struct DOPRI45T
    {

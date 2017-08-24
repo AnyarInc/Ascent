@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "ascent/Utility.h"
+
 // Five pass Runge Kutta Merson's Method. With adaptive time stepping.
 
 namespace asc
@@ -30,10 +32,10 @@ namespace asc
       void operator()(System&& system, state_t& x, value_t& t, value_t& dt)
       {
          const value_t t0 = t;
-         const value_t dt_2 = half*dt;
-         const value_t dt_3 = third*dt;
-         const value_t dt_6 = sixth*dt;
-         const value_t dt_8 = eigth*dt;
+         const value_t dt_2 = 0.5_v*dt;
+         const value_t dt_3 = cx(1.0 / 3.0)*dt;
+         const value_t dt_6 = cx(1.0 / 6.0)*dt;
+         const value_t dt_8 = cx(1.0 / 8.0)*dt;
 
          const size_t n = x.size();
          if (xd0.size() < n)
@@ -104,12 +106,6 @@ namespace asc
       }
 
    private:
-      static constexpr auto half = static_cast<value_t>(0.5);
-      static constexpr auto third = static_cast<value_t>(1.0 / 3.0);
-      static constexpr auto fifth = static_cast<value_t>(1.0 / 5.0);
-      static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
-      static constexpr auto eigth = static_cast<value_t>(1.0 / 8.0);
-
       state_t x0, xd0, xd2_temp, xd3_temp, xd_temp;
       state_t x3_temp;
       const value_t epsilon, epsilon_64;

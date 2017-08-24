@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "ascent/Utility.h"
+
 // Fourth order, four pass Runge Kutta.
 
 namespace asc
@@ -27,8 +29,8 @@ namespace asc
       void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
          const value_t t0 = t;
-         const value_t dt_2 = half*dt;
-         const value_t dt_6 = sixth*dt;
+         const value_t dt_2 = 0.5_v*dt;
+         const value_t dt_6 = cx(1.0 / 6.0)*dt;
 
          const size_t n = x.size();
          if (xd.size() < n)
@@ -65,8 +67,6 @@ namespace asc
       }
 
    private:
-      static constexpr auto half = static_cast<value_t>(0.5);
-      static constexpr auto sixth = static_cast<value_t>(1.0 / 6.0);
       state_t x0, xd, xd_temp;
    };
 }
