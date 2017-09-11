@@ -24,6 +24,14 @@
 namespace asc
 {
    template <typename T>
+   std::string to_string_precision(const T input, const int n = 6)
+   {
+      std::ostringstream out;
+      out << std::setprecision(n) << input;
+      return out.str();
+   }
+   
+   template <typename T>
    struct RecorderT
    {
       inline void operator()(std::initializer_list<T>&& initializer) { history.emplace_back(std::move(initializer)); }
@@ -55,7 +63,10 @@ namespace asc
                const size_t num_states = history.front().size();
                for (size_t j = 0; j < num_states; ++j)
                {
-                  file << history[i][j];
+                  if (precision > 0)
+                     file << to_string_precision(history[i][j], precision);
+                  else
+                     file << history[i][j]; // faster, but can truncate values
                   if (j < num_states - 1)
                      file << ", ";
                }
@@ -68,5 +79,6 @@ namespace asc
 
       std::function<void()> record; // a record function for ChaiScript
       std::vector<std::vector<T>> history;
+      int precision{};
    };
 }
