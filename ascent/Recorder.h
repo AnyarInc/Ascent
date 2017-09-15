@@ -16,6 +16,9 @@
 
 #include <fstream>
 #include <functional>
+#include <iomanip>
+#include <ostream>
+#include <sstream>
 #include <vector>
 
 // Recorder is a fast, type specific class for generically recording data
