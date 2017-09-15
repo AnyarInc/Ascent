@@ -79,6 +79,10 @@ namespace asc
          integrator<RK2>("RK2");
          integrator<RK4>("RK4");
       }
+      ChaiEngine(const ChaiEngine&) = default;
+      ChaiEngine(ChaiEngine&&) = default;
+      ChaiEngine& operator=(const ChaiEngine&) = default;
+      ChaiEngine& operator=(ChaiEngine&&) = default;
 
    private:
       template <typename T>
