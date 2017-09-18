@@ -20,7 +20,7 @@ namespace asc
    template <typename T>
    struct SamplerT
    {
-      SamplerT(T& t, T& dt) : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(const T t, T& dt) : t(t), dt(dt), dt_base(dt) {}
 
       ~SamplerT() { dt = dt_base; }
 
