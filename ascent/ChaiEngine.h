@@ -76,7 +76,7 @@ namespace asc
          add(chaiscript::fun([](System& sys, const system_t& func) { sys.push_back(func);  }), "push_back");
 
          // Integrators
-         integrator<Euler>("Euler");
+         integrator<Euler>("ascEuler");
          integrator<RK2>("RK2");
          integrator<RK4>("RK4");
       }
