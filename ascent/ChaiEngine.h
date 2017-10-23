@@ -68,6 +68,12 @@ namespace asc
          add(chaiscript::fun([](ParamV& lhs, const std::vector<asc::value_t>& rhs) { return lhs = rhs; }), "=");
          add(chaiscript::fun([](ParamV& v) { v.zero(); }), "zero");
 
+         add(chaiscript::user_type<Sampler>(), "Sampler");
+         add(chaiscript::constructor<Sampler(const asc::value_t&, asc::value_t&)>(), "Sampler");
+         add(chaiscript::fun(&Sampler::operator()), "eval");
+         add(chaiscript::fun(&Sampler::event), "event");
+         add(chaiscript::fun(&Sampler::reset), "reset");
+
          // System
          add(chaiscript::user_type<System>(), "System");
          add(chaiscript::constructor<System()>(), "System");

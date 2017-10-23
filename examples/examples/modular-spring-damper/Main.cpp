@@ -15,46 +15,76 @@
 #include "Damper.h"
 #include "Spring.h"
 
+#include <iostream>
+
 using namespace asc;
+
+// The goal is to be able to implement radix sorting
+
+struct Seq
+{
+   size_t N{};
+   size_t id{};
+
+   void init()
+   {
+      if (!initialized)
+      {
+         for (auto& f : run_after)
+            f();
+      }
+      initialized = true;
+   }
+
+   void increment()
+   {
+      ++N;
+      for (auto& f : run_after)
+         f();
+   }
+
+   void before(Seq& s)
+   {
+      run_after.emplace_back([&] { s.increment(); });
+   }
+
+   void after(Seq& s)
+   {
+      s.run_before.emplace_back([&] { increment(); });
+   }
+
+private:
+   bool initialized{};
+   std::vector<std::function<void()>> run_before, run_after;
+};
 
 int main()
 {
-   state_t x;
-   x.reserve(100); // We reserve more space than necessary, but Ascent will only allocate what is needed
-   double t = 0.0;
-   double dt = 0.01;
-   double t_end = 1.5;
+   asc::state_t x;
+   x.reserve(100);
 
-   Body b0(x);
-   Body b1(x);
-   b1.m = 1.0;
-   b1.s = 1.0;
-   b1.v = 40.0;
+   std::vector<Seq> seq;
+   seq.emplace_back();
+   seq.emplace_back();
+   seq.emplace_back();
+   seq.emplace_back();
 
-   Spring spring(b0, b1);
-   spring.k = 2000.0;
-
-   Damper damper(b0, b1);
-   damper.c = 5.0;
-
-   RK4 integrator;
-   Recorder recorder;
-
-   auto system = [&](const asc::state_t& x, asc::state_t& D, const double t)
+   const size_t n = seq.size();
+   for (size_t i = 0; i < n; ++i)
    {
-      // We must run the spring and damper before the body in order to accumulate forces
-      spring(x, D, t);
-      damper(x, D, t);
-      b1(x, D, t);
-   };
-
-   while (t < t_end)
-   {
-      recorder({ t, b1.s });
-      integrator(system, x, t, dt);
+      seq[i].id = i;
    }
 
-   recorder.csv("spring-damper", { "t", "b1 position" });
+   seq[2].before(seq[1]);
+   //seq[0].after(seq[1]);
+
+   for (auto& s : seq)
+      s.init();
+
+   std::sort(seq.begin(), seq.end(), [](auto& lhs, auto& rhs) { return lhs.N < rhs.N; });
+
+   for (size_t i = 0; i < n; ++i)
+      std::cout << seq[i].id << '\n';
 
    return 0;
 }
