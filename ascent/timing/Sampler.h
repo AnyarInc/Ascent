@@ -22,7 +22,7 @@ namespace asc
    template <typename T>
    struct SamplerT
    {
-      SamplerT(const T t, T& dt) : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(const T& t, T& dt) : t(t), dt(dt), dt_base(dt) {}
 
       ~SamplerT() { dt = dt_base; }
 
@@ -57,7 +57,7 @@ namespace asc
 
    private:
       static constexpr T eps = static_cast<T>(1.0e-10);
-      const T t;
+      const T& t;
       T& dt;
       const T dt_base;
    };
