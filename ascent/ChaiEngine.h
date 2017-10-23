@@ -43,7 +43,7 @@ namespace asc
          add(chaiscript::fun([](Recorder& record, const state_t& data) { record.push_back(data); }), "push_back");
          add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name) { recorder.csv(file_name); }), "csv");
          add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
-         add(chaiscript::type_conversion<Recorder&, std::function<void()>>([](Recorder& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
+         //add(chaiscript::type_conversion<Recorder&, std::function<void()>>([](Recorder& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
 
          // This allows for more generic mixing of various data types, all they need is to be converted to a string prior to being passed into the recorder
          // The RecorderString is primarily for data that is going to be output to a file and not operated on during the simulation
@@ -54,7 +54,7 @@ namespace asc
          add(chaiscript::fun([](RecorderString& record, const std::vector<std::string>& data) { record.push_back(data); }), "push_back");
          add(chaiscript::fun([](const RecorderString& recorder, const std::string& file_name) { recorder.csv(file_name); }), "csv");
          add(chaiscript::fun([](const RecorderString& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
-         add(chaiscript::type_conversion<RecorderString&, std::function<void()>>([](RecorderString& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
+         //add(chaiscript::type_conversion<RecorderString&, std::function<void()>>([](RecorderString& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
 
          add(chaiscript::user_type<asc::Param>(), "Param");
          add(chaiscript::constructor<asc::Param(state_t&)>(), "Param");

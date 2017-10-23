@@ -16,7 +16,9 @@
 
 namespace asc
 {
-   // A Sampler resets the base time step when it goes out of scope. It is designed to be short-lived in a simulation loop.
+   // A Sampler resets the base time step when it goes out of scope. In this manner it can be used as a short-lived object within the simulation loop.
+   // If the Sampler is to exist long term, then the reset() must be called after time is incremented within the simulation loop.
+   // Note that keeping the Sampler around longer maintains a consistent base time step.
    template <typename T>
    struct SamplerT
    {
@@ -46,6 +48,11 @@ namespace asc
             return true;
 
          return false;
+      }
+
+      void reset() noexcept
+      {
+         dt = dt_base;
       }
 
    private:
