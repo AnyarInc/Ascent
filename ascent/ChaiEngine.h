@@ -40,6 +40,7 @@ namespace asc
          add(chaiscript::constructor<Recorder()>(), "Recorder");
          add(chaiscript::fun(&Recorder::record), "record");
          add(chaiscript::fun(&Recorder::reserve), "reserve");
+         add(chaiscript::fun(&Recorder::precision), "precision");
          add(chaiscript::fun([](Recorder& record, const state_t& data) { record.push_back(data); }), "push_back");
          add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name) { recorder.csv(file_name); }), "csv");
          add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
