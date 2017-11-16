@@ -24,7 +24,7 @@ namespace asc
    template <typename T>
    struct ParamVT
    {
-      using It = typename std::vector<T>::iterator;
+      using iterator = typename std::vector<T>::iterator;
 
       ParamVT(ParamVT&&) = default;
       ParamVT(const ParamVT&) = default;
@@ -80,23 +80,23 @@ namespace asc
          return ParamVT(i0, n, xd.data() + i0);
       }
 
-      const T* begin() const { return data_ptr; }
-      const T* end() const { return data_ptr + n; }
+      const T* begin() const noexcept { return data_ptr; }
+      const T* end() const noexcept { return data_ptr + n; }
 
-      T& operator[](const size_t i) const { return *(data_ptr + i); }
+      T& operator[](const size_t i) const noexcept { return *(data_ptr + i); }
 
-      size_t size() const { return n; }
+      size_t size() const noexcept { return n; }
 
-      T* data() const { return data_ptr; }
+      T* data() const noexcept { return data_ptr; }
 
-      void zero()
+      void zero() noexcept
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = T();
       }
 
    private:
-      size_t i0{}; // staring index
+      size_t i0{}; // starting index
       const size_t n;
       T* data_ptr;
    };
