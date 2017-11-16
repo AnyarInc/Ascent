@@ -16,9 +16,6 @@
 
 #include "Param.h"
 #include <initializer_list>
-#include <array>
-#include <deque>
-#include <vector>
 
 // The ParamV behaves like a std::vector of Params
 

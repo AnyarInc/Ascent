@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace asc
 {
    // User type definitions for ease of use
