@@ -34,23 +34,26 @@ namespace asc
       template <typename C>
       ParamT(C& c, const T x0 = T()) : index(c.size()), x(core::emplace_back_ref(c, x0)) {}
 
-      ParamT(const ParamT& state) : index(state.index), x(state.x) {}
+      ParamT(const ParamT&) = default;
+      ParamT(ParamT&&) = default;
+      ParamT& operator=(const ParamT&) = default;
+      ParamT& operator=(ParamT&&) = default;
 
       template <typename C>
-      T& operator()(C& xd) const { return xd[index]; }
+      T& operator()(C& xd) const noexcept { return xd[index]; }
 
       // Returns true if this State is within a given state array
       template <typename C>
-      bool within(const C& vec) const
+      bool within(const C& vec) const noexcept
       {
          if (&x == &vec[index])
             return true;
          return false;
       }
 
-      operator T&() const { return x; }
+      operator T&() const noexcept { return x; }
 
-      T& operator=(const T y) { x = y; return x; }
+      T& operator=(const T y) noexcept { x = y; return x; }
 
    private:
       const size_t index;
