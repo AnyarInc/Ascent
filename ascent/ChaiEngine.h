@@ -36,26 +36,11 @@ namespace asc
          add(chaiscript::vector_conversion<std::vector<std::string>>());
          add(chaiscript::bootstrap::standard_library::vector_type<state_t>("state_t"));
 
-         add(chaiscript::user_type<Recorder>(), "Recorder");
-         add(chaiscript::constructor<Recorder()>(), "Recorder");
-         add(chaiscript::fun(&Recorder::record), "record");
-         add(chaiscript::fun(&Recorder::reserve), "reserve");
-         add(chaiscript::fun(&Recorder::precision), "precision");
-         add(chaiscript::fun([](Recorder& record, const state_t& data) { record.push_back(data); }), "push_back");
-         add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name) { recorder.csv(file_name); }), "csv");
-         add(chaiscript::fun([](const Recorder& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
-         //add(chaiscript::type_conversion<Recorder&, std::function<void()>>([](Recorder& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
+         Recorder::script(*this, "Recorder");
 
          // This allows for more generic mixing of various data types, all they need is to be converted to a string prior to being passed into the recorder
          // The RecorderString is primarily for data that is going to be output to a file and not operated on during the simulation
-         add(chaiscript::user_type<RecorderString>(), "RecorderString");
-         add(chaiscript::constructor<RecorderString()>(), "RecorderString");
-         add(chaiscript::fun(&RecorderString::record), "record");
-         add(chaiscript::fun(&RecorderString::reserve), "reserve");
-         add(chaiscript::fun([](RecorderString& record, const std::vector<std::string>& data) { record.push_back(data); }), "push_back");
-         add(chaiscript::fun([](const RecorderString& recorder, const std::string& file_name) { recorder.csv(file_name); }), "csv");
-         add(chaiscript::fun([](const RecorderString& recorder, const std::string& file_name, const std::vector<std::string>& names) { recorder.csv(file_name, names); }), "csv");
-         //add(chaiscript::type_conversion<RecorderString&, std::function<void()>>([](RecorderString& recorder) -> std::function<void()> { return [&] { return recorder.record(); }; }));
+         RecorderT<std::string>::script(*this, "RecorderString");
 
          add(chaiscript::user_type<asc::Param>(), "Param");
          add(chaiscript::constructor<asc::Param(state_t&)>(), "Param");
