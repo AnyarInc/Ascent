@@ -66,7 +66,7 @@ namespace asc
                for (size_t j = 0; j < num_states; ++j)
                {
                   if (precision > 0)
-                     file << to_string_precision(history[i][j], precision);
+                     file << std::setprecision(precision) << history[i][j];
                   else
                      file << history[i][j]; // faster, but can truncate values
                   if (j < num_states - 1)
