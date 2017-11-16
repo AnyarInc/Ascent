@@ -22,11 +22,14 @@ namespace asc
    template <typename T>
    struct SamplerT
    {
-      SamplerT(const T& t, T& dt) : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(const T& t, T& dt) noexcept : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(const SamplerT&) = default;
+      SamplerT(SamplerT&&) = default;
+      SamplerT& operator=(const SamplerT&) = default;
+      SamplerT& operator=(SamplerT&&) = default;
+      ~SamplerT() noexcept { dt = dt_base; }
 
-      ~SamplerT() { dt = dt_base; }
-
-      bool operator()(const T sample_rate)
+      bool operator()(const T sample_rate) noexcept
       {
          const size_t n = static_cast<size_t>((t + eps) / sample_rate); // the number of sample time steps that have occured
          const T sample_time = (n + 1) * sample_rate; // the next sample time
@@ -39,7 +42,7 @@ namespace asc
          return false;
       }
 
-      bool event(const T event_time)
+      bool event(const T event_time) noexcept
       {
          if (event_time < t + dt - eps && event_time >= t + eps)
             dt = event_time - t;
