@@ -81,19 +81,5 @@ namespace asc
 
       std::vector<std::vector<T>> history;
       int precision{};
-
-      template <typename ChaiScript>
-      static void script(ChaiScript& c, const std::string& name)
-      {
-         using namespace chaiscript;
-         using R = RecorderT<T>;
-         c.add(user_type<R>(), name);
-         c.add(constructor<R()>(), name);
-         c.add(fun(&R::reserve), "reserve");
-         c.add(fun(&R::precision), "precision");
-         c.add(fun([](R& rec, const std::vector<T>& data) { rec.push_back(data); }), "push_back");
-         c.add(fun([](const R& rec, const std::string& file_name) { rec.csv(file_name); }), "csv");
-         c.add(fun([](const R& rec, const std::string& file_name, const std::vector<std::string>& names) { rec.csv(file_name, names); }), "csv");
-      }
    };
 }

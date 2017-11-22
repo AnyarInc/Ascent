@@ -30,17 +30,32 @@ namespace asc
          add(chaiscript::type_conversion<std::shared_ptr<T>&, system_t>([](std::shared_ptr<T>& system) -> system_t { return [&](const state_t& x, state_t& xd, const value_t t) { return (*system)(x, xd, t); }; }));
 	   }
 
+      // This code must exist here and not within the Recorder class for compatibilty with compilers that inspect templates (i.e. Xcode's LLVM)
+      template <typename T, typename ChaiScript>
+      void scriptRecorder(ChaiScript& c, const std::string& name)
+      {
+         using namespace chaiscript;
+         using R = RecorderT<T>;
+         c.add(user_type<R>(), name);
+         c.add(constructor<R()>(), name);
+         c.add(fun(&R::reserve), "reserve");
+         c.add(fun(&R::precision), "precision");
+         c.add(fun([](R& rec, const std::vector<T>& data) { rec.push_back(data); }), "push_back");
+         c.add(fun([](const R& rec, const std::string& file_name) { rec.csv(file_name); }), "csv");
+         c.add(fun([](const R& rec, const std::string& file_name, const std::vector<std::string>& names) { rec.csv(file_name, names); }), "csv");
+      }
+
       ChaiEngine()
       {
          add(chaiscript::vector_conversion<state_t>());
          add(chaiscript::vector_conversion<std::vector<std::string>>());
          add(chaiscript::bootstrap::standard_library::vector_type<state_t>("state_t"));
 
-         Recorder::script(*this, "Recorder");
+         scriptRecorder<asc::value_t>(*this, "Recorder");
 
          // This allows for more generic mixing of various data types, all they need is to be converted to a string prior to being passed into the recorder
          // The RecorderString is primarily for data that is going to be output to a file and not operated on during the simulation
-         RecorderT<std::string>::script(*this, "RecorderString");
+         scriptRecorder<std::string>(*this, "RecorderString");
 
          add(chaiscript::user_type<asc::Param>(), "Param");
          add(chaiscript::constructor<asc::Param(state_t&)>(), "Param");
