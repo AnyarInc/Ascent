@@ -22,10 +22,10 @@ namespace asc
    template <typename T>
    struct SamplerT
    {
-      SamplerT(const T& t, T& dt) noexcept : t(t), dt(dt), dt_base(dt) {}
-      SamplerT(const SamplerT&) = default;
+      SamplerT(T& t, T& dt) noexcept : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(const SamplerT& other) = default;
       SamplerT(SamplerT&&) = default;
-      SamplerT& operator=(const SamplerT&) = default;
+      SamplerT& operator=(const SamplerT& other) = default;
       SamplerT& operator=(SamplerT&&) = default;
       ~SamplerT() noexcept { dt = dt_base; }
 
@@ -60,8 +60,8 @@ namespace asc
 
    private:
       static constexpr T eps = static_cast<T>(1.0e-10);
-      const T& t;
+      T& t;
       T& dt;
-      const T dt_base;
+      T dt_base;
    };
 }

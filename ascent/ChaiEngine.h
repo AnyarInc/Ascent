@@ -70,7 +70,7 @@ namespace asc
          add(chaiscript::fun([](ParamV& v) { v.zero(); }), "zero");
 
          add(chaiscript::user_type<Sampler>(), "Sampler");
-         add(chaiscript::constructor<Sampler(const asc::value_t&, asc::value_t&)>(), "Sampler");
+         add(chaiscript::constructor<Sampler(asc::value_t&, asc::value_t&)>(), "Sampler");
          add(chaiscript::fun(&Sampler::operator()), "eval");
          add(chaiscript::fun(&Sampler::event), "event");
          add(chaiscript::fun(&Sampler::reset), "reset");
