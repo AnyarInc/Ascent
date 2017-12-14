@@ -45,9 +45,10 @@ namespace asc
       }
 
       template <typename C>
-      ParamVT(C& c, const size_t n) : n(n), data_ptr(c.data() + c.size())
+      ParamVT(C& c, const size_t n) : n(n)
       {
          ParamT<T>(c, T());
+         data_ptr = c.data() + c.size() - 1;
          i0 = --c.end() - c.begin();
 
          for (size_t i = 1; i < n; ++i)
@@ -55,7 +56,7 @@ namespace asc
       }
 
       template <typename C>
-      ParamVT(C& c, std::initializer_list<T>&& list) : n(list.size()), data_ptr(c.data() + c.size())
+      ParamVT(C& c, std::initializer_list<T>&& list) : n(list.size())
       {
          bool first_element{ true };
          for (T x : list)
@@ -65,7 +66,7 @@ namespace asc
             if (first_element)
             {
                first_element = false;
-
+               data_ptr = c.data() + c.size() - 1;
                i0 = --c.end() - c.begin();
             }
          }
@@ -95,7 +96,7 @@ namespace asc
             this->operator[](i) = T();
       }
 
-   private:
+   protected:
       size_t i0{}; // starting index
       const size_t n;
       T* data_ptr;

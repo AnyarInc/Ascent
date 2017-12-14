@@ -23,9 +23,15 @@ namespace asc
    struct SamplerT
    {
       SamplerT(T& t, T& dt) noexcept : t(t), dt(dt), dt_base(dt) {}
-      SamplerT(const SamplerT& other) = default;
+      SamplerT(const SamplerT& other) : t(other.t), dt(other.dt), dt_base(other.dt_base) {}
       SamplerT(SamplerT&&) = default;
-      SamplerT& operator=(const SamplerT& other) = default;
+      SamplerT& operator=(const SamplerT& other)
+      {
+         t = other.t;
+         dt = other.dt;
+         dt_base = other.dt_base;
+         return *this;
+      }
       SamplerT& operator=(SamplerT&&) = default;
       ~SamplerT() noexcept { dt = dt_base; }
 
