@@ -64,6 +64,16 @@ namespace asc
          dt = dt_base;
       }
 
+      double base_time_step() const noexcept
+      {
+         return dt_base;
+      }
+
+      void base_time_step(const double dt_new) noexcept
+      {
+         dt = dt_base = dt_new;
+      }
+
    private:
       static constexpr T eps = static_cast<T>(1.0e-10);
       T& t;
