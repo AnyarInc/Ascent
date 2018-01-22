@@ -22,6 +22,7 @@
 
 // Integrators
 #include "ascent/integrators/Euler.h"
+#include "ascent/integrators/Midpoint.h"
 #include "ascent/integrators/RK2.h"
 #include "ascent/integrators/RK4.h"
 #include "ascent/integrators/DOPRI45.h"
@@ -52,6 +53,7 @@ namespace asc
 
    // Integrators
    using Euler = EulerT<state_t>;
+   using Midpoint = MidpointT<state_t>;
    using RK2 = RK2T<state_t>;
    using RK4 = RK4T<state_t>;
    using DOPRI45 = DOPRI45T<state_t>;
