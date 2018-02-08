@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Anyar, Inc.
+// Copyright (c) 2016-2018 Anyar, Inc.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,8 +38,19 @@ namespace asc
          using R = RecorderT<T>;
          c.add(user_type<R>(), name);
          c.add(constructor<R()>(), name);
+
+         c.add(fun(&R::titles), "titles");
          c.add(fun(&R::reserve), "reserve");
          c.add(fun(&R::precision), "precision");
+         c.add(fun(&R::update), "update");
+         c.add(fun([](R& rec, const T& x) { rec.add(x); }), "add");
+         c.add(fun([](R& rec, const std::vector<T>& data) { rec.add(data); }), "add");
+         c.add(fun([](R& rec, const std::string& title) { rec.add_title(title); }), "add_title");
+         c.add(fun([](R& rec, const std::vector<std::string>& titles) { rec.add_titles(titles); }), "add_titles");
+         c.add(fun([](R& rec, T& x) { rec.record(x); }), "record");
+         c.add(fun([](R& rec, T& x, const std::string& title) { rec.record(x, title); }), "record");
+         c.add(fun([](R& rec, std::vector<T>& v) { rec.record(v); }), "record");
+         c.add(fun([](R& rec, std::vector<T>& v, const std::vector<std::string>& title) { rec.record(v, title); }), "record");
          c.add(fun([](R& rec, const std::vector<T>& data) { rec.push_back(data); }), "push_back");
          c.add(fun([](const R& rec, const std::string& file_name) { rec.csv(file_name); }), "csv");
          c.add(fun([](const R& rec, const std::string& file_name, const std::vector<std::string>& names) { rec.csv(file_name, names); }), "csv");

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Anyar, Inc.
+// Copyright (c) 2016-2018 Anyar, Inc.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
 
 #pragma once
 
+#include <functional>
 #include <fstream>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Recorder is a fast, type specific class for generically recording data
@@ -36,12 +38,61 @@ namespace asc
    template <typename T>
    struct RecorderT
    {
+      std::vector<std::function<std::vector<T>()>> records;
+      std::vector<std::string> titles;
+      std::vector<std::vector<T>> history;
+      int precision{};
+
       inline void operator()(std::initializer_list<T>&& initializer) { history.emplace_back(std::move(initializer)); }
-      inline void push_back(const std::vector<T>& x) { history.push_back(x); }
+      inline void push_back(const std::vector<T>& v) { history.push_back(v); }
+
+      inline void add(const T& x) { history.back().push_back(x); }
+      inline void add(const std::vector<T>& v)
+      {
+         for (auto& x : v)
+            history.back().push_back(x);
+      }
+
+      void add_title(const std::string& title)
+      {
+         titles.emplace_back(title);
+      }
+
+      void add_titles(const std::vector<std::string>& new_titles)
+      {
+         for (auto& title : new_titles)
+            titles.emplace_back(title);
+      }
+
+      void record(T& x) { record(x, ""); }
+      void record(T& x, const std::string& title)
+      {
+         titles.emplace_back(title);
+         records.emplace_back([&]() -> std::vector<T> { return{ x }; });
+      }
+      
+      void record(std::vector<T>& v)
+      {
+         const size_t n = v.size();
+         record(v, std::vector<std::string>(n));
+      }
+      void record(std::vector<T>& v, const std::vector<std::string>& new_titles)
+      {
+         for (auto& title : new_titles)
+            titles.emplace_back(title);
+         records.emplace_back([&]() -> std::vector<T> { return v; });
+      }
 
       void reserve(const size_t n) { history.reserve(n); }
 
-      void csv(const std::string& file_name) const { csv(file_name, std::vector<std::string>()); }
+      void update()
+      {
+         history.emplace_back(); // need to allocate the slot that we will be adding (appending) to
+         for (auto& rec : records)
+            add(rec());
+      }
+
+      void csv(const std::string& file_name) const { csv(file_name, titles); }
       void csv(const std::string& file_name, const std::vector<std::string>& names) const
       {
          std::ofstream file;
@@ -78,8 +129,5 @@ namespace asc
          else
             throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
       }
-
-      std::vector<std::vector<T>> history;
-      int precision{};
    };
 }
