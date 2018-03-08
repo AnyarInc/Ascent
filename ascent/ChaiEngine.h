@@ -63,6 +63,10 @@ namespace asc
          add(chaiscript::bootstrap::standard_library::vector_type<state_t>("state_t"));
 
          scriptRecorder<asc::value_t>(*this, "Recorder");
+         add(chaiscript::fun([](RecorderT<asc::value_t>& rec, int& x) { rec.record(x); }), "record");
+         add(chaiscript::fun([](RecorderT<asc::value_t>& rec, size_t& x) { rec.record(x); }), "record");
+         add(chaiscript::fun([](RecorderT<asc::value_t>& rec, int& x, const std::string& title) { rec.record(x, title); }), "record");
+         add(chaiscript::fun([](RecorderT<asc::value_t>& rec, size_t& x, const std::string& title) { rec.record(x, title); }), "record");
 
          // This allows for more generic mixing of various data types, all they need is to be converted to a string prior to being passed into the recorder
          // The RecorderString is primarily for data that is going to be output to a file and not operated on during the simulation

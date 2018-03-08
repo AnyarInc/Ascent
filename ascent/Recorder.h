@@ -64,11 +64,14 @@ namespace asc
             titles.emplace_back(title);
       }
 
-      void record(T& x) { record(x, ""); }
-      void record(T& x, const std::string& title)
+      template <typename V>
+      void record(V& x) { record(x, ""); }
+
+      template <typename V>
+      void record(V& x, const std::string& title)
       {
          titles.emplace_back(title);
-         records.emplace_back([&]() -> std::vector<T> { return{ x }; });
+         records.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
       }
       
       void record(std::vector<T>& v)
@@ -83,6 +86,7 @@ namespace asc
          records.emplace_back([&]() -> std::vector<T> { return v; });
       }
 
+      // Reserve memory for history vector
       void reserve(const size_t n) { history.reserve(n); }
 
       void update()
@@ -92,6 +96,7 @@ namespace asc
             add(rec());
       }
 
+      // Write out a csv file
       void csv(const std::string& file_name) const { csv(file_name, titles); }
       void csv(const std::string& file_name, const std::vector<std::string>& names) const
       {
