@@ -26,8 +26,8 @@ namespace asc
    {
       using iterator = typename std::vector<T>::iterator;
 
-      ParamVT(ParamVT&&) = default;
-      ParamVT(const ParamVT&) = default;
+      ParamVT(ParamVT&& other) : i0(std::move(i0)), n(std::move(n)), data_ptr(std::move(data_ptr)) {}
+      ParamVT(const ParamVT& other) : i0(other.i0), n(n), data_ptr(data_ptr) {}
 
       ParamVT& operator=(const ParamVT& v)
       {
@@ -49,7 +49,7 @@ namespace asc
       {
          ParamT<T>(c, T());
          data_ptr = c.data() + c.size() - 1;
-         i0 = --c.end() - c.begin();
+         i0 = (--c.end()) - c.begin();
 
          for (size_t i = 1; i < n; ++i)
             ParamT<T>(c, T());
@@ -67,7 +67,7 @@ namespace asc
             {
                first_element = false;
                data_ptr = c.data() + c.size() - 1;
-               i0 = --c.end() - c.begin();
+               i0 = (--c.end()) - c.begin();
             }
          }
       }
