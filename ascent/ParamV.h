@@ -26,8 +26,8 @@ namespace asc
    {
       using iterator = typename std::vector<T>::iterator;
 
-      ParamVT(ParamVT&& other) : i0(std::move(i0)), n(std::move(n)), data_ptr(std::move(data_ptr)) {}
-      ParamVT(const ParamVT& other) : i0(other.i0), n(n), data_ptr(data_ptr) {}
+      ParamVT(ParamVT&& other) : i0(std::move(other.i0)), n(std::move(other.n)), data_ptr(std::move(other.data_ptr)) {}
+      ParamVT(const ParamVT& other) : i0(other.i0), n(other.n), data_ptr(other.data_ptr) {}
 
       ParamVT& operator=(const ParamVT& v)
       {
