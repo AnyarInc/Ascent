@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <cmath>
+
 namespace asc
 {
    // A Sampler resets the base time step when it goes out of scope. In this manner it can be used as a short-lived object within the simulation loop.
@@ -53,7 +55,7 @@ namespace asc
          if (event_time < t + dt - eps && event_time >= t + eps)
             dt = event_time - t;
 
-         if (fabs(event_time - t) < eps)
+         if (std::abs(event_time - t) < eps)
             return true;
 
          return false;
