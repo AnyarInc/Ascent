@@ -27,7 +27,7 @@ namespace asc
 	   void addSystem()
 	   {
 		   add(chaiscript::type_conversion<T&, system_t>([](T& system) -> system_t { return [&](const state_t& x, state_t& xd, const value_t t) { return system(x, xd, t); }; }));
-         add(chaiscript::type_conversion<std::shared_ptr<T>&, system_t>([](std::shared_ptr<T>& system) -> system_t { return [&](const state_t& x, state_t& xd, const value_t t) { return (*system)(x, xd, t); }; }));
+         add(chaiscript::type_conversion<std::shared_ptr<T>, system_t>([](std::shared_ptr<T> system) -> system_t { return [=](const state_t& x, state_t& xd, const value_t t) { return (*system)(x, xd, t); }; }));
 	   }
 
       // This code must exist here and not within the Recorder class for compatibilty with compilers that inspect templates (i.e. Xcode's LLVM)
