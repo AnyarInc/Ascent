@@ -54,6 +54,7 @@ namespace asc
 
          c.add(fun(&T::n_threads), "n_threads");
          c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
+         c.add(fun([](T& pool, std::function<void()> func) { pool.emplace_back(func); }), "push_back");
          c.add(fun(&T::size), "size");
       }
    };
