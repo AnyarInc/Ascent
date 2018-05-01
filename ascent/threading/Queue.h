@@ -61,6 +61,8 @@ namespace asc
          return jobs.size();
       }
 
+      std::function<void()> work_done = [] {}; // Do not assign to work_done while jobs are running
+
       template <typename ChaiScript>
       static void script(ChaiScript& c, const std::string& name)
       {
@@ -68,6 +70,7 @@ namespace asc
          using T = Queue;
          c.add(constructor<T()>(), name);
 
+         c.add(fun(&T::work_done), "work_done");
          c.add(fun(&T::computing), "computing");
          c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
          c.add(fun(&T::size), "size");
@@ -92,6 +95,7 @@ namespace asc
                   jobs.pop_front();
                }
                running_jobs = false;
+               work_done();
 
                std::unique_lock<std::mutex> lock(m);
                cv.wait(lock);

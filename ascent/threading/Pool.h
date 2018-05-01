@@ -24,10 +24,26 @@ namespace asc
    {
       std::vector<std::unique_ptr<Queue>> pool;
 
+      bool computing() const
+      {
+         for (auto& q : pool)
+         {
+            if (q->computing())
+               return true;
+         }
+         return false;
+      }
+
       void n_threads(const size_t n)
       {
          for (size_t i = pool.size(); i < n; ++i)
             pool.emplace_back(std::make_unique<Queue>());
+      }
+
+      void assign_callback(const std::function<void()>& f)
+      {
+         for (auto& q : pool)
+            q->work_done = f;
       }
 
       template <typename ...Args>
@@ -52,7 +68,9 @@ namespace asc
          using T = Pool;
          c.add(constructor<T()>(), name);
 
+         c.add(fun(&T::computing), "computing");
          c.add(fun(&T::n_threads), "n_threads");
+         c.add(fun(&T::assign_callback), "assign_callback");
          c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
          c.add(fun([](T& pool, std::function<void()> func) { pool.emplace_back(func); }), "push_back");
          c.add(fun(&T::size), "size");
