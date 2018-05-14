@@ -54,8 +54,7 @@ int main()
    double dt = 1.0;
    double t_end = 100.0;
 
-   //RK4 integrator;
-   PC233 integrator;
+   RK4 integrator;
    Fountain system;
 
    Recorder recorder;

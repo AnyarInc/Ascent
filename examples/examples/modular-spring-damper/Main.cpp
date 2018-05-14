@@ -37,8 +37,7 @@ int main()
    Damper damper(b0, b1);
    damper.c = 5.0;
 
-   //RK4 integrator;
-   PC233 integrator;
+   RK4 integrator;
    Recorder recorder;
 
    auto system = [&](const asc::state_t& x, asc::state_t& D, const double t)
