@@ -46,7 +46,7 @@ namespace asc
          }
 
          x0 = x;
-         system(x, xd, t);
+         system(x0, xd, t);
          xd0 = xd;
          size_t i;
          for (i = 0; i < n; ++i)

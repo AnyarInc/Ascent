@@ -45,7 +45,7 @@ namespace asc
 
          if (!fsal_computed) // if an adaptive stepper hasn't computed the first same as last state, we must compute the step here
          {
-            system(x, xd0, t);
+            system(x0, xd0, t);
             fsal_computed = false;
          }
 
