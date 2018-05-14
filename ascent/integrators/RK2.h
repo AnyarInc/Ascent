@@ -36,7 +36,7 @@ namespace asc
             xd.resize(n);
 
          x0 = x;
-         system(x, xd, t);
+         system(x0, xd, t);
          size_t i{};
          for (; i < n; ++i)
             x[i] = dt_2 * xd[i] + x0[i];
@@ -48,7 +48,9 @@ namespace asc
          t = t0 + dt;
       }
 
+      state_t xd;
+
    private:
-      state_t x0, xd;
+      state_t x0;
    };
 }

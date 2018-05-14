@@ -40,7 +40,7 @@ namespace asc
          }
 
          x0 = x;
-         system(x, xd, t);
+         system(x0, xd, t);
          size_t i{};
          for (; i < n; ++i)
             x[i] = dt_2 * xd[i] + x0[i];
