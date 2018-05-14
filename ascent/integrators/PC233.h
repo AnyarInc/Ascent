@@ -51,7 +51,7 @@ namespace asc
          }
 
          x0 = x;
-         system(x, xd0, t);
+         system(x0, xd0, t);
          size_t i{};
          for (; i < n; ++i)
             x[i] = x0[i] + c0 * dt * (7.0*xd0[i] - xd_1[i]); // X(n + 1/3), third step computation
