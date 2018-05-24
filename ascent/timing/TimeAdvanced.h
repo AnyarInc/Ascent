@@ -17,7 +17,7 @@
 namespace asc
 {
    // TimeAdvanced must be called at the end of the update sequence, otherwise there will be no difference between the current time and the previous time
-   template <typename state_t, typename value_t>
+   template <typename value_t>
    struct TimeAdvancedT
    {
       value_t t_previous{};
@@ -36,6 +36,7 @@ namespace asc
             t_previous = t;
       }
 
+      template <class state_t>
       void operator()(state_t&, state_t&, const value_t t) noexcept
       {
          if (operator()(t))
