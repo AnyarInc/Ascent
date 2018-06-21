@@ -22,9 +22,6 @@
 #include <string>
 #include <vector>
 
-// Recorder is a fast, type specific class for generically recording data
-// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
-
 namespace asc
 {
    template <typename T>
@@ -35,10 +32,14 @@ namespace asc
       return out.str();
    }
    
+   /// Recorder is a fast, type specific class for generically recording data.
+   ///
+   /// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
+   /// \paramt T The type to be recorded.
    template <typename T>
    struct RecorderT
    {
-      std::vector<std::function<std::vector<T>()>> records;
+      std::vector<std::function<std::vector<T>()>> recording_functions;
       std::vector<std::string> titles;
       std::vector<std::vector<T>> history;
       int precision{};
@@ -71,7 +72,7 @@ namespace asc
       void record(V& x, const std::string& title)
       {
          titles.emplace_back(title);
-         records.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
+         recording_functions.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
       }
       
       void record(std::vector<T>& v)
@@ -83,7 +84,7 @@ namespace asc
       {
          for (auto& title : new_titles)
             titles.emplace_back(title);
-         records.emplace_back([&]() -> std::vector<T> { return v; });
+         recording_functions.emplace_back([&]() -> std::vector<T> { return v; });
       }
 
       // Reserve memory for history vector
@@ -92,11 +93,11 @@ namespace asc
       void update()
       {
          history.emplace_back(); // need to allocate the slot that we will be adding (appending) to
-         for (auto& rec : records)
+         for (auto& rec : recording_functions)
             add(rec());
       }
 
-      // Write out a csv file
+      /// Write out a csv file
       void csv(const std::string& file_name) const { csv(file_name, titles); }
       void csv(const std::string& file_name, const std::vector<std::string>& names) const
       {

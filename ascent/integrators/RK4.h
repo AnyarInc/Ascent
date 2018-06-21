@@ -16,15 +16,27 @@
 
 #include "ascent/Utility.h"
 
-// Fourth order, four pass Runge Kutta.
-
 namespace asc
 {
+   /// Fourth order, four pass Runge Kutta integrator.
+   ///
+   /// Designed for optimum speed and minimal memory load. We use one additional multiplication to reduce memory cost by 25%.
+   /// \tparam state_t The state type of the system to be integrated. I.e. a std::vector or std::deque.
    template <typename state_t>
    struct RK4T
    {
       using value_t = typename state_t::value_type;
 
+      /// \brief Integration step operation
+      /// 
+      /// Steps the system a single time step (dt), internally advances time (t)
+      ///
+      /// \tparam System The system object or function type. The system to be stepped must have a function syntax that takes \c (state_t, state_t, value_t) \c (x, xd, t).
+      /// The system can be a function, functor, or lambda expression. Taken as an rvalue reference.
+      /// \param[in, out] system The \c System instance.
+      /// \param[in, out] x The system's state vector.
+      /// \param[in, out] t The current time, which will be advanced by c\ dt.
+      /// \param[in] dt The time step for the input system to be advanced.
       template <typename System>
       void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
