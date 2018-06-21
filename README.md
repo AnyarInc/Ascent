@@ -12,7 +12,7 @@ Study the [modular-spring-damper](https://github.com/AnyarInc/Ascent/wiki/modula
 
 Ascent's integration algorithms are designed for speed, and outperform boost's [odeint](http://headmyshoulder.github.io/odeint-v2/index.html) in both Debug and Release
 
-<img src="https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG" width="400">
+<img src="https://github.com/AnyarInc/Ascent/wiki/graphics/speedup-ratio.PNG" width="400"><img src="https://github.com/AnyarInc/Ascent/wiki/graphics/Lorenz.PNG" width="300">
 
 Integration algorithms are automatically vectorized when using std::vector
 
