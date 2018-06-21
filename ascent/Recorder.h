@@ -39,47 +39,75 @@ namespace asc
    template <typename T>
    struct RecorderT
    {
-      std::vector<std::function<std::vector<T>()>> recording_functions;
-      std::vector<std::string> titles;
-      std::vector<std::vector<T>> history;
-      int precision{};
+      std::vector<std::function<std::vector<T>()>> recording_functions; //!< std::vector of type erasing converters (std::functions) to enable user defined classes to be recorded.
+      std::vector<std::string> titles; //!< Titles that will appear at the top row of a CSV export.
+      std::vector<std::vector<T>> history; //!< All recorded data is stored in history.
+      int precision{}; //!< An integer to specify the recording precision for CSV output. If precision is not set (left at 0) then values will be exported with the c++ filestream default precision. This precision only affects export to CSV.
 
-      inline void operator()(std::initializer_list<T>&& initializer) { history.emplace_back(std::move(initializer)); }
+      /// \brief Add row of history data
+      ///
+      /// \param[in] initializer_list An input initializer list. Highly efficient as it performs a move operation on the data list.
+      inline void operator()(std::initializer_list<T>&& initializer_list) { history.emplace_back(std::move(initializer_list)); }
+
+      /// \brief Add row of history data
+      ///
+      /// \param[in] v A std::vector of data to be saved.
       inline void push_back(const std::vector<T>& v) { history.push_back(v); }
 
+      /// \brief Add an item to the current row of data
+      ///
+      /// \param[in] x Item to be added to last row of history.
       inline void add(const T& x) { history.back().push_back(x); }
+
+      /// \brief Add a std::vector of items to the current row of data
+      ///
+      /// \param[in] v A std::vector of items to be added to last row of history.
       inline void add(const std::vector<T>& v)
       {
          for (auto& x : v)
             history.back().push_back(x);
       }
 
+      /// \brief Add a title for the next column of data for output to CSV.
+      ///
+      /// \param[in] title The title name for a column of data, used in the first row of the CSV generation.
       void add_title(const std::string& title)
       {
          titles.emplace_back(title);
       }
 
+      /// \brief Add a std::vector of titles for the next columns of data for output to CSV.
+      ///
+      /// \param[in] new_titles A std::vector of title names, used in the first row of the CSV generation.
       void add_titles(const std::vector<std::string>& new_titles)
       {
          for (auto& title : new_titles)
             titles.emplace_back(title);
       }
 
+      /// \brief Wrap a user defined type that has an implicit or explicit conversion to this Recorder's type T.
+      ///
+      /// \param[in] x The user defined input type, internally a reference to this instance is saved, so the Recorder should not outlive the object.
       template <typename V>
       void record(V& x) { record(x, ""); }
 
+      /// \brief Wrap a user defined type that has an implicit or explicit conversion to this Recorder's type T.
+      ///
+      /// \param[in] x The user defined input type, internally a reference to this instance is saved, so the Recorder should not outlive the object.
+      /// \param[in] title The title associated with this input variable.
       template <typename V>
       void record(V& x, const std::string& title)
       {
          titles.emplace_back(title);
          recording_functions.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
       }
-      
+
       void record(std::vector<T>& v)
       {
          const size_t n = v.size();
          record(v, std::vector<std::string>(n));
       }
+
       void record(std::vector<T>& v, const std::vector<std::string>& new_titles)
       {
          for (auto& title : new_titles)
