@@ -102,12 +102,19 @@ namespace asc
          recording_functions.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
       }
 
+      /// \brief Specify a std::vector<T> of this recorder's type T, to be saved every time update is called.
+      ///
+      /// \param[in] v Reference vector to be recorded upon update.
       void record(std::vector<T>& v)
       {
          const size_t n = v.size();
          record(v, std::vector<std::string>(n));
       }
 
+      /// \brief Specify a std::vector<T> of this recorder's type T, to be saved every time update is called.
+      ///
+      /// \param[in] v Reference vector to be recorded upon update.
+      /// \param[in] new_titles Specify the title for each component of the vector that will be recorded.
       void record(std::vector<T>& v, const std::vector<std::string>& new_titles)
       {
          for (auto& title : new_titles)
@@ -115,9 +122,12 @@ namespace asc
          recording_functions.emplace_back([&]() -> std::vector<T> { return v; });
       }
 
-      // Reserve memory for history vector
+      /// \brief Reserve space for n steps of history.
+      ///
+      /// \param[in] n The number of update steps to reserve space for.
       void reserve(const size_t n) { history.reserve(n); }
 
+      /// \brief All variables specified via the record functions will be saved when update is called.
       void update()
       {
          history.emplace_back(); // need to allocate the slot that we will be adding (appending) to
@@ -125,8 +135,11 @@ namespace asc
             add(rec());
       }
 
-      /// Write out a csv file
+      /// \brief Write out a Comma Separated Value (CSV) file from the recorded data.
+      ///
+      /// \param[in] file_name The path and name of the file to be generated, excepting the .csv which is added by the function.
       void csv(const std::string& file_name) const { csv(file_name, titles); }
+
       void csv(const std::string& file_name, const std::vector<std::string>& names) const
       {
          std::ofstream file;
