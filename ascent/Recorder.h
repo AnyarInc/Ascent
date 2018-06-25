@@ -140,6 +140,10 @@ namespace asc
       /// \param[in] file_name The path and name of the file to be generated, excepting the .csv which is added by the function.
       void csv(const std::string& file_name) const { csv(file_name, titles); }
 
+      /// \brief Write out a Comma Separated Value (CSV) file from the recorded data.
+      ///
+      /// \param[in] file_name The path and name of the file to be generated, excepting the .csv which is added by the function.
+      /// \param[in] names The variable names associated with each column of data.
       void csv(const std::string& file_name, const std::vector<std::string>& names) const
       {
          std::ofstream file;
