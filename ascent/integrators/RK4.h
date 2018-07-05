@@ -78,7 +78,9 @@ namespace asc
             x[i] = dt_6 * (xd[i] + xd_temp[i]) + x0[i];
       }
 
+      state_t xd;
+
    private:
-      state_t x0, xd, xd_temp;
+      state_t x0, xd_temp;
    };
 }

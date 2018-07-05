@@ -24,7 +24,7 @@
 
 namespace asc
 {
-   template <typename state_t, typename init_integrator = RK2T<state_t>>
+   template <typename state_t, typename init_integrator = RK4T<state_t>>
    struct PC233T
    {
       using value_t = typename state_t::value_type;

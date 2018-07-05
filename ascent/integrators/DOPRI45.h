@@ -26,7 +26,7 @@ namespace asc
       using value_t = typename state_t::value_type;
 
       template <typename System>
-      void operator()(System&& system, state_t& x, value_t& t, value_t& dt)
+      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
       {
          const auto t0 = t;
          const auto dt_5 = 0.2_v * dt;
