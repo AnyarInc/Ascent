@@ -77,7 +77,7 @@ namespace asc
       }
 
    private:
-      static constexpr T eps = static_cast<T>(1.0e-10);
+      static constexpr T eps = static_cast<T>(1.0e-8);
       T& t;
       T& dt;
       T dt_base;

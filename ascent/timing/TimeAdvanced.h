@@ -21,13 +21,18 @@ namespace asc
    struct TimeAdvancedT
    {
       value_t t_previous{};
-      value_t eps = static_cast<value_t>(1.0e-10);
+      value_t eps = static_cast<value_t>(1.0e-8);
 
       bool operator()(const value_t t) const noexcept
       {
          if (t > t_previous + eps)
             return true;
          return false;
+      }
+
+      double delta_t(const value_t t) const noexcept
+      {
+         return t - t_previous;
       }
 
       void update(const value_t t) noexcept
