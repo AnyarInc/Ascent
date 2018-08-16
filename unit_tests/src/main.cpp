@@ -25,6 +25,7 @@ bool test(const std::string& title, const double x, const double target, const d
       std::cout << title << " failed: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
       return false;
    }
+   return true;
 }
 
 struct Airy
