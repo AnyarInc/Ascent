@@ -40,7 +40,6 @@ namespace asc
          c.add(constructor<R()>(), name);
 
          c.add(fun(&R::titles), "titles");
-         c.add(fun(&R::reserve), "reserve");
          c.add(fun(&R::precision), "precision");
          c.add(fun(&R::update), "update");
          c.add(fun([](R& rec, const T& x) { rec.add(x); }), "add");

@@ -22,9 +22,11 @@
 #include <string>
 #include <vector>
 
+#include "ascent/containers/stack.h"
+
 namespace asc
 {
-   template <typename T>
+   template <class T>
    std::string to_string_precision(const T input, const int n = 6)
    {
       std::ostringstream out;
@@ -36,12 +38,18 @@ namespace asc
    ///
    /// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
    /// \paramt T The type to be recorded.
-   template <typename T>
+   template <class T, size_t block_size = 4096>
    struct RecorderT
    {
+      RecorderT() noexcept = default;
+      RecorderT(const RecorderT&) = default;
+      RecorderT(RecorderT&&) = default;
+      RecorderT& operator=(const RecorderT&) = default;
+      RecorderT& operator=(RecorderT&&) = default;
+
       std::vector<std::function<std::vector<T>()>> recording_functions; //!< std::vector of type erasing converters (std::functions) to enable user defined classes to be recorded.
       std::vector<std::string> titles; //!< Titles that will appear at the top row of a CSV export.
-      std::vector<std::vector<T>> history; //!< All recorded data is stored in history.
+      asc::stack<std::vector<T>, block_size> history; //!< All recorded data is stored in history.
       int precision{}; //!< An integer to specify the recording precision for CSV output. If precision is not set (left at 0) then values will be exported with the c++ filestream default precision. This precision only affects export to CSV.
 
       /// \brief Add row of history data
@@ -52,7 +60,7 @@ namespace asc
       /// \brief Add row of history data
       ///
       /// \param[in] v A std::vector of data to be saved.
-      inline void push_back(const std::vector<T>& v) { history.push_back(v); }
+      inline void push_back(const std::vector<T>& v) { history.emplace_back(v); }
 
       /// \brief Add an item to the current row of data
       ///
@@ -121,11 +129,6 @@ namespace asc
             titles.emplace_back(title);
          recording_functions.emplace_back([&]() -> std::vector<T> { return v; });
       }
-
-      /// \brief Reserve space for n steps of history.
-      ///
-      /// \param[in] n The number of update steps to reserve space for.
-      void reserve(const size_t n) { history.reserve(n); }
 
       /// \brief All variables specified via the record functions will be saved when update is called.
       void update()
