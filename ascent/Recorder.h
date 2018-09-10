@@ -41,7 +41,7 @@ namespace asc
    template <class T, size_t block_size = 4096>
    struct RecorderT
    {
-      RecorderT() noexcept = default;
+      RecorderT() = default;
       RecorderT(const RecorderT&) = default;
       RecorderT(RecorderT&&) = default;
       RecorderT& operator=(const RecorderT&) = default;
