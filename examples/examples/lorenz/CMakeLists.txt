@@ -1,3 +1,2 @@
-project(lorenz)
-file(GLOB srcs *.cpp *.h)
-add_executable(${PROJECT_NAME} ${srcs})
+add_executable(lorenz lorenz.cpp)
+target_link_libraries(lorenz ascent)

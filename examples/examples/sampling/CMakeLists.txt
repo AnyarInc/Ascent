@@ -1,3 +1,2 @@
-project(sampling)
-file(GLOB srcs *.cpp *.h)
-add_executable(${PROJECT_NAME} ${srcs})
+add_executable(sampling sampling.cpp)
+target_link_libraries(sampling ascent)

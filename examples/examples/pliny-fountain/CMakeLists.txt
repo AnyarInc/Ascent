@@ -1,3 +1,2 @@
-project(pliny-fountain)
-file(GLOB srcs *.cpp *.h)
-add_executable(${PROJECT_NAME} ${srcs})
+add_executable(pliny-fountain fountain.cpp)
+target_link_libraries(pliny-fountain ascent)
