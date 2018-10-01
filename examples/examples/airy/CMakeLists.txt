@@ -1,3 +1,2 @@
-project(airy)
-file(GLOB srcs *.cpp *.h)
-add_executable(${PROJECT_NAME} ${srcs})
+add_executable(airy airy.cpp)
+target_link_libraries(airy ascent)
