@@ -16,6 +16,7 @@
 
 #include "Param.h"
 #include <initializer_list>
+#include <vector>
 
 // The ParamV behaves like a std::vector of Params
 
