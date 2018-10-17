@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace asc
 {
    // x is the independant variable, y is dependent. Returns derivative for unequally spaced points. xest is the x value at which to evaluate the derivative.
@@ -51,29 +53,57 @@ namespace asc
       return derivative(x, y, x.back());
    }
 
-   // E is intended to be an Eigen::Vector, such as Eigen::Vector3d, supports n dimensional Eigen vectors
-   template <typename E, typename T0, typename T1>
-   inline E derivative_vector(const T0 &t, const T1 &v)
+   // supports n dimensional containers of vectors
+   template <typename T0, typename T1>
+   inline std::vector<double> derivative_vector(const T0& t, const T1& v)
    {
       const size_t n = t.size();
+      const size_t dimensions = v.front().size();
       if (n < 2)
-         return E::Zero();
+         return std::vector<double>(dimensions);
       else if (n == 2)
          return (v[1] - v[0]) / (t[1] - t[0]);
 
-      std::vector<std::vector<double>> dimensional_history; // each vector is for a dimension, such as x, y, z, . . . (can have more dimensions than 3), saving three time steps of history
-      const size_t dimensions = v[0].rows();
-      dimensional_history.resize(dimensions);
+      std::vector<std::vector<double>> dimensional_history(dimensions); // each vector is for a dimension, such as x, y, z, . . . (can have more dimensions than 3), saving three time steps of history
       for (size_t i = 0; i < dimensions; ++i)
       {
          for (size_t j = 3; j > 0; --j) // iterate over last three states, from oldest to newest
-            dimensional_history[i].push_back(v[n - j][i]); // this will push back the ith states (i.e. if i = 0, x dimension) from the last three Eigen::Vector states
+            dimensional_history[i].push_back(v[n - j][i]); // this will push back the ith states (i.e. if i = 0, x dimension) from the last three vx states
       }
 
-      E deriv;
+      std::vector<double> deriv(dimensions);
       for (size_t i = 0; i < dimensions; ++i)
-         deriv[i] = derivative(t, dimensional_history[i]); // t can contain more than 3 steps
+         deriv[i] = asc::derivative(t, dimensional_history[i]); // t can contain more than 3 steps
 
       return deriv;
+   }
+
+   namespace eigen
+   {
+      // E is intended to be an Eigen::Vector, such as Eigen::Vector3d, supports n dimensional Eigen vectors
+      template <typename E, typename T0, typename T1>
+      inline E derivative_vector(const T0 &t, const T1 &v)
+      {
+         const size_t n = t.size();
+         if (n < 2)
+            return E::Zero();
+         else if (n == 2)
+            return (v[1] - v[0]) / (t[1] - t[0]);
+
+         std::vector<std::vector<double>> dimensional_history; // each vector is for a dimension, such as x, y, z, . . . (can have more dimensions than 3), saving three time steps of history
+         const size_t dimensions = v[0].rows();
+         dimensional_history.resize(dimensions);
+         for (size_t i = 0; i < dimensions; ++i)
+         {
+            for (size_t j = 3; j > 0; --j) // iterate over last three states, from oldest to newest
+               dimensional_history[i].push_back(v[n - j][i]); // this will push back the ith states (i.e. if i = 0, x dimension) from the last three Eigen::Vector states
+         }
+
+         E deriv;
+         for (size_t i = 0; i < dimensions; ++i)
+            deriv[i] = derivative(t, dimensional_history[i]); // t can contain more than 3 steps
+
+         return deriv;
+      }
    }
 }
