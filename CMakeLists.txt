@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(ascent_project)
+project(ascent)
 
 if(MSVC)
 	# for ChaiScript
@@ -17,6 +17,19 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-add_subdirectory(include)
-add_subdirectory(examples)
-add_subdirectory(unit_tests)
+# ascent library
+add_library(ascent INTERFACE)
+target_include_directories(ascent INTERFACE
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:include>)
+	
+option(BUILD_EXAMPLES "Build example projects" TRUE)
+option(BUILD_UNIT_TESTS "Build unit testing project" TRUE)
+
+if(BUILD_EXAMPLES)
+   add_subdirectory(examples)
+endif()
+
+if (BUILD_UNIT_TESTS)
+	add_subdirectory(unit_tests)
+endif()
