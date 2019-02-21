@@ -16,15 +16,26 @@
 
 namespace asc
 {
+   // pointers, rather than references are used for the possibility of developing states with shared_ptrs for x and xd
    struct State
    {
-      State(double& x, double& xd) noexcept : x(x), xd(xd) {}
+      State(double& x, double& xd) noexcept : x(&x), xd(&xd) {}
       State(const State&) = default;
       State(State&&) = default;
       State& operator=(const State&) = default;
       State& operator=(State&&) = default;
 
-      double& x;
-      double& xd;
+      double* x{};
+      double* xd{};
    };
+
+   template <class states_t, class x_t, class xd_t>
+   inline void make_states(states_t& states, x_t& x, xd_t& xd)
+   {
+      const size_t n = x.size();
+      for (size_t i = 0; i < n; ++i)
+      {
+         states.emplace_back(x[i], xd[i]);
+      }
+   }
 }

@@ -40,37 +40,37 @@ namespace asc
 
             size_t i{};
             for (; i < n; ++i)
-               x0[i] = states[i].x;
+               x0[i] = *states[i].x;
 
             system(t);
             for (i = 0; i < n; ++i)
             {
-               xd[i] = states[i].xd;
-               states[i].x = dt_2 * xd[i] + x0[i];
+               xd[i] = *states[i].xd;
+               *states[i].x = dt_2 * xd[i] + x0[i];
             }
             t += dt_2;
 
             system(t);
             for (i = 0; i < n; ++i)
             {
-               const auto& xdi = states[i].xd;
+               const auto& xdi = *states[i].xd;
                xd[i] += 2 * xdi;
-               states[i].x = dt_2 * xdi + x0[i];
+               *states[i].x = dt_2 * xdi + x0[i];
             }
 
             system(t);
             for (i = 0; i < n; ++i)
             {
-               const auto& xdi = states[i].xd;
+               const auto& xdi = *states[i].xd;
                xd[i] += 2 * xdi;
-               states[i].x = dt * xdi + x0[i];
+               *states[i].x = dt * xdi + x0[i];
             }
             t = t0 + dt;
 
             system(t);
             for (i = 0; i < n; ++i)
             {
-               states[i].x = dt_6 * (xd[i] + states[i].xd) + x0[i];
+               *states[i].x = dt_6 * (xd[i] + *states[i].xd) + x0[i];
             }
          }
 
