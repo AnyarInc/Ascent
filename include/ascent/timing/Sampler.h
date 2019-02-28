@@ -66,7 +66,7 @@ namespace asc
          dt = dt_base;
       }
 
-      double base_time_step() const noexcept
+      T base_time_step() const noexcept
       {
          return dt_base;
       }

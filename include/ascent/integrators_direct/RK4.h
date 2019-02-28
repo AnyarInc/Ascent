@@ -42,7 +42,7 @@ namespace asc
             for (; i < n; ++i)
                x0[i] = *states[i].x;
 
-            system(t);
+            system();
             for (i = 0; i < n; ++i)
             {
                xd[i] = *states[i].xd;
@@ -50,7 +50,7 @@ namespace asc
             }
             t += dt_2;
 
-            system(t);
+            system();
             for (i = 0; i < n; ++i)
             {
                const auto& xdi = *states[i].xd;
@@ -58,7 +58,7 @@ namespace asc
                *states[i].x = dt_2 * xdi + x0[i];
             }
 
-            system(t);
+            system();
             for (i = 0; i < n; ++i)
             {
                const auto& xdi = *states[i].xd;
@@ -67,7 +67,7 @@ namespace asc
             }
             t = t0 + dt;
 
-            system(t);
+            system();
             for (i = 0; i < n; ++i)
             {
                *states[i].x = dt_6 * (xd[i] + *states[i].xd) + x0[i];
