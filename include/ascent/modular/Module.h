@@ -27,8 +27,47 @@ namespace asc
       Module& operator=(Module&&) = default;
       virtual ~Module() = default;
 
-      virtual void init(std::vector<asc::State>& states) {} // initialization
+      std::vector<State> states;
+
+      template <class x_t, class xd_t>
+      void make_states(x_t& x, xd_t& xd)
+      {
+         const size_t n = x.size();
+         for (size_t i = 0; i < n; ++i)
+         {
+            states.emplace_back(x[i], xd[i]);
+         }
+      }
+
+      virtual void init() {} // initialization
       virtual void operator()() {} // derivative updates
       virtual void postcalc() {} // post integration calculations
    };
+
+   template <class modules_t>
+   inline void init(modules_t& modules)
+   {
+      for (auto& module : modules)
+      {
+         module->init();
+      }
+   }
+
+   template <class modules_t>
+   inline void update(modules_t& modules)
+   {
+      for (auto& module : modules)
+      {
+         module->operator()();
+      }
+   }
+
+   template <class modules_t>
+   inline void postcalc(modules_t& modules)
+   {
+      for (auto& module : modules)
+      {
+         module->postcalc();
+      }
+   }
 }

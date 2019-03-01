@@ -38,4 +38,17 @@ namespace asc
          states.emplace_back(x[i], xd[i]);
       }
    }
+
+   template <class states_t, class modules_t>
+   inline void add_states(states_t& states, modules_t& modules)
+   {
+      for (auto& module : modules)
+      {
+         auto& m_states = module->states;
+         for (auto& state : m_states)
+         {
+            states.emplace_back(state);
+         }
+      }
+   }
 }
