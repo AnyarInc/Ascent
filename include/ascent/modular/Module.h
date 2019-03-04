@@ -16,6 +16,8 @@
 
 #include "ascent/direct/State.h"
 
+#include <vector>
+
 namespace asc
 {
    struct Module
