@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Anyar, Inc.
+// Copyright (c) 2016-2019 Anyar, Inc.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cmath>
+#include "ascent/timing/Sampler.h"
 
 namespace asc
 {
@@ -39,6 +40,16 @@ namespace asc
       bool event(const value_t event_time) noexcept
       {
          return sampler.event(event_time);
+      }
+
+      void base_time_step(const value_t base_dt)
+      {
+         sampler.base_time_step(base_dt);
+      }
+
+      value_t delta_t(const value_t t) const noexcept
+      {
+         return t - t_previous;
       }
 
       void reset() noexcept
