@@ -16,6 +16,7 @@
 
 #include "ascent/direct/State.h"
 
+#include <memory>
 #include <vector>
 
 namespace asc
@@ -38,6 +39,15 @@ namespace asc
          for (size_t i = 0; i < n; ++i)
          {
             states.emplace_back(x[i], xd[i]);
+         }
+      }
+
+      template <class states_t>
+      void add_states(states_t& ext_states)
+      {
+         for (auto& state : states)
+         {
+            ext_states.emplace_back(state);
          }
       }
 
@@ -70,6 +80,37 @@ namespace asc
       for (auto& module : modules)
       {
          module->postcalc();
+      }
+   }
+
+   template <class states_t>
+   inline void add_states(states_t& states, std::vector<std::shared_ptr<Module>>& modules)
+   {
+      for (auto& module : modules)
+      {
+         auto& m_states = module->states;
+         for (auto& state : m_states)
+         {
+            states.emplace_back(state);
+         }
+      }
+   }
+
+   template <class states_t>
+   inline void add_states(states_t& states, Module& module)
+   {
+      for (auto& state : module.states)
+      {
+         states.emplace_back(state);
+      }
+   }
+
+   template <class states_t>
+   inline void add_states(states_t& states, std::shared_ptr<Module>& module)
+   {
+      for (auto& state : module->states)
+      {
+         states.emplace_back(state);
       }
    }
 }

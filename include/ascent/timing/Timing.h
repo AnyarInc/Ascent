@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include "ascent/timing/Sampler.h"
+#include "ascent/modular/Module.h"
 
 namespace asc
 {
