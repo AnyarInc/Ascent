@@ -77,5 +77,4 @@ namespace asc
          std::vector<value_t> x0, xd;
       };
    }
-   
 }

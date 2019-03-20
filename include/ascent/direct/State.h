@@ -27,6 +27,8 @@ namespace asc
 
       double* x{};
       double* xd{};
+
+      std::vector<double> memory;
    };
 
    template <class states_t, class x_t, class xd_t>

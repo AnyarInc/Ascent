@@ -33,6 +33,12 @@ namespace asc
       std::vector<State> states;
 
       template <class x_t, class xd_t>
+      void make_state(x_t& x, xd_t& xd)
+      {
+         states.emplace_back(x, xd);
+      }
+
+      template <class x_t, class xd_t>
       void make_states(x_t& x, xd_t& xd)
       {
          const size_t n = x.size();
