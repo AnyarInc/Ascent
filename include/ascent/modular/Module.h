@@ -60,6 +60,8 @@ namespace asc
       virtual void init() {} // initialization
       virtual void operator()() {} // derivative updates
       virtual void postcalc() {} // post integration calculations
+
+      bool init_called = false;
    };
 
    template <class modules_t>
@@ -67,7 +69,11 @@ namespace asc
    {
       for (auto& module : modules)
       {
-         module->init();
+         if (!module->init_called)
+         {
+            module->init();
+            module->init_called = true;
+         }   
       }
    }
 
