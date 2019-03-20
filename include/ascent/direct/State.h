@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace asc
 {
    // pointers, rather than references are used for the possibility of developing states with shared_ptrs for x and xd
