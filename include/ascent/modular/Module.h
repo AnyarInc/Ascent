@@ -57,6 +57,7 @@ namespace asc
          }
       }
 
+      virtual void link() {} // linking modules
       virtual void init() {} // initialization
       virtual void operator()() {} // derivative updates
       virtual void postcalc() {} // post integration calculations
