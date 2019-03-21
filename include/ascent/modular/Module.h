@@ -48,6 +48,15 @@ namespace asc
          }
       }
 
+      template <class data_t>
+      void make_states(data_t* x, data_t* xd, const size_t n)
+      {
+         for (size_t i = 0; i < n; ++i)
+         {
+            states.emplace_back(x[i], xd[i]);
+         }
+      }
+
       template <class states_t>
       void add_states(states_t& ext_states)
       {
