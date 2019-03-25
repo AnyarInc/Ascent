@@ -48,7 +48,7 @@ namespace asc
          sampler.base_time_step(base_dt);
       }
 
-      value_t delta_t(const value_t t) const noexcept
+      value_t delta_t() const noexcept
       {
          return t - t_previous;
       }
