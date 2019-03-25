@@ -26,6 +26,7 @@ namespace asc
       value_t t{};
       value_t dt{ 0.01 };
       value_t t_end = std::numeric_limits<value_t>::max();
+      value_t t_delta{};
 
       value_t t_previous{};
       value_t eps = static_cast<value_t>(1.0e-8);
@@ -55,7 +56,7 @@ namespace asc
 
       value_t delta_t() const noexcept
       {
-         return t - t_previous;
+         return t_delta;
       }
 
       void reset() noexcept
@@ -78,6 +79,7 @@ namespace asc
          {
             time_advanced = false;
          }
+         t_delta = t - t_previous;
          t_previous = t;
       }
    };
