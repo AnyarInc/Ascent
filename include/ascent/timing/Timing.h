@@ -48,6 +48,11 @@ namespace asc
          sampler.base_time_step(base_dt);
       }
 
+      value_t base_time_step() const noexcept
+      {
+         return sampler.base_time_step();
+      }
+
       value_t delta_t() const noexcept
       {
          return t - t_previous;
