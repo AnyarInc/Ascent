@@ -14,40 +14,16 @@
 
 #pragma once
 
-#include "ascent/Utility.h"
+#include "ascent/modular/Module.h"
 
 namespace asc
 {
    namespace modular
    {
       template <class value_t>
-      struct RK4
+      struct RK4prop : public Propagator<value_t>
       {
-         template <class modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
-         {
-            pass = 0;
-            const auto t0 = t;
-
-            update(modules);
-            propagate(modules, dt);
-            t += 0.5 * dt;
-
-            update(modules);
-            propagate(modules, dt);
-
-            update(modules);
-            propagate(modules, dt);
-            t = t0 + dt;
-
-            update(modules);
-            propagate(modules, dt);
-         }
-
-      private:
-         size_t pass{};
-
-         void propagate(State& state, const double dt)
+         void operator()(State& state, const value_t dt) override
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
@@ -79,18 +55,72 @@ namespace asc
                break;
             }
          }
+      };
+
+      template <class value_t>
+      struct TimeStepper
+      {
+         TimeStepper() = default;
+         TimeStepper(const TimeStepper&) = default;
+         TimeStepper(TimeStepper&&) = default;
+         TimeStepper& operator=(const TimeStepper&) = default;
+         TimeStepper& operator=(TimeStepper&&) = default;
+         virtual ~TimeStepper() {}
+
+         virtual void operator()(const size_t, value_t&, const value_t) = 0; // inputs: pass, t (time), dt (time step)
+      };
+
+      template <class value_t>
+      struct RK4stepper : public TimeStepper<value_t>
+      {
+         value_t t0{};
+
+         void operator()(const size_t pass, value_t& t, const value_t dt) override
+         {
+            switch (pass)
+            {
+            case 0:
+               t0 = t;
+               t += 0.5 * dt;
+               break;
+            case 2:
+               t = t0 + dt;
+               break;
+            default:
+               break;
+            }
+         }
+      };
+
+      template <class value_t>
+      struct RK4
+      {
+         RK4prop<value_t> propagator;
+         RK4stepper<value_t> stepper;
 
          template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
+         void operator()(modules_t& modules, value_t& t, const value_t dt)
          {
-            for (auto& module : modules)
-            {
-               for (auto& state : module->states)
-               {
-                  propagate(state, dt);
-               }
-            }
+            auto& pass = propagator.pass;
+            pass = 0;
+            const auto t0 = t;
+
+            update(modules);
+            propagate(modules, dt);
+            stepper(pass, t, dt);
             ++pass;
+
+            update(modules);
+            propagate(modules, dt);
+            ++pass;
+
+            update(modules);
+            propagate(modules, dt);
+            stepper(pass, t, dt);
+            ++pass;
+
+            update(modules);
+            propagate(modules, dt);
          }
 
          template <class modules_t>
@@ -99,6 +129,15 @@ namespace asc
             for (auto& module : modules)
             {
                (*module)();
+            }
+         }
+
+         template <class modules_t>
+         void propagate(modules_t& modules, const value_t dt)
+         {
+            for (auto& module : modules)
+            {
+               module->propagate(propagator, dt);
             }
          }
       };

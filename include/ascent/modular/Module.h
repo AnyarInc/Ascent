@@ -21,6 +21,21 @@
 
 namespace asc
 {
+   template <class value_t>
+   struct Propagator
+   {
+      Propagator() = default;
+      Propagator(const Propagator&) = default;
+      Propagator(Propagator&&) = default;
+      Propagator& operator=(const Propagator&) = default;
+      Propagator& operator=(Propagator&&) = default;
+      virtual ~Propagator() {}
+
+      virtual void operator()(State&, const double) = 0; // inputs: states, dt (time step)
+
+      size_t pass{};
+   };
+
    struct Module
    {
       Module() = default;
@@ -69,6 +84,13 @@ namespace asc
       virtual void link() {} // linking modules
       virtual void init() {} // initialization
       virtual void operator()() {} // derivative updates
+      virtual void propagate(Propagator<double>& propagator, const double dt)
+      {
+         for (auto& state : states)
+         {
+            propagator(state, dt);
+         }
+      }
       virtual void postcalc() {} // post integration calculations
 
       bool init_called = false;
