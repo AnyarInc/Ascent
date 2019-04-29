@@ -57,7 +57,7 @@ namespace asc
    template <typename T0, typename T1>
    inline std::vector<double> derivative_vector(const T0& t, const T1& v)
    {
-      const size_t n = t.size();
+      const size_t n = std::min(t.size(), v.size());
       const size_t dimensions = v.front().size();
       if (n < 2)
          return std::vector<double>(dimensions);
@@ -84,7 +84,7 @@ namespace asc
       template <typename E, typename T0, typename T1>
       inline E derivative_vector(const T0 &t, const T1 &v)
       {
-         const size_t n = t.size();
+         const size_t n = std::min(t.size(), v.size());
          if (n < 2)
             return E::Zero();
          else if (n == 2)
