@@ -36,6 +36,15 @@ namespace asc
       size_t pass{};
    };
 
+   enum struct Phase
+   {
+      Link,
+      Init,
+      Update,
+      Postprop,
+      Postcalc
+   };
+
    struct Module
    {
       Module() = default;
@@ -44,6 +53,8 @@ namespace asc
       Module& operator=(const Module&) = default;
       Module& operator=(Module&&) = default;
       virtual ~Module() = default;
+
+      Phase* phase{};
 
       std::vector<State> states;
 
@@ -91,7 +102,8 @@ namespace asc
             propagator(state, dt);
          }
       }
-      virtual void postcalc() {} // post integration calculations
+      virtual void postprop() {} // post propagation calculations (every substep)
+      virtual void postcalc() {} // post integration calculations (every full step)
 
       bool init_called = false;
    };

@@ -23,59 +23,95 @@ namespace asc
    template <class T>
    struct Link
    {
-      std::shared_ptr<std::remove_cv_t<T>> module{}; // Non-const qualified module for doing low level, potentially dangerous simulation stuff. Used for asynchronous module access.
+      std::remove_cv_t<T>>* module{}; // Non-const qualified module for doing low level, potentially dangerous simulation stuff.
+                                      // The pointer will be returned with T qualifiers, so that the module can be const qualified.
 
-      template <class... Args>
-      Link(Args&&... args) : module(std::make_shared<std::remove_cv_t<T>>(args...)) {}
-
-      Link(const Link&) = default;
-      Link(Link&&) = default;
-      Link& operator=(const Link&) = default;
-      Link& operator=(Link&&) = default;
-
-      Link& operator=(const std::shared_ptr<T>& ptr)
+      Link& operator=(const T* ptr) noexcept
       {
          module = ptr;
          return *this;
       }
 
-      operator std::shared_ptr<T>()
+      T& operator*()
       {
+         check();
+         return *module;
+      }
+      
+      T* operator->()
+      {
+         check();
          return module;
       }
 
-      operator std::shared_ptr<Module>()
+      explicit operator bool() const noexcept { return (module != 0); }
+
+      std::string to_string() const { return "Link<" + static_cast<std::string>(typeid(T).name()) + '>'; }
+
+   private:
+      void check_init()
       {
-         return module;
+         if (!module->init_run)
+         {
+            if (module->init_called)
+            {
+               throw std::runtime_error("Circular dependency for init(): " + to_string());
+            }
+            else
+            {
+               module->init_called = true;
+               module->init();
+            }
+            module->init_run = true;
+         }
       }
 
-      // The pointer is copied with T qualifiers, so that the module can be const qualified.
-      T* operator -> ()
+      void check()
       {
-         if (!module)
+         if (module)
          {
-            throw std::runtime_error(("nullptr access ->: " + class_info()).c_str());
+            assert(module->phase);
+            // The Link phase and Postprop phase do not check initialization.
+            // Linking may occur prior to initialization and is not ordered.
+            // Postprop is not sequenced, as calculations may only be performed on propagated states
+            switch (*module->phase)
+            {
+            case Phase::Init:
+               check_init();
+               return;
+            case Phase::Update:
+               check_init();
+               if (!module->update_run)
+               {
+                  if (module->update_called)
+                  {
+                     throw std::runtime_error("Circular dependency for update operator(): " + to_string());
+                  }
+                  else
+                  {
+                     module->update_called = true;
+                     module->operator()();
+                  }
+                  module->update_run = true;
+               }
+               return;
+            case Phase::Postcalc:
+               check_init();
+               return;
+            case default:
+               return;
+            }
          }
-
-         if (!module->init_called)
+         else
          {
-            module->init();
-            module->init_called = true;
+            throw std::runtime_error(("nullptr access ->: " + to_string()).c_str());
          }
-
-         return module.get();
       }
-
-      explicit operator bool() const { return (module.get() != 0); }
-
-      void reset() { module.reset(); }
-
-      std::string class_info() const { return "Link<" + static_cast<std::string>(typeid(T).name()) + '>'; }
    };
 
-   template <class T> bool operator==(const Link<T>& link, std::nullptr_t ptr) { return link.module == ptr; }
-   template <class T> bool operator==(std::nullptr_t ptr, const Link<T>& link) { return link.module == ptr; }
+   template <class T> bool operator==(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module == ptr; }
+   template <class T> bool operator==(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module == ptr; }
 
-   template <class T> bool operator!=(const Link<T>& link, std::nullptr_t ptr) { return link.module != ptr; }
-   template <class T> bool operator!=(std::nullptr_t ptr, const Link<T>& link) { return link.module != ptr; }
+   template <class T> bool operator!=(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module != ptr; }
+   template <class T> bool operator!=(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module != ptr; }
 }

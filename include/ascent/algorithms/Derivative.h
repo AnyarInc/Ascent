@@ -16,6 +16,10 @@
 
 #include <vector>
 
+#ifdef min
+#undef min
+#endif
+
 namespace asc
 {
    // x is the independant variable, y is dependent. Returns derivative for unequally spaced points. xest is the x value at which to evaluate the derivative.
