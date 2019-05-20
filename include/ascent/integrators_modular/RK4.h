@@ -34,7 +34,7 @@ namespace asc
             auto& xd2 = state.memory[3];
             auto& xd3 = state.memory[4];
 
-            switch (pass)
+            switch (Propagator<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -103,8 +103,7 @@ namespace asc
          {
             auto& pass = propagator.pass;
             pass = 0;
-            const auto t0 = t;
-
+            
             update(modules);
             propagate(modules, dt);
             stepper(pass, t, dt);
