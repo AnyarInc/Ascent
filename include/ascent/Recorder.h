@@ -159,7 +159,7 @@ namespace asc
             {
                file << names[i].c_str();
                if (i < num_names - 1)
-                  file << ", ";
+                  file << ",";
             }
             if (num_names > 0)
                file << '\n';
@@ -175,7 +175,7 @@ namespace asc
                   else
                      file << history[i][j]; // faster, but can truncate values
                   if (j < num_states - 1)
-                     file << ", ";
+                     file << ",";
                }
                file << '\n';
             }
