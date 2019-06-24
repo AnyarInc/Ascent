@@ -154,12 +154,19 @@ namespace asc
 
          if (file)
          {
+            if (precision > 0)
+            {
+               file.precision(precision);
+            }
+
             const size_t num_names = names.size();
             for (size_t i = 0; i < num_names; ++i)
             {
                file << names[i].c_str();
                if (i < num_names - 1)
+               {
                   file << ",";
+               }
             }
             if (num_names > 0)
             {
@@ -168,35 +175,17 @@ namespace asc
 
             const size_t num_states = history.front().size();
 
-            if (precision > 0)
+            for (auto& step : history)
             {
-               for (auto& step : history)
+               for (auto i = 0; i < num_states; ++i)
                {
-                  for (auto i = 0; i < num_states; ++i)
+                  file << step[i];
+                  if (i < num_states - 1)
                   {
-                     file << std::setprecision(precision) << step[i];
-                     if (i < num_states - 1)
-                     {
-                        file << ",";
-                     }
+                     file << ",";
                   }
-                  file << '\n';
                }
-            }
-            else // faster, but can truncate values
-            {
-               for (auto& step : history)
-               {
-                  for (auto i = 0; i < num_states; ++i)
-                  {
-                     file << step[i];
-                     if (i < num_states - 1)
-                     {
-                        file << ",";
-                     }
-                  }
-                  file << '\n';
-               }
+               file << '\n';
             }
          }
          else
