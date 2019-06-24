@@ -41,6 +41,21 @@ namespace asc
          return *ptr;
       }
 
+      const T& operator*() const
+      {
+         return *ptr;
+      }
+
+      pointer operator->() noexcept
+      {
+         return ptr;
+      }
+
+      const pointer operator->() const noexcept
+      {
+         return ptr;
+      }
+
       stack_iterator& operator++() noexcept
       {
          ++index;
@@ -75,6 +90,65 @@ namespace asc
       T* ptr;
    };
 
+   template <class T, class stack_t>
+   struct const_stack_iterator
+   {
+      const_stack_iterator(const size_t i, stack_t& stack) noexcept : index(i % stack_t::block_size), slice(i / stack_t::block_size), stack(stack), ptr(stack.data(i)) {}
+
+      const_stack_iterator(const const_stack_iterator&) noexcept = default;
+      const_stack_iterator(const_stack_iterator&&) noexcept = default;
+      const_stack_iterator& operator=(const const_stack_iterator&) noexcept = default;
+      const_stack_iterator& operator=(const_stack_iterator&&) noexcept = default;
+
+      using value_type = T;
+      using pointer = T*;
+      using reference = T&;
+      using iterator_category = std::forward_iterator_tag;
+
+      const T& operator*() const
+      {
+         return *ptr;
+      }
+
+      const pointer operator->() const
+      {
+         return ptr;
+      }
+
+      const_stack_iterator& operator++() noexcept
+      {
+         ++index;
+         ++ptr;
+         if (index == stack_t::block_size)
+         {
+            index = 0;
+            ++slice;
+            ptr = stack.data_slice(slice);
+         }
+         return *this;
+      }
+
+      bool operator!=(const const_stack_iterator& rhs) const noexcept
+      {
+         if (index != rhs.index || slice != rhs.slice)
+            return true;
+         return false;
+      }
+
+      bool operator==(const const_stack_iterator& rhs) const noexcept
+      {
+         if (index == rhs.index && slice == rhs.slice)
+            return true;
+         return false;
+      }
+
+   private:
+      size_t index{};
+      size_t slice{};
+      stack_t& stack;
+      T* ptr;
+   };
+
    template <class T, size_t block>
    struct stack final
    {
@@ -92,7 +166,7 @@ namespace asc
       static constexpr size_t block_size = block;
 
       using iterator = stack_iterator<T, stack<T, block>>;
-      using const_iterator = stack_iterator<const std::decay_t<T>, stack<const std::decay_t<T>, block>>;
+      using const_iterator = const_stack_iterator<T, stack<T, block>>;
 
       iterator begin()
       {
@@ -104,12 +178,12 @@ namespace asc
          return{ size(), *this };
       }
 
-      const_iterator cbegin() const
+      const_iterator cbegin()
       {
-         return{ 0, *this };
+         return{ size(), *this };
       }
 
-      const_iterator cend() const
+      const_iterator cend()
       {
          return{ size(), *this };
       }
@@ -151,6 +225,11 @@ namespace asc
          return deq[slice_index][index];
       }
 
+      const T& operator()(const size_t slice_index, const size_t index) const noexcept
+      {
+         return deq[slice_index][index];
+      }
+
       T& front()
       {
          return deq.front().front();
@@ -183,7 +262,21 @@ namespace asc
          return deq[s].data();
       }
 
+      const T* data_slice(const size_t s) const
+      {
+         if (s >= deq.size())
+            return nullptr;
+         return deq[s].data();
+      }
+
       T* data(const size_t i)
+      {
+         if (i / block >= deq.size())
+            return nullptr;
+         return deq[i / block].data() + i % block;
+      }
+
+      const T* data(const size_t i) const
       {
          if (i / block >= deq.size())
             return nullptr;

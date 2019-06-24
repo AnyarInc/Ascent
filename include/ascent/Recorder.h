@@ -141,13 +141,13 @@ namespace asc
       /// \brief Write out a Comma Separated Value (CSV) file from the recorded data.
       ///
       /// \param[in] file_name The path and name of the file to be generated, excepting the .csv which is added by the function.
-      void csv(const std::string& file_name) const { csv(file_name, titles); }
+      void csv(const std::string& file_name) { csv(file_name, titles); }
 
       /// \brief Write out a Comma Separated Value (CSV) file from the recorded data.
       ///
       /// \param[in] file_name The path and name of the file to be generated, excepting the .csv which is added by the function.
       /// \param[in] names The variable names associated with each column of data.
-      void csv(const std::string& file_name, const std::vector<std::string>& names) const
+      void csv(const std::string& file_name, const std::vector<std::string>& names)
       {
          std::ofstream file;
          file.open(file_name + ".csv");
@@ -162,22 +162,41 @@ namespace asc
                   file << ",";
             }
             if (num_names > 0)
-               file << '\n';
-
-            const size_t num_steps = history.size();
-            for (size_t i = 0; i < num_steps; ++i)
             {
-               const size_t num_states = history.front().size();
-               for (size_t j = 0; j < num_states; ++j)
-               {
-                  if (precision > 0)
-                     file << std::setprecision(precision) << history[i][j];
-                  else
-                     file << history[i][j]; // faster, but can truncate values
-                  if (j < num_states - 1)
-                     file << ",";
-               }
                file << '\n';
+            }
+
+            const size_t num_states = history.front().size();
+
+            if (precision > 0)
+            {
+               for (auto& step : history)
+               {
+                  for (auto i = 0; i < num_states; ++i)
+                  {
+                     file << std::setprecision(precision) << step[i];
+                     if (i < num_states - 1)
+                     {
+                        file << ",";
+                     }
+                  }
+                  file << '\n';
+               }
+            }
+            else // faster, but can truncate values
+            {
+               for (auto& step : history)
+               {
+                  for (auto i = 0; i < num_states; ++i)
+                  {
+                     file << step[i];
+                     if (i < num_states - 1)
+                     {
+                        file << ",";
+                     }
+                  }
+                  file << '\n';
+               }
             }
          }
          else
