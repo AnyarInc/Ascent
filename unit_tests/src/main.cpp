@@ -14,6 +14,11 @@
 
 #include "ascent/Ascent.h"
 
+#include "ascent/integrators_modular/RK2.h"
+#include "ascent/integrators_modular/RK4.h"
+#include "ascent/integrators_modular/PC233.h"
+#include "ascent/timing/Timing.h"
+
 #include <iostream>
 
 using namespace asc;
@@ -24,6 +29,11 @@ bool test(const std::string& title, const double x, const double target, const d
    {
       std::cout << title << " failed: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
       return false;
+   }
+   else
+   {
+      std::cout << title << " results: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
+      return true;
    }
    return true;
 }
@@ -37,11 +47,46 @@ struct Airy
    }
 };
 
+struct AiryMod : asc::Module
+{
+   double a{};
+   double a_d{};
+   double b{};
+   double b_d{};
+   std::shared_ptr<asc::Timing<double>> sim{};
+
+   void init()
+   {
+      make_state(a, a_d);
+      make_state(b, b_d);
+   }
+
+   void operator()()
+   {
+      a_d = b;
+      b_d = -sim->t*a; 
+   }
+};
+
 struct Exponential
 {
    void operator()(const state_t& x, state_t& xd, const double t)
    {
       xd[0] = x[0];
+   }
+}; 
+struct ExponentialMod : asc::Module
+{
+   double value{};
+   double deriv{};
+
+   void init()
+   {
+      make_state(value, deriv);
+   }
+   void operator()()
+   {
+      deriv = value;
    }
 };
 
@@ -62,6 +107,29 @@ state_t airy_test(const double dt)
 
    return x;
 }
+template <class Integrator>
+std::vector<double> airy_test_mod(const double dt)
+{
+   Integrator integrator;
+   auto system = std::make_shared<AiryMod>();
+   system->sim = std::make_shared<asc::Timing<double>>(); 
+   system->a = 1.0;
+   system->b = 0.0;
+   system->sim->t = 0.0;
+   system->sim->t_end = 10.0;
+   std::vector<asc::Module*> module{};
+   module.emplace_back(system.get());
+
+   system->init();
+
+   while (system->sim->t < system->sim->t_end)
+   {
+      integrator(module, system->sim->t, dt);
+   }
+
+   return{ system->a, system->b };
+}
+
 
 template <class Integrator>
 std::pair<state_t, double> exponential_test(const double dt)
@@ -80,6 +148,27 @@ std::pair<state_t, double> exponential_test(const double dt)
 
    return{ x, t };
 }
+template <class Integrator>
+std::pair<double, double> exponential_test_mod(const double dt)
+{
+   Integrator integrator;
+   auto system = std::make_shared<ExponentialMod>();
+   auto sim = std::make_shared<asc::Timing<double>>();
+   system->value = 1.0;
+   sim->t = 0.0;
+   sim->t_end = 10.0;
+   std::vector<asc::Module*> module{};
+   module.emplace_back(system.get());
+
+   system->init();
+
+   while (sim->t < sim->t_end)
+   {
+      integrator(module, sim->t, dt);
+   }
+
+   return{ system->value, sim->t };
+}
 
 int main()
 {
@@ -92,7 +181,19 @@ int main()
    x = airy_test<DOPRI45>(0.001);
    test("Airy DOPRI45 x[0]", x[0], -0.200693641142, 1.0e-8); // compared to RK4 results
    test("Airy DOPRI45 x[1]", x[1], -1.49817601143, 1.0e-8); // compared to RK4 results
+   
+   std::cout << "\n";
+   auto x2 = airy_test_mod<modular::RK4<double>>(0.001);
+   test("Airy RK4 Modular a", x2[0], -0.200693641142, 1.0e-8);
+   test("Airy RK4 Modular b", x2[1], -1.49817601143, 1.0e-8);
+   x2 = airy_test_mod<modular::RK2<double>>(0.001);
+   test("Airy RK2 Modular a", x2[0], -0.200703911717, 1.0e-8);
+   test("Airy RK2 Modular b", x2[1], -1.49816435475, 1.0e-8);
+   x2 = airy_test_mod<modular::PC233<double>>(0.001);
+   test("Airy PC233 Modular a", x2[0], -0.200693641142, 1.0e-8);
+   test("Airy PC233 Modular b", x2[1], -1.49817601143, 1.0e-8);
 
+   std::cout << "\n";
    auto result = exponential_test<RK4>(0.001);
    test("Exponential RK4 x", result.first[0], exp(result.second), 1.0e-8);
    result = exponential_test<RK2>(0.001);
@@ -101,6 +202,14 @@ int main()
    test("Exponential DOPRI45 x", result.first[0], exp(result.second), 1.0e-8);
    result = exponential_test<PC233>(0.001);
    test("Exponential PC233 x", result.first[0], exp(result.second), 1.0e-2);
+
+   std::cout << "\n";
+   auto result2 = exponential_test_mod<modular::RK4<double>>(0.001);
+   test("Exponential RK4 Modular x", result2.first, exp(result2.second), 1.0e-8);
+   result2 = exponential_test_mod<modular::RK2<double>>(0.001);
+   test("Exponential RK2 Modular x", result2.first, exp(result2.second), 1.0e-1);
+   result2 = exponential_test_mod<modular::PC233<double>>(0.001);
+   test("Exponential PC233 Modular x", result2.first, exp(result2.second), 1.0e-2);
 
    return 0;
 }
