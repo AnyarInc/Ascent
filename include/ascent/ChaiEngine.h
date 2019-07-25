@@ -51,8 +51,8 @@ namespace asc
          c.add(fun([](R& rec, std::vector<T>& v) { rec.record(v); }), "record");
          c.add(fun([](R& rec, std::vector<T>& v, const std::vector<std::string>& title) { rec.record(v, title); }), "record");
          c.add(fun([](R& rec, const std::vector<T>& data) { rec.push_back(data); }), "push_back");
-         c.add(fun([](const R& rec, const std::string& file_name) { rec.csv(file_name); }), "csv");
-         c.add(fun([](const R& rec, const std::string& file_name, const std::vector<std::string>& names) { rec.csv(file_name, names); }), "csv");
+         c.add(fun([](R& rec, const std::string& file_name) { rec.csv(file_name); }), "csv");
+         c.add(fun([](R& rec, const std::string& file_name, const std::vector<std::string>& names) { rec.csv(file_name, names); }), "csv");
       }
 
       ChaiEngine()

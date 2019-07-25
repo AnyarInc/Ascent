@@ -15,6 +15,7 @@
 #pragma once
 
 #include "ascent/modular/Module.h"
+#include "ascent/integrators_modular/ModularIntegrators.h"
 
 namespace asc
 {
@@ -55,19 +56,6 @@ namespace asc
                break;
             }
          }
-      };
-
-      template <class value_t>
-      struct TimeStepper
-      {
-         TimeStepper() = default;
-         TimeStepper(const TimeStepper&) = default;
-         TimeStepper(TimeStepper&&) = default;
-         TimeStepper& operator=(const TimeStepper&) = default;
-         TimeStepper& operator=(TimeStepper&&) = default;
-         virtual ~TimeStepper() {}
-
-         virtual void operator()(const size_t, value_t&, const value_t) = 0; // inputs: pass, t (time), dt (time step)
       };
 
       template <class value_t>
