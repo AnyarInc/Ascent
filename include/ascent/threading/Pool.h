@@ -22,6 +22,17 @@ namespace asc
 {
    struct Pool final
    {
+      Pool() = default;
+      Pool(const Pool&) = default;
+      Pool(Pool&&) = default;
+      Pool& operator=(const Pool&) = default;
+      Pool& operator=(Pool&&) = default;
+      ~Pool()
+      {
+         run_balancer = false;
+         cv_balancer.notify_one();
+      }
+
       std::vector<std::unique_ptr<Queue>> pool;
 
       bool computing() const
@@ -37,23 +48,80 @@ namespace asc
       void n_threads(const size_t n)
       {
          for (size_t i = pool.size(); i < n; ++i)
+         {
             pool.emplace_back(std::make_unique<Queue>());
+            pool.back()->pool_balancer = &cv_balancer;
+         }
       }
 
-      void assign_callback(const std::function<void()>& f)
+      void wait()
       {
          for (auto& q : pool)
-            q->work_done = f;
+         {
+            if (q->computing())
+            {
+               q->wait();
+            }
+         }
       }
 
       template <typename ...Args>
       void emplace_back(Args&&... args)
       {
          if (pool.empty())
+         {
             pool.emplace_back(std::make_unique<Queue>());
+            pool.back()->pool_balancer = &cv_balancer;
+         }
          auto compare = [](auto& l, auto& r) { return l->size() < r->size(); };
          auto it = std::min_element(pool.begin(), pool.end(), compare);
          (*it)->emplace_back(std::forward<Args>(args)...);
+
+         if (!balancer_active)
+         {
+            balancer_active = true;
+
+            auto balancer = [&]
+            {
+               while (run_balancer)
+               {
+                  size_t min_size = std::numeric_limits<size_t>::max();
+                  size_t max_size{};
+                  size_t min_index{};
+                  size_t max_index{};
+
+                  for (auto i = 0; i < pool.size(); ++i)
+                  {
+                     const auto n = pool[i]->size();
+                     if (n < min_size)
+                     {
+                        min_size = n;
+                        min_index = i;
+                     }
+                     if (n > max_size)
+                     {
+                        max_size = n;
+                        max_index = i;
+                     }
+                  }
+
+                  if (max_index != min_index && max_size > 1)
+                  {
+                     const auto job = pool[max_index]->jobs.back();
+                     pool[max_index]->jobs.pop_back();
+                     pool[min_index]->emplace_back(std::move(job));
+                  }
+
+                  if (run_balancer)
+                  {
+                     std::unique_lock<std::mutex> lock(mtx_balancer);
+                     cv_balancer.wait(lock);
+                  }
+               }
+            };
+
+            std::thread(balancer).detach();
+         }
       }
 
       size_t size() const
@@ -70,10 +138,16 @@ namespace asc
 
          c.add(fun(&T::computing), "computing");
          c.add(fun(&T::n_threads), "n_threads");
-         c.add(fun(&T::assign_callback), "assign_callback");
+         c.add(fun(&T::wait), "wait");
          c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
          c.add(fun([](T& pool, const std::function<void()>& func) { pool.emplace_back(func); }), "push_back");
          c.add(fun(&T::size), "size");
       }
+
+   private:
+      std::mutex mtx_balancer;
+      std::condition_variable cv_balancer;
+      std::atomic<bool> balancer_active = false;
+      std::atomic<bool> run_balancer = true;
    };
 }

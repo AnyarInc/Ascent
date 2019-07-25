@@ -87,6 +87,9 @@ namespace asc
          work_done.wait(lock);
       }
 
+      std::deque<std::function<void()>> jobs;
+      std::condition_variable* pool_balancer{};
+
    private:
       void start()
       {
@@ -106,6 +109,11 @@ namespace asc
                      std::this_thread::yield();
                   }
                   jobs.pop_front();
+
+                  if (pool_balancer)
+                  {
+                     pool_balancer->notify_one();
+                  }
                }
                running_jobs = false;
                work_done.notify_one();
@@ -122,6 +130,5 @@ namespace asc
       bool started{};
       std::atomic<bool> run{}, adding{}, running_jobs{};
       std::condition_variable cv, work_done;
-      std::deque<std::function<void()>> jobs;
    };
 }
