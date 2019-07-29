@@ -40,6 +40,8 @@ namespace asc
 
       std::vector<std::unique_ptr<Queue>> pool;
 
+      std::atomic<bool> use_load_balancer = true;
+
       bool computing() const
       {
          for (auto& q : pool)
@@ -82,7 +84,7 @@ namespace asc
          auto it = std::min_element(pool.begin(), pool.end(), compare);
          (*it)->emplace_back(std::forward<Args>(args)...);
 
-         if (!balancer_active)
+         if (use_load_balancer && !balancer_active)
          {
             balancer_active = true;
 
