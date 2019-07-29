@@ -89,6 +89,7 @@ namespace asc
 
       std::deque<std::function<void()>> jobs;
       std::condition_variable* pool_balancer{};
+      std::atomic<bool> adding{};
 
    private:
       void start()
@@ -100,7 +101,7 @@ namespace asc
             while (run)
             {
                running_jobs = true;
-               while (jobs.size() > 0)
+               while (jobs.size())
                {
                   jobs.front()();
 
@@ -109,17 +110,20 @@ namespace asc
                      std::this_thread::yield();
                   }
                   jobs.pop_front();
-
-                  if (pool_balancer)
-                  {
-                     pool_balancer->notify_one();
-                  }
                }
                running_jobs = false;
-               work_done.notify_one();
+               if (pool_balancer)
+               {
+                  pool_balancer->notify_one();
+                  std::this_thread::sleep_for(std::chrono::milliseconds(1)); // TO DO: THIS IS A HACK!
+               }
 
-               std::unique_lock<std::mutex> lock(mtx_work);
-               cv.wait(lock);
+               if (jobs.empty())
+               {
+                  work_done.notify_one();
+                  std::unique_lock<std::mutex> lock(mtx_work);
+                  cv.wait(lock);
+               }
             }
          };
 
@@ -128,7 +132,7 @@ namespace asc
 
       std::mutex mtx_work, mtx_wait;
       bool started{};
-      std::atomic<bool> run{}, adding{}, running_jobs{};
+      std::atomic<bool> run{}, running_jobs{};
       std::condition_variable cv, work_done;
    };
 }

@@ -31,6 +31,11 @@ namespace asc
       {
          run_balancer = false;
          cv_balancer.notify_one();
+
+         while (balancer_active)
+         {
+            std::this_thread::yield();
+         }
       }
 
       std::vector<std::unique_ptr<Queue>> pool;
@@ -87,10 +92,10 @@ namespace asc
                {
                   size_t min_size = std::numeric_limits<size_t>::max();
                   size_t max_size{};
-                  size_t min_index{};
-                  size_t max_index{};
+                  size_t min_index{}, max_index{};
 
-                  for (auto i = 0; i < pool.size(); ++i)
+                  const auto n_pool = pool.size();
+                  for (auto i = 0; i < n_pool; ++i)
                   {
                      const auto n = pool[i]->size();
                      if (n < min_size)
@@ -105,11 +110,17 @@ namespace asc
                      }
                   }
 
-                  if (max_index != min_index && max_size > 1)
+                  if (max_index != min_index && max_size > 1 && min_size < 1)
                   {
-                     const auto job = pool[max_index]->jobs.back();
-                     pool[max_index]->jobs.pop_back();
-                     pool[min_index]->emplace_back(std::move(job));
+                     auto& p_max = pool[max_index];
+                     if (p_max->jobs.size()) // check that we haven't finished jobs while finding the max and min
+                     {
+                        const auto job = p_max->jobs.back();
+                        p_max->jobs.pop_back();
+
+                        auto& p_min = pool[min_index];
+                        p_min->emplace_back(std::move(job));
+                     }
                   }
 
                   if (run_balancer)
@@ -118,6 +129,8 @@ namespace asc
                      cv_balancer.wait(lock);
                   }
                }
+
+               balancer_active = false;
             };
 
             std::thread(balancer).detach();
@@ -145,9 +158,9 @@ namespace asc
       }
 
    private:
-      std::mutex mtx_balancer;
       std::condition_variable cv_balancer;
       std::atomic<bool> balancer_active = false;
       std::atomic<bool> run_balancer = true;
+      std::mutex mtx_balancer;
    };
 }
