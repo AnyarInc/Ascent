@@ -14,48 +14,29 @@
 
 #pragma once
 
-// Simple Euler integration.
+#include "ascent/modular/Module.h"
+#include "ascent/integrators_modular/ModularIntegrators.h"
 
 namespace asc
 {
    namespace modular
    {
       template <class value_t>
-      struct EulerProp : public Propagator<value_t>
+      struct MidpointProp : public Propagator<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
-            *state.x += dt * *state.xd;
-         }
-      };
-
-      template <typename value_t>
-      struct Euler
-      {
-         template <class modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
-         {
-            for (auto& module : modules)
+            if (state.memory.empty())
             {
-               (*module)();
+               state.memory.resize(1);
+               state.memory[0] = 0.0;
             }
-            propagate(modules, dt);
-            t += dt;
-         }
-
-      private:
-         template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
-         {
-            for (auto& module : modules)
-            {
-               for (auto& state : module->states)
-               {
-                  *state.x += dt * *state.xd;
-               }
-            }
+            auto& xd0 = state.memory[0];
+            
+            auto& xd = *state.xd;
+            *state.x += 0.5 * dt * (xd0 + xd);
+            xd0 = xd;
          }
       };
    }
-
 }

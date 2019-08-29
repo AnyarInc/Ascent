@@ -43,6 +43,8 @@ namespace asc
             case 1:
                x = x0 + dt * xd;
                break;
+            default:
+               break;
             }
          }
       };
