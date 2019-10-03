@@ -68,7 +68,8 @@ namespace asc
       else if (n == 2)
       {
          //return (v[1] - v[0]) / (t[1] - t[0]);  // Changed this so its compatible with std::array
-         std::vector<double> ret{};
+         std::vector<double> ret;
+         ret.resize(dimensions);
          for (size_t i = 0; i < dimensions; ++i)
             ret[i] = (v[1][i] - v[0][i]) / (t[1] - t[0]);
          return ret;
