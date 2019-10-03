@@ -66,7 +66,13 @@ namespace asc
       if (n < 2)
          return std::vector<double>(dimensions);
       else if (n == 2)
-         return (v[1] - v[0]) / (t[1] - t[0]);
+      {
+         //return (v[1] - v[0]) / (t[1] - t[0]);  // Changed this so its compatible with std::array
+         std::vector<double> ret{};
+         for (size_t i = 0; i < dimensions; ++i)
+            ret[i] = (v[1][i] - v[0][i]) / (t[1] - t[0]);
+         return ret;
+      }         
 
       std::vector<std::vector<double>> dimensional_history(dimensions); // each vector is for a dimension, such as x, y, z, . . . (can have more dimensions than 3), saving three time steps of history
       for (size_t i = 0; i < dimensions; ++i)
