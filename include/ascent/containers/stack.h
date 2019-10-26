@@ -158,9 +158,20 @@ namespace asc
          deq.back().reserve(block);
       }
 
-      stack(const stack&) = default;
+      stack(const stack& other)
+      {
+         deq = other.deq;
+         deq.back().reserve(block); // is not by default copied to the same size
+         slice = other.slice;
+      }
       stack(stack&&) = default;
-      stack& operator=(const stack& other) = default;
+      stack& operator=(const stack& other)
+      {
+         deq = other.deq;
+         deq.back().reserve(block); // capacity is not by default copied to the same size
+         slice = other.slice;
+         return *this;
+      }
       stack& operator=(stack&&) = default;
 
       static constexpr size_t block_size = block;
