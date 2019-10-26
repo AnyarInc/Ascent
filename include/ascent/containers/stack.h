@@ -192,8 +192,8 @@ namespace asc
       {
          emplace_back(T());
       }
-
-      void emplace_back(T x) noexcept
+      
+      void emplace_back(T&& x) noexcept
       {
          auto& s = deq[slice];
          if (s.size() == block)
@@ -201,12 +201,12 @@ namespace asc
             deq.emplace_back();
             auto& v_back = deq.back();
             v_back.reserve(block);
-            v_back.emplace_back(x);
+            v_back.emplace_back(std::forward<T>(x));
             ++slice;
          }
          else
          {
-            s.emplace_back(x);
+            s.emplace_back(std::forward<T>(x));
          }
       }
 
