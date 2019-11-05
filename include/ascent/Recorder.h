@@ -24,6 +24,10 @@
 
 #include "ascent/containers/stack.h"
 
+#if _HAS_CXX17
+   #include <charconv>
+#endif
+
 namespace asc
 {
    template <class T>
@@ -192,4 +196,62 @@ namespace asc
             throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
       }
    };
+
+   #if _HAS_CXX17
+   //Faster cvs writer using to_chars for floating point to double conversion
+   template<>
+   void RecorderT<double>::csv(const std::string& file_name, const std::vector<std::string>& names)
+   {
+	   std::ofstream file;
+	   file.open(file_name + ".csv");
+
+	   if (file)
+	   {
+		   const size_t n_names = names.size();
+		   for (size_t i = 0; i < n_names; ++i)
+		   {
+			   file << names[i].c_str();
+			   if (i < n_names - 1)
+			   {
+				   file << ",";
+			   }
+		   }
+		   if (n_names > 0)
+		   {
+			   file << '\n';
+		   }
+
+		   const size_t n_columns = history.front().size();
+		   const size_t n_rows = history.size();
+		   size_t capacity = n_columns * n_rows * 20;
+		   size_t size = 0;
+		   char* buffer = (char*)malloc(capacity * sizeof(char));
+		   for (auto& row : history) {
+			   bool isFirst = true;
+			   for (auto& item : row) {
+				   if (capacity - size < 258) {
+					   capacity *= 2;
+					   buffer = (char*)realloc(buffer, capacity * sizeof(char));
+				   }
+				   if (isFirst)
+					   isFirst = false;
+				   else
+					   *(buffer + size++) = ',';
+				   auto[p, err] = std::to_chars(buffer + size, buffer + capacity, item);
+				   if (err != std::errc())
+					   std::runtime_error("Recorder exceeded buffer length");
+				   size = p - buffer;
+			   }
+			   //We could just allways add a comma after each item and overwrite the last comma with a newline so we dont need isFirst
+			   *(buffer + size++) = '\n'; 
+		   }
+		   *(buffer + size++) = 0;
+		   file << buffer;
+		   free(buffer);
+
+	   }
+	   else
+		   throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
+   }
+   #endif
 }
