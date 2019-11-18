@@ -105,12 +105,13 @@ namespace asc
       }
 
       // takes the derivative over three points of history
+      template <class E>
       struct derivative_vector_3
       {
          std::vector<std::vector<double>> dimensional_history; // each vector is for a dimension, such as x, y, z, . . . (can have more dimensions than 3), saving three time steps of history
 
          // E is intended to be an Eigen::Vector, such as Eigen::Vector3d, supports n dimensional Eigen vectors
-         template <typename E, typename T0, typename T1>
+         template <typename T0, typename T1>
          inline E operator()(const T0 &t, const T1 &v)
          {
             const auto n = std::min(t.size(), v.size());
