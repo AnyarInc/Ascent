@@ -23,6 +23,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <iostream>
 
 // A threaded worker queue
 

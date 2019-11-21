@@ -37,7 +37,7 @@ namespace asc
       SamplerT& operator=(SamplerT&&) = default;
       ~SamplerT() noexcept { dt = dt_base; }
 
-      bool operator()(const T sample_rate) noexcept
+      bool operator()(const T sample_rate) const noexcept
       {
          const size_t n = static_cast<size_t>((t + eps) / sample_rate); // the number of sample time steps that have occured
          const T sample_time = (n + 1) * sample_rate; // the next sample time
