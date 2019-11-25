@@ -24,8 +24,9 @@
 
 #include "ascent/containers/stack.h"
 
-#if _HAS_CXX17
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
    #include <charconv>
+   #include <variant>
 #endif
 
 namespace asc
@@ -181,9 +182,9 @@ namespace asc
 
             for (auto& step : history)
             {
-               for (auto i = 0; i < num_states; ++i)
+               for (size_t i = 0; i < num_states; ++i)
                {
-                  file << step[i];
+                  stream_insert(file, step[i]);
                   if (i < num_states - 1)
                   {
                      file << ",";
@@ -195,9 +196,25 @@ namespace asc
          else
             throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
       }
+   private:
+      #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
+      //Handles writing variant types
+      template <typename T0, typename ... Ts>
+      void stream_insert (std::ostream& stream, std::variant<T0, Ts...> const& value)
+      {
+         std::visit([&](auto&& arg) { stream << arg; }, value);
+      }
+      #endif
+
+      //Seperate stream insertion so we cand handle certain types 
+      template <typename T>
+      void stream_insert (std::ostream& stream, T const& value)
+      {
+         stream << value;
+      }
    };
 
-   #if _HAS_CXX17
+   #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
    //Faster cvs writer using to_chars for floating point to double conversion
    template<>
    void RecorderT<double>::csv(const std::string& file_name, const std::vector<std::string>& names)
