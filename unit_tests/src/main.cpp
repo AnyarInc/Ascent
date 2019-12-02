@@ -30,13 +30,22 @@ bool test(const std::string& title, const double x, const double target, const d
       std::cout << title << " failed: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
       return false;
    }
-   else
-   {
-      std::cout << title << " results: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
-      return true;
-   }
+   std::cout << title << " results: " << to_string_precision(x, 12) << ", " << to_string_precision(target, 12) << '\n';
    return true;
 }
+
+struct TestResult {
+   TestResult& operator = (const bool &input) {
+      if (this->passed)
+         this->passed = input;
+      return *this;
+   }
+   bool failed() {
+      return !passed;
+   }
+private:
+   bool passed = true;
+};
 
 struct Airy
 {
@@ -172,44 +181,46 @@ std::pair<double, double> exponential_test_mod(const double dt)
 
 int main()
 {
+   TestResult res;
+
    auto x = airy_test<RK4>(0.001);
-   test("Airy RK4 x[0]", x[0], -0.200693641142, 1.0e-8);
-   test("Airy RK4 x[1]", x[1], -1.49817601143, 1.0e-8);
+   res = test("Airy RK4 x[0]", x[0], -0.200693641142, 1.0e-8);
+   res = test("Airy RK4 x[1]", x[1], -1.49817601143, 1.0e-8);
    x = airy_test<RK2>(0.001);
-   test("Airy RK2 x[0]", x[0], -0.200703911717, 1.0e-8);
-   test("Airy RK2 x[1]", x[1], -1.49816435475, 1.0e-8);
+   res = test("Airy RK2 x[0]", x[0], -0.200703911717, 1.0e-8);
+   res = test("Airy RK2 x[1]", x[1], -1.49816435475, 1.0e-8);
    x = airy_test<DOPRI45>(0.001);
-   test("Airy DOPRI45 x[0]", x[0], -0.200693641142, 1.0e-8); // compared to RK4 results
-   test("Airy DOPRI45 x[1]", x[1], -1.49817601143, 1.0e-8); // compared to RK4 results
+   res = test("Airy DOPRI45 x[0]", x[0], -0.200693641142, 1.0e-8); // compared to RK4 results
+   res = test("Airy DOPRI45 x[1]", x[1], -1.49817601143, 1.0e-8); // compared to RK4 results
    
    std::cout << "\n";
    auto x2 = airy_test_mod<modular::RK4<double>>(0.001);
-   test("Airy RK4 Modular a", x2[0], -0.200693641142, 1.0e-8);
-   test("Airy RK4 Modular b", x2[1], -1.49817601143, 1.0e-8);
+   res = test("Airy RK4 Modular a", x2[0], -0.200693641142, 1.0e-8);
+   res = test("Airy RK4 Modular b", x2[1], -1.49817601143, 1.0e-8);
    x2 = airy_test_mod<modular::RK2<double>>(0.001);
-   test("Airy RK2 Modular a", x2[0], -0.200703911717, 1.0e-8);
-   test("Airy RK2 Modular b", x2[1], -1.49816435475, 1.0e-8);
+   res = test("Airy RK2 Modular a", x2[0], -0.200703911717, 1.0e-8);
+   res = test("Airy RK2 Modular b", x2[1], -1.49816435475, 1.0e-8);
    x2 = airy_test_mod<modular::PC233<double>>(0.001);
-   test("Airy PC233 Modular a", x2[0], -0.200693641142, 1.0e-8);
-   test("Airy PC233 Modular b", x2[1], -1.49817601143, 1.0e-8);
+   res = test("Airy PC233 Modular a", x2[0], -0.200693641142, 1.0e-8);
+   res = test("Airy PC233 Modular b", x2[1], -1.49817601143, 1.0e-8);
 
    std::cout << "\n";
    auto result = exponential_test<RK4>(0.001);
-   test("Exponential RK4 x", result.first[0], exp(result.second), 1.0e-8);
+   res = test("Exponential RK4 x", result.first[0], exp(result.second), 1.0e-8);
    result = exponential_test<RK2>(0.001);
-   test("Exponential RK2 x", result.first[0], exp(result.second), 1.0e-1);
+   res = test("Exponential RK2 x", result.first[0], exp(result.second), 1.0e-1);
    result = exponential_test<DOPRI45>(0.001);
-   test("Exponential DOPRI45 x", result.first[0], exp(result.second), 1.0e-8);
+   res = test("Exponential DOPRI45 x", result.first[0], exp(result.second), 1.0e-8);
    result = exponential_test<PC233>(0.001);
-   test("Exponential PC233 x", result.first[0], exp(result.second), 1.0e-2);
+   res = test("Exponential PC233 x", result.first[0], exp(result.second), 1.0e-2);
 
    std::cout << "\n";
    auto result2 = exponential_test_mod<modular::RK4<double>>(0.001);
-   test("Exponential RK4 Modular x", result2.first, exp(result2.second), 1.0e-8);
+   res = test("Exponential RK4 Modular x", result2.first, exp(result2.second), 1.0e-8);
    result2 = exponential_test_mod<modular::RK2<double>>(0.001);
-   test("Exponential RK2 Modular x", result2.first, exp(result2.second), 1.0e-1);
+   res = test("Exponential RK2 Modular x", result2.first, exp(result2.second), 1.0e-1);
    result2 = exponential_test_mod<modular::PC233<double>>(0.001);
-   test("Exponential PC233 Modular x", result2.first, exp(result2.second), 1.0e-2);
+   res = test("Exponential PC233 Modular x", result2.first, exp(result2.second), 1.0e-2);
 
-   return 0;
+   return res.failed();
 }
