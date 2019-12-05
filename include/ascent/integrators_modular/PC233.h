@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "ascent/Utility.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 #include "ascent/integrators_modular/RK4.h"
 
@@ -45,15 +46,15 @@ namespace asc
             case 0:
                x0 = x;
                xd0 = xd;
-               x = x0 + c0 * dt * (7.0*xd0 - xd_1);   // X(n + 1/3), third step computation
+               x = x0 + c0 * dt * (7 * xd0 - xd_1);   // X(n + 1/3), third step computation
                break;
             case 1:
                xd1 = xd;
-               x = x0 + c1 * dt * (39.0*xd1 - 4.0*xd0 + xd_1);   // X(n + 2/3), two thirds step computation
+               x = x0 + c1 * dt * (39 * xd1 - 4 * xd0 + xd_1);   // X(n + 2/3), two thirds step computation
                break;
             case 2:
                xd2 = xd;
-               x = x0 + c2 * dt * (xd0 + 3.0*xd2);
+               x = x0 + c2 * dt * (xd0 + 3 * xd2);
                xd_1 = xd0;
                break;
             }
