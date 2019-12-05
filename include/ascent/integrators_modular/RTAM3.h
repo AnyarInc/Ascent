@@ -17,7 +17,7 @@
 #include "ascent/modular/Module.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 
-// Second order, two pass Real Time (RT) Adams Moulton predictor-corrector integrator
+// Third order, two pass Real Time (RT) Adams Moulton predictor-corrector integrator
 // A new family of real-time predictor-corrector integration algorithms
 // R.M. Howe. A new family of real-time predictor-corrector integration algorithms. The University of Michigan. September 1991.
 
@@ -26,35 +26,39 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct RTAM2prop : public Propagator<value_t>
+      struct RTAM3prop : public Propagator<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
-            if (state.memory.size() < 2)
+            if (state.memory.size() < 4)
             {
-               state.memory.resize(2);
+               state.memory.resize(4);
             }
             auto& x0 = state.memory[0];
-            auto& xd1 = state.memory[1];
+            auto& xd0 = state.memory[1];
+            auto& xd1 = state.memory[2];
+            auto& xd2 = state.memory[3];
 
             switch (Propagator<value_t>::pass)
             {
             case 0:
                x0 = x;
-               x = x0 + dt / 8 * (5 * xd - xd1);
-               xd1 = xd;
+               xd0 = xd;
+               x = x0 + dt / 24 * (17 * xd - 7 * xd1 + 2 * xd2);
                break;
             case 1:
-               x = x0 + dt * xd; // where xd is the evaluated derivative at n + 1/2 (half a step)
+               x = x0 + dt / 18 * (20 * xd - 3 * xd0 + xd1);
+               xd2 = xd1;
+               xd1 = xd0;
                break;
             }
          }
       };
 
       template <class value_t>
-      struct RTAM2stepper : public TimeStepper<value_t>
+      struct RTAM3stepper : public TimeStepper<value_t>
       {
          value_t t0{};
 
@@ -76,10 +80,10 @@ namespace asc
       };
 
       template <class value_t>
-      struct RTAM2
+      struct RTAM3
       {
-         RTAM2prop<value_t> propagator;
-         RTAM2stepper<value_t> stepper;
+         RTAM3prop<value_t> propagator;
+         RTAM3stepper<value_t> stepper;
 
          template <class modules_t>
          void operator()(modules_t& modules, value_t& t, const value_t dt)
@@ -91,7 +95,7 @@ namespace asc
             propagate(modules, dt);
             stepper(pass, t, dt);
             ++pass;
-
+            
             update(modules);
             propagate(modules, dt);
             stepper(pass, t, dt);
