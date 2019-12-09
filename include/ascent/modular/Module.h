@@ -109,42 +109,42 @@ namespace asc
    };
 
    template <class modules_t>
-   inline void init(modules_t& modules)
+   inline void init(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         if (!module->init_called)
+         if (!block->init_called)
          {
-            module->init();
-            module->init_called = true;
+            block->init();
+            block->init_called = true;
          }   
       }
    }
 
    template <class modules_t>
-   inline void update(modules_t& modules)
+   inline void update(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         module->operator()();
+         block->operator()();
       }
    }
 
    template <class modules_t>
-   inline void postcalc(modules_t& modules)
+   inline void postcalc(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         module->postcalc();
+         block->postcalc();
       }
    }
 
    template <class states_t>
-   inline void add_states(states_t& states, std::vector<std::shared_ptr<Module>>& modules)
+   inline void add_states(states_t& states, std::vector<std::shared_ptr<Module>>& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         auto& m_states = module->states;
+         auto& m_states = block->states;
          for (auto& state : m_states)
          {
             states.emplace_back(state);
@@ -153,18 +153,18 @@ namespace asc
    }
 
    template <class states_t>
-   inline void add_states(states_t& states, Module& module)
+   inline void add_states(states_t& states, Module& block)
    {
-      for (auto& state : module.states)
+      for (auto& state : block.states)
       {
          states.emplace_back(state);
       }
    }
 
    template <class states_t>
-   inline void add_states(states_t& states, std::shared_ptr<Module>& module)
+   inline void add_states(states_t& states, std::shared_ptr<Module>& block)
    {
-      for (auto& state : module->states)
+      for (auto& state : block->states)
       {
          states.emplace_back(state);
       }
