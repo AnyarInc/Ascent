@@ -16,9 +16,6 @@
 
 #include "ascent/direct/State.h"
 
-#include <memory>
-#include <vector>
-
 namespace asc
 {
    template <class value_t>
@@ -31,7 +28,7 @@ namespace asc
       Propagator& operator=(Propagator&&) = default;
       virtual ~Propagator() {}
 
-      virtual void operator()(State&, const double) = 0; // inputs: states, dt (time step)
+      virtual void operator()(State&, const double) = 0; // inputs: state, dt (time step)
 
       size_t pass{};
    };
@@ -54,7 +51,7 @@ namespace asc
       Module& operator=(Module&&) = default;
       virtual ~Module() = default;
 
-      Phase* phase{};
+      [[deprecated("Must inherit from this class and add phase if required.")]] Phase* phase{};
 
       std::vector<State> states;
 
@@ -139,8 +136,8 @@ namespace asc
       }
    }
 
-   template <class states_t>
-   inline void add_states(states_t& states, std::vector<std::shared_ptr<Module>>& blocks)
+   template <class states_t, class ptr_t>
+   inline void add_states(states_t& states, std::vector<ptr_t>& blocks)
    {
       for (auto& block : blocks)
       {
@@ -153,7 +150,7 @@ namespace asc
    }
 
    template <class states_t>
-   inline void add_states(states_t& states, Module& block)
+   [[deprecated("use add_states with pointer types instead: Module*")]] inline void add_states(states_t& states, Module& block)
    {
       for (auto& state : block.states)
       {
@@ -161,8 +158,8 @@ namespace asc
       }
    }
 
-   template <class states_t>
-   inline void add_states(states_t& states, std::shared_ptr<Module>& block)
+   template <class states_t, class ptr_t>
+   inline void add_states(states_t& states, ptr_t& block)
    {
       for (auto& state : block->states)
       {
