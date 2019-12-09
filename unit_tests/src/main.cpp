@@ -126,14 +126,14 @@ std::vector<double> airy_test_mod(const double dt)
    system->b = 0.0;
    system->sim->t = 0.0;
    system->sim->t_end = 10.0;
-   std::vector<asc::Module*> module{};
-   module.emplace_back(system.get());
+   std::vector<asc::Module*> blocks{};
+   blocks.emplace_back(system.get());
 
    system->init();
 
    while (system->sim->t < system->sim->t_end)
    {
-      integrator(module, system->sim->t, dt);
+      integrator(blocks, system->sim->t, dt);
    }
 
    return{ system->a, system->b };
@@ -166,14 +166,14 @@ std::pair<double, double> exponential_test_mod(const double dt)
    system->value = 1.0;
    sim->t = 0.0;
    sim->t_end = 10.0;
-   std::vector<asc::Module*> module{};
-   module.emplace_back(system.get());
+   std::vector<asc::Module*> blocks{};
+   blocks.emplace_back(system.get());
 
    system->init();
 
    while (sim->t < sim->t_end)
    {
-      integrator(module, sim->t, dt);
+      integrator(blocks, sim->t, dt);
    }
 
    return{ system->value, sim->t };
