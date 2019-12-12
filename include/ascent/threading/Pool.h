@@ -11,137 +11,56 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #pragma once
 
-#include "ascent/threading/Queue.h"
+#include <thread>
+#include <deque>
+#include <vector>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 
-// a multi-threaded pool of queues, with simple load balancing
-
-namespace asc
-{
-   struct Pool final
+namespace asc {
+   // A simple threadpool
+   class Pool
    {
-      Pool() = default;
-      Pool(const Pool&) = default;
-      Pool(Pool&&) = default;
-      Pool& operator=(const Pool&) = default;
-      Pool& operator=(Pool&&) = default;
-      ~Pool()
+   public:
+      Pool(const unsigned int n = std::thread::hardware_concurrency())
       {
-         run_balancer = false;
-         cv_balancer.notify_one();
-
-         while (balancer_active)
-         {
-            std::this_thread::yield();
-         }
+         n_threads(n);
       }
-
-      std::vector<std::unique_ptr<Queue>> pool;
-
-      std::atomic<bool> use_load_balancer = true;
-
+      void n_threads(const unsigned int n)
+      {
+         for (size_t i = threads.size(); i < n; ++i)
+            threads.emplace_back(std::thread(&Pool::worker, this));
+      }
+      void emplace_back(std::function<void()>&& task)
+      {
+         std::lock_guard<std::mutex> lock(m);
+         queue.emplace_back(std::forward<std::function<void()>>(task));
+         work_cv.notify_one();
+      }
       bool computing() const
       {
-         for (auto& q : pool)
-         {
-            if (q->computing())
-               return true;
-         }
-         return false;
+         return (working != 0);
       }
-
-      void n_threads(const size_t n)
-      {
-         for (size_t i = pool.size(); i < n; ++i)
-         {
-            pool.emplace_back(std::make_unique<Queue>());
-            pool.back()->pool_balancer = &cv_balancer;
-         }
+      void wait() {
+         std::unique_lock<std::mutex> lock(m);
+         if (queue.empty() && (working == 0))
+            return;
+         done_cv.wait(lock, [&]() { return queue.empty() && (working == 0); });
       }
-
-      void wait()
+      ~Pool()
       {
-         for (auto& q : pool)
-         {
-            if (q->computing())
-            {
-               q->wait();
-            }
-         }
-      }
+         //Close the queue and finish all the remaining work
+         std::unique_lock<std::mutex> lock(m);
+         closed = true;
+         work_cv.notify_all();
+         lock.unlock();
 
-      template <typename ...Args>
-      void emplace_back(Args&&... args)
-      {
-         if (pool.empty())
-         {
-            pool.emplace_back(std::make_unique<Queue>());
-            pool.back()->pool_balancer = &cv_balancer;
-         }
-         auto compare = [](auto& l, auto& r) { return l->size() < r->size(); };
-         auto it = std::min_element(pool.begin(), pool.end(), compare);
-         (*it)->emplace_back(std::forward<Args>(args)...);
-
-         if (use_load_balancer && !balancer_active)
-         {
-            balancer_active = true;
-
-            auto balancer = [&]
-            {
-               while (run_balancer)
-               {
-                  size_t min_size = std::numeric_limits<size_t>::max();
-                  size_t max_size{};
-                  size_t min_index{}, max_index{};
-
-                  const auto n_pool = pool.size();
-                  for (auto i = 0; i < n_pool; ++i)
-                  {
-                     const auto n = pool[i]->size();
-                     if (n < min_size)
-                     {
-                        min_size = n;
-                        min_index = i;
-                     }
-                     if (n > max_size)
-                     {
-                        max_size = n;
-                        max_index = i;
-                     }
-                  }
-
-                  if (max_index != min_index && max_size > 1 && min_size < 1)
-                  {
-                     auto& p_max = pool[max_index];
-                     if (p_max->jobs.size()) // check that we haven't finished jobs while finding the max and min
-                     {
-                        const auto job = p_max->jobs.back();
-                        p_max->jobs.pop_back();
-
-                        auto& p_min = pool[min_index];
-                        p_min->emplace_back(std::move(job));
-                     }
-                  }
-
-                  if (run_balancer)
-                  {
-                     std::unique_lock<std::mutex> lock(mtx_balancer);
-                     cv_balancer.wait(lock);
-                  }
-               }
-
-               balancer_active = false;
-            };
-
-            std::thread(balancer).detach();
-         }
-      }
-
-      size_t size() const
-      {
-         return pool.size();
+         for (auto& t : threads)
+            if (t.joinable())
+               t.join();
       }
 
       template <typename ChaiScript>
@@ -157,12 +76,48 @@ namespace asc
          c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
          c.add(fun([](T& pool, const std::function<void()>& func) { pool.emplace_back(func); }), "push_back");
          c.add(fun(&T::size), "size");
+            //Notify that work is finished
+            lock.lock();
+            --working;
+            done_cv.notify_all();
       }
 
    private:
-      std::condition_variable cv_balancer;
-      std::atomic<bool> balancer_active = false;
-      std::atomic<bool> run_balancer = true;
-      std::mutex mtx_balancer;
+      std::vector< std::thread > threads;
+      std::deque< std::function<void()> > queue;
+      std::atomic<unsigned int> working = 0;
+      bool closed = false;
+      std::mutex m;
+      std::condition_variable work_cv;
+      std::condition_variable done_cv;
+
+      void worker()
+      {
+         while (true)
+         {
+            //Wait for work
+            std::unique_lock<std::mutex> lock(m);
+            work_cv.wait(lock, [this]() { return closed || !queue.empty(); });
+            if (queue.empty()) {
+               if (closed) {
+                  return;
+               }
+               continue;
+            }
+
+            //Grab work
+            ++working;
+            auto work = queue.front();
+            queue.pop_front();
+            lock.unlock();
+
+            work();
+
+            //Notify that work is finished
+            lock.lock();
+            --working;
+            done_cv.notify_all();
+         }
+      }
    };
 }
