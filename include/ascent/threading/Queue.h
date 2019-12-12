@@ -89,7 +89,6 @@ namespace asc
       }
 
       std::deque<std::function<void()>> jobs;
-      std::condition_variable* pool_balancer{};
       std::atomic<bool> adding{};
 
    private:
@@ -113,11 +112,6 @@ namespace asc
                   jobs.pop_front();
                }
                running_jobs = false;
-               if (pool_balancer)
-               {
-                  pool_balancer->notify_one();
-                  std::this_thread::sleep_for(std::chrono::milliseconds(1)); // TO DO: THIS IS A HACK!
-               }
 
                if (jobs.empty())
                {
