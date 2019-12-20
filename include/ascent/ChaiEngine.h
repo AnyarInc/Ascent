@@ -16,6 +16,7 @@
 
 #include "ascent/Ascent.h"
 #include "ascent/threading/Pool.h"
+#include "ascent/threading/Queue.h"
 #include "chaiscript/chaiscript.hpp"
 #include "chaiscript/chaiscript_stdlib.hpp"
 
