@@ -78,36 +78,36 @@ namespace asc
          RK2stepper<value_t> stepper;
 
          template <typename modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
+         void operator()(modules_t& blocks, value_t& t, const value_t dt)
          {
             auto& pass = propagator.pass;
             pass = 0;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks);
+            propagate(blocks, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks);
+            propagate(blocks, dt);
             stepper(pass, t, dt);
          }
 
          template <class modules_t>
-         void update(modules_t& modules)
+         void update(modules_t& blocks)
          {
-            for (auto& module : modules)
+            for (auto& block : blocks)
             {
-               (*module)();
+               (*block)();
             }
          }
 
          template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
+         void propagate(modules_t& blocks, const value_t dt)
          {
-            for (auto& module : modules)
+            for (auto& block : blocks)
             {
-               module->propagate(propagator, dt);
+               block->propagate(propagator, dt);
             }
          }
       };

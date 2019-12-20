@@ -16,9 +16,6 @@
 
 #include "ascent/direct/State.h"
 
-#include <memory>
-#include <vector>
-
 namespace asc
 {
    template <class value_t>
@@ -31,7 +28,7 @@ namespace asc
       Propagator& operator=(Propagator&&) = default;
       virtual ~Propagator() {}
 
-      virtual void operator()(State&, const double) = 0; // inputs: states, dt (time step)
+      virtual void operator()(State&, const double) = 0; // inputs: state, dt (time step)
 
       size_t pass{};
    };
@@ -54,7 +51,7 @@ namespace asc
       Module& operator=(Module&&) = default;
       virtual ~Module() = default;
 
-      Phase* phase{};
+      [[deprecated("Must inherit from this class and add phase if required.")]] Phase* phase{};
 
       std::vector<State> states;
 
@@ -109,42 +106,42 @@ namespace asc
    };
 
    template <class modules_t>
-   inline void init(modules_t& modules)
+   inline void init(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         if (!module->init_called)
+         if (!block->init_called)
          {
-            module->init();
-            module->init_called = true;
+            block->init();
+            block->init_called = true;
          }   
       }
    }
 
    template <class modules_t>
-   inline void update(modules_t& modules)
+   inline void update(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         module->operator()();
+         block->operator()();
       }
    }
 
    template <class modules_t>
-   inline void postcalc(modules_t& modules)
+   inline void postcalc(modules_t& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         module->postcalc();
+         block->postcalc();
       }
    }
 
-   template <class states_t>
-   inline void add_states(states_t& states, std::vector<std::shared_ptr<Module>>& modules)
+   template <class states_t, class ptr_t>
+   inline void add_states(states_t& states, std::vector<ptr_t>& blocks)
    {
-      for (auto& module : modules)
+      for (auto& block : blocks)
       {
-         auto& m_states = module->states;
+         auto& m_states = block->states;
          for (auto& state : m_states)
          {
             states.emplace_back(state);
@@ -153,18 +150,18 @@ namespace asc
    }
 
    template <class states_t>
-   inline void add_states(states_t& states, Module& module)
+   [[deprecated("use add_states with pointer types instead: Module*")]] inline void add_states(states_t& states, Module& block)
    {
-      for (auto& state : module.states)
+      for (auto& state : block.states)
       {
          states.emplace_back(state);
       }
    }
 
-   template <class states_t>
-   inline void add_states(states_t& states, std::shared_ptr<Module>& module)
+   template <class states_t, class ptr_t>
+   inline void add_states(states_t& states, ptr_t& block)
    {
-      for (auto& state : module->states)
+      for (auto& state : block->states)
       {
          states.emplace_back(state);
       }

@@ -17,52 +17,44 @@
 #include "ascent/modular/Module.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 
+// Second order, two pass Real Time (RT) Adams Moulton predictor-corrector integrator
+// A new family of real-time predictor-corrector integration algorithms
+// R.M. Howe. A new family of real-time predictor-corrector integration algorithms. The University of Michigan. September 1991.
+
 namespace asc
 {
    namespace modular
    {
       template <class value_t>
-      struct RK4prop : public Propagator<value_t>
+      struct RTAM2prop : public Propagator<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
-            if (state.memory.size() < 5)
+            if (state.memory.size() < 2)
             {
-               state.memory.resize(5);
+               state.memory.resize(2);
             }
             auto& x0 = state.memory[0];
-            auto& xd0 = state.memory[1];
-            auto& xd1 = state.memory[2];
-            auto& xd2 = state.memory[3];
-            auto& xd3 = state.memory[4];
+            auto& xd1 = state.memory[1];
 
             switch (Propagator<value_t>::pass)
             {
             case 0:
                x0 = x;
-               xd0 = xd;
-               x = x0 + 0.5 * dt * xd0;
+               x = x0 + dt / 8 * (5 * xd - xd1);
+               xd1 = xd;
                break;
             case 1:
-               xd1 = xd;
-               x = x0 + 0.5 * dt * xd1;
-               break;
-            case 2:
-               xd2 = xd;
-               x = x0 + dt * xd2;
-               break;
-            case 3:
-               xd3 = xd;
-               x = x0 + dt / 6.0 * (xd0 + 2 * xd1 + 2 * xd2 + xd3);
+               x = x0 + dt * xd; // where xd is the evaluated derivative at n + 1/2 (half a step)
                break;
             }
          }
       };
 
       template <class value_t>
-      struct RK4stepper : public TimeStepper<value_t>
+      struct RTAM2stepper : public TimeStepper<value_t>
       {
          value_t t0{};
 
@@ -74,7 +66,7 @@ namespace asc
                t0 = t;
                t += 0.5 * dt;
                break;
-            case 2:
+            case 1:
                t = t0 + dt;
                break;
             default:
@@ -84,50 +76,42 @@ namespace asc
       };
 
       template <class value_t>
-      struct RK4
+      struct RTAM2
       {
-         RK4prop<value_t> propagator;
-         RK4stepper<value_t> stepper;
+         RTAM2prop<value_t> propagator;
+         RTAM2stepper<value_t> stepper;
 
          template <class modules_t>
-         void operator()(modules_t& blocks, value_t& t, const value_t dt)
+         void operator()(modules_t& modules, value_t& t, const value_t dt)
          {
             auto& pass = propagator.pass;
             pass = 0;
             
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(blocks);
-            propagate(blocks, dt);
-            ++pass;
-
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
             stepper(pass, t, dt);
-            ++pass;
-
-            update(blocks);
-            propagate(blocks, dt);
          }
 
          template <class modules_t>
-         void update(modules_t& blocks)
+         void update(modules_t& modules)
          {
-            for (auto& block : blocks)
+            for (auto& module : modules)
             {
-               (*block)();
+               (*module)();
             }
          }
 
          template <class modules_t>
-         void propagate(modules_t& blocks, const value_t dt)
+         void propagate(modules_t& modules, const value_t dt)
          {
-            for (auto& block : blocks)
+            for (auto& module : modules)
             {
-               block->propagate(propagator, dt);
+               module->propagate(propagator, dt);
             }
          }
       };

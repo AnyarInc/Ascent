@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "ascent/Utility.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 #include "ascent/integrators_modular/RK4.h"
 
@@ -45,15 +46,15 @@ namespace asc
             case 0:
                x0 = x;
                xd0 = xd;
-               x = x0 + c0 * dt * (7.0*xd0 - xd_1);   // X(n + 1/3), third step computation
+               x = x0 + c0 * dt * (7 * xd0 - xd_1);   // X(n + 1/3), third step computation
                break;
             case 1:
                xd1 = xd;
-               x = x0 + c1 * dt * (39.0*xd1 - 4.0*xd0 + xd_1);   // X(n + 2/3), two thirds step computation
+               x = x0 + c1 * dt * (39 * xd1 - 4 * xd0 + xd_1);   // X(n + 2/3), two thirds step computation
                break;
             case 2:
                xd2 = xd;
-               x = x0 + c2 * dt * (xd0 + 3.0*xd2);
+               x = x0 + c2 * dt * (xd0 + 3 * xd2);
                xd_1 = xd0;
                break;
             }
@@ -95,16 +96,16 @@ namespace asc
          PC233stepper<value_t> stepper;
 
          template <typename modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
+         void operator()(modules_t& blocks, value_t& t, const value_t dt)
          {
             if (!initialized)
             {
                // Run initializer integrator
-               initializer(modules, t, dt);
+               initializer(blocks, t, dt);
                // Assign previous time steps derivative
-               for (auto& module : modules)
+               for (auto& block : blocks)
                {
-                  for (auto& state : module->states)
+                  for (auto& state : block->states)
                   {
                      state.memory.resize(5);
                      auto& xd_1 = state.memory[4];
@@ -117,36 +118,36 @@ namespace asc
             auto& pass = propagator.pass;
             pass = 0;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks);
+            propagate(blocks, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks);
+            propagate(blocks, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks);
+            propagate(blocks, dt);
             stepper(pass, t, dt);
          }
 
          template <class modules_t>
-         void update(modules_t& modules)
+         void update(modules_t& blocks)
          {
-            for (auto& module : modules)
+            for (auto& block : blocks)
             {
-               (*module)();
+               (*block)();
             }
          }
 
          template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
+         void propagate(modules_t& blocks, const value_t dt)
          {
-            for (auto& module : modules)
+            for (auto& block : blocks)
             {
-               module->propagate(propagator, dt);
+               block->propagate(propagator, dt);
             }
          }
 

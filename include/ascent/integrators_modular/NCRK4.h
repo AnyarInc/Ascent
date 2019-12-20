@@ -17,21 +17,20 @@
 #include "ascent/modular/Module.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 
+// Non-confluent RK4 method ( "3/8th's Rule" )
+
 namespace asc
 {
    namespace modular
    {
       template <class value_t>
-      struct RK4prop : public Propagator<value_t>
+      struct NCRK4prop : public Propagator<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
-            if (state.memory.size() < 5)
-            {
-               state.memory.resize(5);
-            }
+            state.memory.resize(5);
             auto& x0 = state.memory[0];
             auto& xd0 = state.memory[1];
             auto& xd1 = state.memory[2];
@@ -42,27 +41,27 @@ namespace asc
             {
             case 0:
                x0 = x;
-               xd0 = xd;
-               x = x0 + 0.5 * dt * xd0;
+               xd0 = xd;  // k1
+               x = x0 + (1.0/3.0) * dt * xd0;
                break;
             case 1:
-               xd1 = xd;
-               x = x0 + 0.5 * dt * xd1;
+               xd1 = xd;  // k2
+               x = x0 + dt * ( (-1.0/3.0) * xd0 +  xd1) ;
                break;
             case 2:
-               xd2 = xd;
-               x = x0 + dt * xd2;
+               xd2 = xd;  // k3
+               x = x0 + dt * ( xd0 - xd1 + xd2);
                break;
             case 3:
-               xd3 = xd;
-               x = x0 + dt / 6.0 * (xd0 + 2 * xd1 + 2 * xd2 + xd3);
+               xd3 = xd; // k4
+               x = x0 + dt / 8.0 * (xd0 + 3.0 * xd1 + 3.0 * xd2 + xd3);
                break;
             }
          }
       };
 
       template <class value_t>
-      struct RK4stepper : public TimeStepper<value_t>
+      struct NCRK4stepper : public TimeStepper<value_t>
       {
          value_t t0{};
 
@@ -72,7 +71,10 @@ namespace asc
             {
             case 0:
                t0 = t;
-               t += 0.5 * dt;
+               t += 1.0/3.0 * dt;
+               break;
+            case 1:
+               t = t0 + 2.0/3.0 * dt;
                break;
             case 2:
                t = t0 + dt;
@@ -84,50 +86,50 @@ namespace asc
       };
 
       template <class value_t>
-      struct RK4
+      struct NCRK4
       {
-         RK4prop<value_t> propagator;
-         RK4stepper<value_t> stepper;
+         NCRK4prop<value_t> propagator;
+         NCRK4stepper<value_t> stepper;
 
          template <class modules_t>
-         void operator()(modules_t& blocks, value_t& t, const value_t dt)
+         void operator()(modules_t& modules, value_t& t, const value_t dt)
          {
             auto& pass = propagator.pass;
             pass = 0;
             
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
             ++pass;
 
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
             stepper(pass, t, dt);
             ++pass;
 
-            update(blocks);
-            propagate(blocks, dt);
+            update(modules);
+            propagate(modules, dt);
          }
 
          template <class modules_t>
-         void update(modules_t& blocks)
+         void update(modules_t& modules)
          {
-            for (auto& block : blocks)
+            for (auto& module : modules)
             {
-               (*block)();
+               (*module)();
             }
          }
 
          template <class modules_t>
-         void propagate(modules_t& blocks, const value_t dt)
+         void propagate(modules_t& modules, const value_t dt)
          {
-            for (auto& block : blocks)
+            for (auto& module : modules)
             {
-               block->propagate(propagator, dt);
+               module->propagate(propagator, dt);
             }
          }
       };
