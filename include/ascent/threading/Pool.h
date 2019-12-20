@@ -34,12 +34,12 @@ namespace asc {
          for (size_t i = threads.size(); i < n; ++i)
             threads.emplace_back(std::thread(&Pool::worker, this));
       }
-      void emplace_back(std::function<void()>&& task)
-      {
-         std::lock_guard<std::mutex> lock(m);
-         queue.emplace_back(std::forward<std::function<void()>>(task));
-         work_cv.notify_one();
-      }
+	  void emplace_back(std::function<void()>&& task)
+	  {
+		  std::lock_guard<std::mutex> lock(m);
+		  queue.emplace_back(std::forward<std::function<void()>>(task));
+		  work_cv.notify_one();
+	  }
       bool computing() const
       {
          return (working != 0);
@@ -50,6 +50,10 @@ namespace asc {
             return;
          done_cv.wait(lock, [&]() { return queue.empty() && (working == 0); });
       }
+	  size_t size() const
+	  {
+		  return threads.size();
+	  }
       ~Pool()
       {
          //Close the queue and finish all the remaining work
@@ -69,17 +73,11 @@ namespace asc {
          using namespace chaiscript;
          using T = Pool;
          c.add(constructor<T()>(), name);
-
          c.add(fun(&T::computing), "computing");
          c.add(fun(&T::n_threads), "n_threads");
          c.add(fun(&T::wait), "wait");
-         c.add(fun(&T::emplace_back<std::function<void()>>), "emplace_back");
-         c.add(fun([](T& pool, const std::function<void()>& func) { pool.emplace_back(func); }), "push_back");
+         c.add(fun(&T::emplace_back), "emplace_back");
          c.add(fun(&T::size), "size");
-            //Notify that work is finished
-            lock.lock();
-            --working;
-            done_cv.notify_all();
       }
 
    private:
