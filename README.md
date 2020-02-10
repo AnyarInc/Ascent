@@ -47,7 +47,7 @@ Easily multi-thread systems and change integrators on the fly
 
 ***
 ## Requirements
-- C++14 compliant compiler
+- C++17 compliant compiler
 
 ## Scripting Requirements
 - [ChaiScript](http://chaiscript.com/) Embedded Scripting Language
