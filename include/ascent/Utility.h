@@ -25,6 +25,16 @@ namespace asc
    constexpr const value_t cx(long double v) { return static_cast<value_t>(v); }
    constexpr const value_t operator"" _v(long double v) { return static_cast<value_t>(v); }
 
+   struct AdaptiveIntegrator
+   {
+      AdaptiveIntegrator() = default;
+      AdaptiveIntegrator(const AdaptiveIntegrator&) = default;
+      AdaptiveIntegrator(AdaptiveIntegrator&&) = default;
+      AdaptiveIntegrator& operator=(const AdaptiveIntegrator&) = default;
+      AdaptiveIntegrator& operator=(AdaptiveIntegrator&&) = default;
+      virtual ~AdaptiveIntegrator() = default;
+   };
+
    template <typename T>
    struct AdaptiveT
    {

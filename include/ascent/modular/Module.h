@@ -51,8 +51,6 @@ namespace asc
       Module& operator=(Module&&) = default;
       virtual ~Module() = default;
 
-      [[deprecated("Must inherit from this class and add phase if required.")]] Phase* phase{};
-
       std::vector<State> states;
 
       template <class x_t, class xd_t>
@@ -119,20 +117,88 @@ namespace asc
    }
 
    template <class modules_t>
-   inline void update(modules_t& blocks)
+   void update(modules_t& blocks)
    {
-      for (auto& block : blocks)
+      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
       {
-         block->operator()();
+         for (auto& block : blocks)
+         {
+            block.second->operator()();
+         }
+      }
+      else
+      {
+         for (auto& block : blocks)
+         {
+            (*block)();
+         }
+      }
+   }
+
+   template <class modules_t>
+   void update(modules_t& blocks, asc::Module* run_first)
+   {
+      if (run_first)
+      {
+         (*run_first)();
+      }
+      update(blocks);
+   }
+
+   template <class modules_t, class propagator_t, class value_t>
+   void propagate(modules_t& blocks, propagator_t& propagator, const value_t dt)
+   {
+      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
+      {
+         for (auto& block : blocks)
+         {
+            block.second->propagate(propagator, dt);
+         }
+      }
+      else
+      {
+         for (auto& block : blocks)
+         {
+            block->propagate(propagator, dt);
+         }
+      }
+   }
+
+   template <class modules_t>
+   void postprop(modules_t& blocks)
+   {
+      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
+      {
+         for (auto& block : blocks)
+         {
+            block.second->postprop();
+         }
+      }
+      else
+      {
+         for (auto& block : blocks)
+         {
+            block->postprop();
+         }
       }
    }
 
    template <class modules_t>
    inline void postcalc(modules_t& blocks)
    {
-      for (auto& block : blocks)
+      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
       {
-         block->postcalc();
+         for (auto& block : blocks)
+         {
+            block.second->postcalc();
+         }
+      }
+      else
+      {
+         for (auto& block : blocks)
+         {
+            block->postcalc();
+         }
       }
    }
 

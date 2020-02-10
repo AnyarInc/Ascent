@@ -92,6 +92,8 @@ namespace asc
       template <typename value_t, typename init_integrator = RK4<value_t>>
       struct PC233
       {
+         asc::Module* run_first{};
+
          PC233prop<value_t> propagator;
          PC233stepper<value_t> stepper;
 
@@ -100,18 +102,40 @@ namespace asc
          {
             if (!initialized)
             {
+               if (run_first)
+               {
+                  initializer.run_first = run_first;
+               }
                // Run initializer integrator
                initializer(blocks, t, dt);
-               // Assign previous time steps derivative
-               for (auto& block : blocks)
+
+               if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
                {
-                  for (auto& state : block->states)
+                  // Assign previous time step's derivative
+                  for (auto& block : blocks)
                   {
-                     state.memory.resize(5);
-                     auto& xd_1 = state.memory[4];
-                     xd_1 = *state.xd;
+                     for (auto& state : block.second->states)
+                     {
+                        state.memory.resize(5);
+                        auto& xd_1 = state.memory[4];
+                        xd_1 = *state.xd;
+                     }
                   }
                }
+               else
+               {
+                  // Assign previous time step's derivative
+                  for (auto& block : blocks)
+                  {
+                     for (auto& state : block->states)
+                     {
+                        state.memory.resize(5);
+                        auto& xd_1 = state.memory[4];
+                        xd_1 = *state.xd;
+                     }
+                  }
+               }
+
                initialized = true;
                return;
             }
@@ -119,36 +143,21 @@ namespace asc
             pass = 0;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
-         }
-
-         template <class modules_t>
-         void update(modules_t& blocks)
-         {
-            for (auto& block : blocks)
-            {
-               (*block)();
-            }
-         }
-
-         template <class modules_t>
-         void propagate(modules_t& blocks, const value_t dt)
-         {
-            for (auto& block : blocks)
-            {
-               block->propagate(propagator, dt);
-            }
+            postprop(blocks);
          }
 
       private:

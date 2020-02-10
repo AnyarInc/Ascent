@@ -83,6 +83,8 @@ namespace asc
       template <class value_t>
       struct RK3
       {
+         asc::Timing<double>* timing{};
+
          RK3prop<value_t> propagator;
          RK3stepper<value_t> stepper;
 
@@ -110,6 +112,10 @@ namespace asc
          template <class modules_t>
          void update(modules_t& modules)
          {
+            if (timing)
+            {
+               (*timing)();
+            }
             for (auto& module : modules)
             {
                (*module)();

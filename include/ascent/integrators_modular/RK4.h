@@ -86,6 +86,8 @@ namespace asc
       template <class value_t>
       struct RK4
       {
+         asc::Module* run_first{};
+
          RK4prop<value_t> propagator;
          RK4stepper<value_t> stepper;
 
@@ -96,39 +98,25 @@ namespace asc
             pass = 0;
             
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
-         }
-
-         template <class modules_t>
-         void update(modules_t& blocks)
-         {
-            for (auto& block : blocks)
-            {
-               (*block)();
-            }
-         }
-
-         template <class modules_t>
-         void propagate(modules_t& blocks, const value_t dt)
-         {
-            for (auto& block : blocks)
-            {
-               block->propagate(propagator, dt);
-            }
+            propagate(blocks, propagator, dt);
+            postprop(blocks);
          }
       };
    }

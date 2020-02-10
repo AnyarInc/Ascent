@@ -82,6 +82,8 @@ namespace asc
       template <class value_t>
       struct RTAM3
       {
+         asc::Timing<double>* timing{};
+
          RTAM3prop<value_t> propagator;
          RTAM3stepper<value_t> stepper;
 
@@ -104,6 +106,10 @@ namespace asc
          template <class modules_t>
          void update(modules_t& modules)
          {
+            if (timing)
+            {
+               (*timing)();
+            }
             for (auto& module : modules)
             {
                (*module)();

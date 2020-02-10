@@ -31,7 +31,10 @@ namespace asc
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
-            state.memory.resize(1);
+            if (state.memory.size() < 1)
+            {
+               state.memory.resize(1);
+            }
             auto& x0 = state.memory[0];
 
             switch (Propagator<value_t>::pass)
@@ -74,6 +77,8 @@ namespace asc
       template <typename value_t>
       struct RK2
       {
+         asc::Module* run_first{};
+
          RK2prop<value_t> propagator;
          RK2stepper<value_t> stepper;
 
@@ -84,31 +89,15 @@ namespace asc
             pass = 0;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
             update(blocks);
-            propagate(blocks, dt);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
-         }
-
-         template <class modules_t>
-         void update(modules_t& blocks)
-         {
-            for (auto& block : blocks)
-            {
-               (*block)();
-            }
-         }
-
-         template <class modules_t>
-         void propagate(modules_t& blocks, const value_t dt)
-         {
-            for (auto& block : blocks)
-            {
-               block->propagate(propagator, dt);
-            }
+            postprop(blocks);
          }
       };
    }

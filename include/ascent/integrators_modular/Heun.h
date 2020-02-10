@@ -73,6 +73,8 @@ namespace asc
       template <typename value_t>
       struct Heun
       {
+         asc::Timing<double>* timing{};
+
          Heunprop<value_t> propagator;
          Heunstepper<value_t> stepper;
 
@@ -95,6 +97,10 @@ namespace asc
          template <class modules_t>
          void update(modules_t& modules)
          {
+            if (timing)
+            {
+               (*timing)();
+            }
             for (auto& module : modules)
             {
                (*module)();
