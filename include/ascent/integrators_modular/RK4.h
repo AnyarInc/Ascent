@@ -97,24 +97,24 @@ namespace asc
             auto& pass = propagator.pass;
             pass = 0;
             
-            update(blocks);
+            update(blocks, run_first);
             propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
             postprop(blocks);
             ++pass;
 
-            update(blocks);
+            update(blocks, run_first);
             propagate(blocks, propagator, dt);
             postprop(blocks);
             ++pass;
 
-            update(blocks);
+            update(blocks, run_first);
             propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
             postprop(blocks);
             ++pass;
 
-            update(blocks);
+            update(blocks, run_first);
             propagate(blocks, propagator, dt);
             postprop(blocks);
          }
