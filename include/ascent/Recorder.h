@@ -52,9 +52,11 @@ namespace asc
       RecorderT& operator=(const RecorderT&) = default;
       RecorderT& operator=(RecorderT&&) = default;
 
-      std::vector<std::function<std::vector<T>()>> recording_functions; //!< std::vector of type erasing converters (std::functions) to enable user defined classes to be recorded.
+      std::vector<T*> recording_pointers; //!< std::vector of pointers to data to be recorded on updat
+      std::vector<std::function<void(std::vector<T>&)>> recording_functions; //!< std::vector of type erasing converters (std::functions) to enable user defined classes to be recorded.
       std::vector<std::string> titles; //!< Titles that will appear at the top row of a CSV export.
       asc::stack<std::vector<T>, block_size> history; //!< All recorded data is stored in history.
+      std::vector<T> buffer; //!< Temp buffer to to reduce dynamic memory allocations
       int precision{}; //!< An integer to specify the recording precision for CSV output. If precision is not set (left at 0) then values will be exported with the c++ filestream default precision. This precision only affects export to CSV.
 
       /// \brief Add row of history data
@@ -70,7 +72,7 @@ namespace asc
       /// \brief Add an item to the current row of data
       ///
       /// \param[in] x Item to be added to last row of history.
-      inline void add(const T& x) { history.back().push_back(x); }
+      inline void add(const T& x) { history.back().emplace_back(x); }
 
       /// \brief Add a std::vector of items to the current row of data
       ///
@@ -78,7 +80,7 @@ namespace asc
       inline void add(const std::vector<T>& v)
       {
          for (auto& x : v)
-            history.back().push_back(x);
+            history.back().emplace_back(x);
       }
 
       /// \brief Add a title for the next column of data for output to CSV.
@@ -112,7 +114,19 @@ namespace asc
       void record(V& x, const std::string& title)
       {
          titles.emplace_back(title);
-         recording_functions.emplace_back([&]() -> std::vector<T> { return{ static_cast<T>(x) }; });
+         recording_pointers.emplace_back(nullptr);
+         recording_functions.emplace_back([&](std::vector<T>& res) { res = { static_cast<T>(x) }; });
+      }
+
+      /// \brief Specify an item of this recorder's type T, to be saved every time update is called.
+      ///
+      /// \param[in] x The user defined input type, internally a reference to this instance is saved, so the Recorder should not outlive the object.
+      /// \param[in] title The title associated with this input variable.
+      template <>
+      void record<T>(T& x, const std::string& title)
+      {
+         titles.emplace_back(title);
+         recording_pointers.emplace_back(&x);
       }
 
       /// \brief Specify a std::vector<T> of this recorder's type T, to be saved every time update is called.
@@ -132,15 +146,28 @@ namespace asc
       {
          for (auto& title : new_titles)
             titles.emplace_back(title);
-         recording_functions.emplace_back([&]() -> std::vector<T> { return v; });
+         recording_functions.emplace_back([&](std::vector<T>& res) { res = v; });
+         recording_pointers.emplace_back(nullptr);
       }
 
       /// \brief All variables specified via the record functions will be saved when update is called.
       void update()
       {
-         history.emplace_back(); // need to allocate the slot that we will be adding (appending) to
-         for (auto& rec : recording_functions)
-            add(rec());
+         history.emplace_back();
+         auto& row = history.back();
+         row.reserve(history.front().size());
+         int func_index = 0;
+         for (auto& ptr : recording_pointers)
+         {
+            if (ptr) 
+               history.back().emplace_back(*ptr);
+            else 
+            {
+               buffer.clear();
+               recording_functions[func_index++](buffer);
+               add(buffer);
+            }
+         }
       }
 
       /// \brief Write out a Comma Separated Value (CSV) file from the recorded data.
@@ -238,6 +265,8 @@ namespace asc
 			   file << '\n';
 		   }
 
+         const size_t n_rows = history.size();
+         if (n_rows == 0) return;
 		   const size_t n_columns = history.front().size();
 		   const size_t n_rows = history.size();
 		   size_t capacity = n_columns * n_rows * 20;
