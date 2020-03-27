@@ -221,7 +221,9 @@ namespace asc
             }
          }
          else
+         {
             throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
+         }
       }
    private:
       #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
@@ -268,7 +270,6 @@ namespace asc
          const size_t n_rows = history.size();
          if (n_rows == 0) return;
 		   const size_t n_columns = history.front().size();
-		   const size_t n_rows = history.size();
 		   size_t capacity = n_columns * n_rows * 20;
 		   size_t size = 0;
 		   char* buffer = (char*)malloc(capacity * sizeof(char));
