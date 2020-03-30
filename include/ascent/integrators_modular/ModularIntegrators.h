@@ -16,15 +16,6 @@
 
 namespace asc
 {
-   template <typename T>
-   struct is_pair : std::false_type { };
-
-   template <typename T, typename U>
-   struct is_pair<std::pair<T, U>> : std::true_type { };
-
-   template <typename T>
-   constexpr bool is_pair_v = is_pair<T>::value;
-
    namespace modular
    {
       template <class value_t>

@@ -25,9 +25,28 @@
 #include "ascent/containers/stack.h"
 
 #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
-   #include <charconv>
-   #include <variant>
+#include <charconv>
+#include <variant>
 #endif
+
+// Helpers
+namespace {
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
+      //Handles writing variant types
+      template <typename T0, typename ... Ts>
+      void stream_insert(std::ostream& stream, const std::variant<T0, Ts...>& value)
+      {
+         std::visit([&](auto&& arg) { stream << arg; }, value);
+      }
+#endif
+
+      ///Handles non variant types
+      template <typename V>
+      void stream_insert(std::ostream& stream, const V& value)
+      {
+         stream << value;
+      }
+}
 
 namespace asc
 {
@@ -38,7 +57,7 @@ namespace asc
       out << std::setprecision(n) << input;
       return out.str();
    }
-   
+
    /// Recorder is a fast, type specific class for generically recording data.
    ///
    /// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
@@ -122,8 +141,7 @@ namespace asc
       ///
       /// \param[in] x The user defined input type, internally a reference to this instance is saved, so the Recorder should not outlive the object.
       /// \param[in] title The title associated with this input variable.
-      template <>
-      void record<T>(T& x, const std::string& title)
+      void record(T& x, const std::string& title)
       {
          titles.emplace_back(title);
          recording_pointers.emplace_back(&x);
@@ -159,9 +177,9 @@ namespace asc
          int func_index = 0;
          for (auto& ptr : recording_pointers)
          {
-            if (ptr) 
+            if (ptr)
                history.back().emplace_back(*ptr);
-            else 
+            else
             {
                buffer.clear();
                recording_functions[func_index++](buffer);
@@ -225,80 +243,64 @@ namespace asc
             throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
          }
       }
-   private:
-      #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
-      //Handles writing variant types
-      template <typename T0, typename ... Ts>
-      void stream_insert (std::ostream& stream, std::variant<T0, Ts...> const& value)
-      {
-         std::visit([&](auto&& arg) { stream << arg; }, value);
-      }
-      #endif
-
-      //Seperate stream insertion so we cand handle certain types 
-      template <typename T>
-      void stream_insert (std::ostream& stream, T const& value)
-      {
-         stream << value;
-      }
    };
 
-   #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
+#if (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
    //Faster cvs writer using to_chars for floating point to double conversion
    template<>
-   void RecorderT<double>::csv(const std::string& file_name, const std::vector<std::string>& names)
+   inline void RecorderT<double>::csv(const std::string& file_name, const std::vector<std::string>& names)
    {
-	   std::ofstream file;
-	   file.open(file_name + ".csv");
+      std::ofstream file;
+      file.open(file_name + ".csv");
 
-	   if (file)
-	   {
-		   const size_t n_names = names.size();
-		   for (size_t i = 0; i < n_names; ++i)
-		   {
-			   file << names[i].c_str();
-			   if (i < n_names - 1)
-			   {
-				   file << ",";
-			   }
-		   }
-		   if (n_names > 0)
-		   {
-			   file << '\n';
-		   }
+      if (file)
+      {
+         const size_t n_names = names.size();
+         for (size_t i = 0; i < n_names; ++i)
+         {
+            file << names[i].c_str();
+            if (i < n_names - 1)
+            {
+               file << ",";
+            }
+         }
+         if (n_names > 0)
+         {
+            file << '\n';
+         }
 
          const size_t n_rows = history.size();
          if (n_rows == 0) return;
-		   const size_t n_columns = history.front().size();
-		   size_t capacity = n_columns * n_rows * 20;
-		   size_t size = 0;
-		   char* buffer = (char*)malloc(capacity * sizeof(char));
-		   for (auto& row : history) {
-			   bool isFirst = true;
-			   for (auto& item : row) {
-				   if (capacity - size < 258) {
-					   capacity *= 2;
-					   buffer = (char*)realloc(buffer, capacity * sizeof(char));
-				   }
-				   if (isFirst)
-					   isFirst = false;
-				   else
-					   *(buffer + size++) = ',';
-				   auto[p, err] = std::to_chars(buffer + size, buffer + capacity, item);
-				   if (err != std::errc())
-					   std::runtime_error("Recorder exceeded buffer length");
-				   size = p - buffer;
-			   }
-			   //We could just allways add a comma after each item and overwrite the last comma with a newline so we dont need isFirst
-			   *(buffer + size++) = '\n'; 
-		   }
-		   *(buffer + size++) = 0;
-		   file << buffer;
-		   free(buffer);
+         const size_t n_columns = history.front().size();
+         size_t capacity = n_columns * n_rows * 20;
+         size_t size = 0;
+         char* buffer = (char*)malloc(capacity * sizeof(char));
+         for (auto& row : history) {
+            bool isFirst = true;
+            for (auto& item : row) {
+               if (capacity - size < 258) {
+                  capacity *= 2;
+                  buffer = (char*)realloc(buffer, capacity * sizeof(char));
+               }
+               if (isFirst)
+                  isFirst = false;
+               else
+                  *(buffer + size++) = ',';
+               auto[p, err] = std::to_chars(buffer + size, buffer + capacity, item);
+               if (err != std::errc())
+                  std::runtime_error("Recorder exceeded buffer length");
+               size = p - buffer;
+            }
+            //We could just allways add a comma after each item and overwrite the last comma with a newline so we dont need isFirst
+            *(buffer + size++) = '\n';
+         }
+         *(buffer + size++) = 0;
+         file << buffer;
+         free(buffer);
 
-	   }
-	   else
-		   throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
+      }
+      else
+         throw std::runtime_error("Record: file '" + file_name + ".csv' could not be opened.");
    }
-   #endif
+#endif
 }
