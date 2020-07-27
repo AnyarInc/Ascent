@@ -88,49 +88,37 @@ namespace asc
       template <class value_t>
       struct NCRK4
       {
+         asc::Module* run_first{};
+		 
          NCRK4prop<value_t> propagator;
          NCRK4stepper<value_t> stepper;
 
          template <class modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
+         void operator()(modules_t& blocks, value_t& t, const value_t dt)
          {
             auto& pass = propagator.pass;
             pass = 0;
             
-            update(modules);
-            propagate(modules, dt);
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
+            postprop(blocks);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
-         }
-
-         template <class modules_t>
-         void update(modules_t& modules)
-         {
-            for (auto& module : modules)
-            {
-               (*module)();
-            }
-         }
-
-         template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
-         {
-            for (auto& module : modules)
-            {
-               module->propagate(propagator, dt);
-            }
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
+            postprop(blocks);
          }
       };
    }

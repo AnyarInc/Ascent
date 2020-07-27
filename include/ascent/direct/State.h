@@ -21,6 +21,7 @@ namespace asc
    // pointers, rather than references are used for the possibility of developing states with shared_ptrs for x and xd
    struct State
    {
+      State() = default;
       State(double& x, double& xd) noexcept : x(&x), xd(&xd) {}
       State(const State&) = default;
       State(State&&) = default;

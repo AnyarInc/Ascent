@@ -73,47 +73,27 @@ namespace asc
       template <typename value_t>
       struct Heun
       {
-         asc::Timing<double>* timing{};
+         asc::Module* run_first{};
 
          Heunprop<value_t> propagator;
          Heunstepper<value_t> stepper;
 
          template <typename modules_t>
-         void operator()(modules_t& modules, value_t& t, const value_t dt)
+         void operator()(modules_t& blocks, value_t& t, const value_t dt)
          {
             auto& pass = propagator.pass;
             pass = 0;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
+            postprop(blocks);
             ++pass;
 
-            update(modules);
-            propagate(modules, dt);
+            update(blocks, run_first);
+            propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
-         }
-
-         template <class modules_t>
-         void update(modules_t& modules)
-         {
-            if (timing)
-            {
-               (*timing)();
-            }
-            for (auto& module : modules)
-            {
-               (*module)();
-            }
-         }
-
-         template <class modules_t>
-         void propagate(modules_t& modules, const value_t dt)
-         {
-            for (auto& module : modules)
-            {
-               module->propagate(propagator, dt);
-            }
+            postprop(blocks);
          }
       };
    }
