@@ -73,6 +73,8 @@ namespace asc
       template <typename value_t>
       struct Heun
       {
+         static constexpr size_t n_substeps = 2;
+         
          asc::Module* run_first{};
 
          Heunprop<value_t> propagator;

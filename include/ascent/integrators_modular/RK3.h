@@ -83,6 +83,8 @@ namespace asc
       template <class value_t>
       struct RK3
       {
+         static constexpr size_t n_substeps = 3;
+         
          asc::Module* run_first{};
 
          RK3prop<value_t> propagator;

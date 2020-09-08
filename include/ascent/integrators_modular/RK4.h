@@ -86,6 +86,8 @@ namespace asc
       template <class value_t>
       struct RK4
       {
+         static constexpr size_t n_substeps = 4;
+         
          asc::Module* run_first{};
 
          RK4prop<value_t> propagator;

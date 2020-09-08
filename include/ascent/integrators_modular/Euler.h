@@ -34,6 +34,8 @@ namespace asc
       template <typename value_t>
       struct Euler
       {
+         static constexpr size_t n_substeps = 1;
+         
          asc::Module* run_first{};
 
          EulerProp<value_t> propagator;

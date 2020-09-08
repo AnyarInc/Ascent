@@ -136,6 +136,8 @@ namespace asc
       template <class value_t>
       struct DOPRI45 : AdaptiveIntegrator
       {
+         static constexpr size_t n_substeps = 5;
+         
          DOPRI45prop<value_t> propagator;
          DOPRI45stepper<value_t> stepper;
 

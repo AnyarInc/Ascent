@@ -92,6 +92,8 @@ namespace asc
       template <typename value_t, typename init_integrator = RK4<value_t>>
       struct PC233
       {
+         static constexpr size_t n_substeps = 3;
+         
          asc::Module* run_first{};
 
          PC233prop<value_t> propagator;

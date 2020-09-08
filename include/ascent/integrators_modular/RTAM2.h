@@ -78,6 +78,8 @@ namespace asc
       template <class value_t>
       struct RTAM2
       {
+         static constexpr size_t n_substeps = 2;
+         
          asc::Module* run_first{};
 
          RTAM2prop<value_t> propagator;

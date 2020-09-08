@@ -77,6 +77,8 @@ namespace asc
       template <typename value_t>
       struct RK2
       {
+         static constexpr size_t n_substeps = 2;
+         
          asc::Module* run_first{};
 
          RK2prop<value_t> propagator;

@@ -88,6 +88,8 @@ namespace asc
       template <class value_t>
       struct NCRK4
       {
+         static constexpr size_t n_substeps = 4;
+         
          asc::Module* run_first{};
 		 
          NCRK4prop<value_t> propagator;
