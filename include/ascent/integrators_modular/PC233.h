@@ -34,7 +34,9 @@ namespace asc
          {
             auto& x = *state.x;
             auto& xd = *state.xd;
-            state.memory.resize(5);
+            if (state.memory.size() < 5) {
+               state.memory.resize(5);
+            }
             auto& x0 = state.memory[0];
             auto& xd0 = state.memory[1];
             auto& xd1 = state.memory[2];
