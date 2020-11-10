@@ -81,8 +81,7 @@ namespace asc
       template <class data_t>
       void make_states(data_t* x, data_t* xd, const size_t n)
       {
-         for (size_t i = 0; i < n; ++i)
-         {
+         for (size_t i = 0; i < n; ++i) {
             states.emplace_back(x[i], xd[i]);
          }
       }
@@ -90,19 +89,18 @@ namespace asc
       template <class states_t>
       void add_states(states_t& ext_states)
       {
-         for (auto& state : states)
-         {
+         for (auto& state : states) {
             ext_states.emplace_back(state);
          }
       }
 
       virtual void link() {} // linking modules
       virtual void init() {} // initialization
-      virtual void operator()() {} // derivative updates
+      virtual void operator()() {} // derivative accumulation
+      virtual void apply() {} // apply accumulations
       virtual void propagate(Propagator<double>& propagator, const double dt)
       {
-         for (auto& state : states)
-         {
+         for (auto& state : states) {
             propagator(state, dt);
          }
       }
@@ -125,33 +123,42 @@ namespace asc
       }
    }
 
-   template <class modules_t>
-   void update(modules_t& blocks)
+   template <void(Module::* func)(), class modules_t>
+   void call_loop(modules_t& blocks)
    {
       if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
       {
-         for (auto& block : blocks)
-         {
-            block.second->operator()();
+         for (auto& block : blocks) {
+            (block.second->*func)();
          }
       }
       else
       {
-         for (auto& block : blocks)
-         {
-            (*block)();
+         for (auto& block : blocks) {
+            (block->*func)();
          }
       }
    }
 
    template <class modules_t>
+   void update(modules_t& blocks)
+   {
+      call_loop<&Module::operator()>(blocks);
+   }
+
+   template <class modules_t>
    void update(modules_t& blocks, asc::Module* run_first)
    {
-      if (run_first)
-      {
+      if (run_first) {
          (*run_first)();
       }
       update(blocks);
+   }
+
+   template <class modules_t>
+   void apply(modules_t& blocks)
+   {
+      call_loop<&Module::apply>(blocks);
    }
 
    template <class modules_t, class propagator_t, class value_t>
@@ -159,15 +166,13 @@ namespace asc
    {
       if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
       {
-         for (auto& block : blocks)
-         {
+         for (auto& block : blocks) {
             block.second->propagate(propagator, dt);
          }
       }
       else
       {
-         for (auto& block : blocks)
-         {
+         for (auto& block : blocks) {
             block->propagate(propagator, dt);
          }
       }
@@ -176,39 +181,13 @@ namespace asc
    template <class modules_t>
    void postprop(modules_t& blocks)
    {
-      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
-      {
-         for (auto& block : blocks)
-         {
-            block.second->postprop();
-         }
-      }
-      else
-      {
-         for (auto& block : blocks)
-         {
-            block->postprop();
-         }
-      }
+      call_loop<&Module::postprop>(blocks);
    }
 
    template <class modules_t>
    inline void postcalc(modules_t& blocks)
    {
-      if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
-      {
-         for (auto& block : blocks)
-         {
-            block.second->postcalc();
-         }
-      }
-      else
-      {
-         for (auto& block : blocks)
-         {
-            block->postcalc();
-         }
-      }
+      call_loop<&Module::postcalc>(blocks);
    }
 
    template <class states_t, class ptr_t>
@@ -217,27 +196,16 @@ namespace asc
       for (auto& block : blocks)
       {
          auto& m_states = block->states;
-         for (auto& state : m_states)
-         {
+         for (auto& state : m_states) {
             states.emplace_back(state);
          }
-      }
-   }
-
-   template <class states_t>
-   [[deprecated("use add_states with pointer types instead: Module*")]] inline void add_states(states_t& states, Module& block)
-   {
-      for (auto& state : block.states)
-      {
-         states.emplace_back(state);
       }
    }
 
    template <class states_t, class ptr_t>
    inline void add_states(states_t& states, ptr_t& block)
    {
-      for (auto& state : block->states)
-      {
+      for (auto& state : block->states) {
          states.emplace_back(state);
       }
    }
