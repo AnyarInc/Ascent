@@ -91,12 +91,14 @@ namespace asc
             pass = 0;
 
             update(blocks, run_first);
+            apply(blocks);
             propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
             postprop(blocks);
             ++pass;
 
             update(blocks, run_first);
+            apply(blocks);
             propagate(blocks, propagator, dt);
             stepper(pass, t, dt);
             postprop(blocks);

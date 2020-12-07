@@ -44,6 +44,7 @@ namespace asc
          void operator()(modules_t& blocks, value_t& t, const value_t dt)
          {
             update(blocks, run_first);
+            apply(blocks);
             propagate(blocks, propagator, dt);
             t += dt;
             postprop(blocks);
