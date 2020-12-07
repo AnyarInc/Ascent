@@ -16,7 +16,7 @@
 
 #include "ascent/modular/Module.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
-
+#include "ascent/timing/Timing.h"
 #include "ascent/Utility.h"
 
 namespace asc
@@ -151,6 +151,7 @@ namespace asc
             if (!fsal_computed) // if an adaptive stepper hasn't computed the first same as last state, we must compute the step here
             {
                update(blocks);
+               apply(blocks);
 
                auto solve = [&](auto& state)
                {
@@ -189,6 +190,7 @@ namespace asc
             for (auto i = 0; i < 5; ++i)
             {
                update(blocks);
+               apply(blocks);
                propagate(blocks, propagator, dt);
                stepper(pass, t, dt);
                postprop(blocks);
@@ -196,6 +198,7 @@ namespace asc
             }
 
             update(blocks);
+            apply(blocks);
             propagate(blocks, propagator, dt);
             postprop(blocks);
          }
@@ -214,6 +217,7 @@ namespace asc
 
             // xd6 is xd0, because first same as last (FSAL)
             update(blocks);
+            apply(blocks);
             for (auto& block : blocks)
             {
                auto solve = [&](auto& state)
@@ -292,7 +296,10 @@ namespace asc
             if (e_max > 1.0)
             {
                dt *= std::max(0.9_v * pow(e_max, -cx(1.0 / 3.0)), 0.2_v);
-               run_first->base_time_step(dt);
+
+               if (run_first) {
+                  run_first->base_time_step(dt);
+               }
 
                t = t0;
 
@@ -326,7 +333,10 @@ namespace asc
             {
                e_max = std::max(3.2e-4_v, e_max); // 3.2e-4 = pow(5, -5)
                dt *= 0.9_v * pow(e_max, -0.2_v);
-               run_first->base_time_step(dt);
+
+               if (run_first) {
+                  run_first->base_time_step(dt);
+               }
             }
 
             for (auto& block : blocks)
