@@ -15,6 +15,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
 namespace asc
 {
