@@ -19,41 +19,113 @@
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
+#include <future>
+
+#ifdef _WIN32
+#define NOMINMAX
+#include <Windows.h>
+#endif
 
 namespace asc {
    // A simple threadpool
    class Pool
    {
    public:
-      Pool(const unsigned int n = std::thread::hardware_concurrency())
+
+      Pool() : Pool(concurrency()) {}
+
+      Pool(const unsigned int n)
       {
          n_threads(n);
       }
+
       void n_threads(const unsigned int n)
       {
-         for (size_t i = threads.size(); i < n; ++i)
+         #ifdef _WIN32
+         // TODO smarter distrubution of threads among groups.
+         auto num_groups = GetActiveProcessorGroupCount();
+         int group = 0;
+         for (size_t i = threads.size(); i < n; ++i) {
+            auto thread = std::thread(&Pool::worker, this);
+            auto hndl = thread.native_handle();
+            GROUP_AFFINITY affinity;
+            if (GetThreadGroupAffinity(hndl, &affinity) && affinity.Group != group) {
+               affinity.Group = group;
+               SetThreadGroupAffinity(hndl, &affinity, nullptr);
+            }
+            group++;
+            if (group >= num_groups) group = 0;
+            threads.emplace_back(std::move(thread));
+         }
+         #else
+         for (size_t i = threads.size(); i < n; ++i) {
             threads.emplace_back(std::thread(&Pool::worker, this));
+         }
+         #endif
       }
-	  void emplace_back(std::function<void()>&& task)
-	  {
-		  std::lock_guard<std::mutex> lock(m);
-		  queue.emplace_back(std::forward<std::function<void()>>(task));
-		  work_cv.notify_one();
-	  }
+
+      unsigned int concurrency()
+      {
+         #ifdef _WIN32
+         auto num_groups = GetActiveProcessorGroupCount();
+         unsigned int sum = 0;
+         for (WORD i = 0; i < num_groups; ++i) {
+            sum += GetMaximumProcessorCount(i);
+         }
+         return sum;
+         #else
+         return std::thread::hardware_concurrency();
+         #endif
+      }
+
+      template<typename F>
+      std::future<std::invoke_result_t<std::decay_t<F>>> emplace_back(F &&func)
+      {
+         using result_type = decltype(func());
+
+         std::lock_guard<std::mutex> lock(m);
+
+         auto promise = std::make_shared<std::promise<result_type>>();
+
+         queue.emplace_back([=]() {
+            try
+            {
+               if constexpr (std::is_void<result_type>::value) {
+                  func();
+               }
+               else {
+                  promise->set_value(func());
+               }
+            }
+            catch (...)
+            {
+               promise->set_exception(std::current_exception());
+            }
+         });
+
+         work_cv.notify_one();
+
+         return promise->get_future();
+      }
+
       bool computing() const
       {
          return (working != 0);
       }
+
       void wait() {
          std::unique_lock<std::mutex> lock(m);
          if (queue.empty() && (working == 0))
             return;
          done_cv.wait(lock, [&]() { return queue.empty() && (working == 0); });
       }
-	  size_t size() const
-	  {
-		  return threads.size();
-	  }
+
+      size_t size() const
+      {
+         return threads.size();
+      }
+
       ~Pool()
       {
          //Close the queue and finish all the remaining work
@@ -62,13 +134,13 @@ namespace asc {
          work_cv.notify_all();
          lock.unlock();
 
-         for (auto& t : threads)
+         for (auto &t : threads)
             if (t.joinable())
                t.join();
       }
 
       template <typename ChaiScript>
-      static void script(ChaiScript& c, const std::string& name)
+      static void script(ChaiScript &c, const std::string &name)
       {
          using namespace chaiscript;
          using T = Pool;
