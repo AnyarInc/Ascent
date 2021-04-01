@@ -23,8 +23,13 @@
 #include <future>
 
 #ifdef _WIN32
+#ifdef NOMINMAX
+#include <windows.h>
+#else
 #define NOMINMAX
-#include <Windows.h>
+#include <windows.h>
+#undef NOMINMAX
+#endif
 #endif
 
 namespace asc {
