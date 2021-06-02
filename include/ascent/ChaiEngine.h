@@ -102,8 +102,8 @@ namespace asc
 
          // Integrators
          integrator<Euler>("ascEuler");
-         integrator<RK2>("RK2");
-         integrator<RK4>("RK4");
+         integrator<RK2>("ascRK2");
+         integrator<RK4>("ascRK4");
 
          // threading
          Queue::script(*this, "Queue");
