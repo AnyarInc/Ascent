@@ -16,7 +16,7 @@
 
 #include "ascent/Ascent.h"
 #include "ascent/threading/Pool.h"
-#include "ascent/threading/Queue.h"
+// #include "ascent/threading/Queue.h"
 #include "chaiscript/chaiscript.hpp"
 #include "chaiscript/chaiscript_stdlib.hpp"
 
@@ -106,7 +106,7 @@ namespace asc
          integrator<RK4>("ascRK4");
 
          // threading
-         Queue::script(*this, "Queue");
+         // Queue::script(*this, "Queue");
          Pool::script(*this, "Pool");
          add(fun([] { return std::thread::hardware_concurrency(); }), "hardware_concurrency");
          add(fun([](asc::Recorder& rec, const int sig_digits) { rec.precision = sig_digits; }), "precision");

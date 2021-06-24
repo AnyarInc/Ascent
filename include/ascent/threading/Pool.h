@@ -153,7 +153,7 @@ namespace asc {
          c.add(fun(&T::computing), "computing");
          c.add(fun(&T::n_threads), "n_threads");
          c.add(fun(&T::wait), "wait");
-         c.add(fun(&T::emplace_back), "emplace_back");
+         // c.add(fun(&T::emplace_back), "emplace_back");
          c.add(fun(&T::size), "size");
       }
 
