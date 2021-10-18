@@ -34,7 +34,7 @@ namespace asc
 
       SamplerT<value_t> sampler{ t, dt };
 
-      bool sample(const value_t sample_rate) noexcept
+      bool sample(const value_t sample_rate) const noexcept
       {
          return sampler(sample_rate);
       }

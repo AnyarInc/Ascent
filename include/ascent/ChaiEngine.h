@@ -111,10 +111,10 @@ namespace asc
          add(fun([] { return std::thread::hardware_concurrency(); }), "hardware_concurrency");
          add(fun([](asc::Recorder& rec, const int sig_digits) { rec.precision = sig_digits; }), "precision");
       }
-      ChaiEngine(const ChaiEngine&) = default;
-      ChaiEngine(ChaiEngine&&) = default;
-      ChaiEngine& operator=(const ChaiEngine&) = default;
-      ChaiEngine& operator=(ChaiEngine&&) = default;
+      ChaiEngine(const ChaiEngine&) = delete;
+      ChaiEngine(ChaiEngine&&) = delete;
+      ChaiEngine& operator=(const ChaiEngine&) = delete;
+      ChaiEngine& operator=(ChaiEngine&&) = delete;
 
    private:
       template <typename T>
