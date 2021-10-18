@@ -23,76 +23,76 @@ namespace asc
    template <class T>
    struct Link
    {
-      std::remove_cv_t<T>>* module{}; // Non-const qualified module for doing low level, potentially dangerous simulation stuff.
-                                      // The pointer will be returned with T qualifiers, so that the module can be const qualified.
+      std::remove_cv_t<T>>* module_{}; // Non-const qualified module for doing low level, potentially dangerous simulation stuff.
+                                       // The pointer will be returned with T qualifiers, so that the module can be const qualified.
 
       Link& operator=(const T* ptr) noexcept
       {
-         module = ptr;
+         module_ = ptr;
          return *this;
       }
 
       T& operator*()
       {
          check();
-         return *module;
+         return *module_;
       }
       
       T* operator->()
       {
          check();
-         return module;
+         return module_;
       }
 
-      explicit operator bool() const noexcept { return (module != 0); }
+      explicit operator bool() const noexcept { return (module_ != 0); }
 
       std::string to_string() const { return "Link<" + static_cast<std::string>(typeid(T).name()) + '>'; }
 
    private:
       void check_init()
       {
-         if (!module->init_run)
+         if (!module_->init_run)
          {
-            if (module->init_called)
+            if (module_->init_called)
             {
                throw std::runtime_error("Circular dependency for init(): " + to_string());
             }
             else
             {
-               module->init_called = true;
-               module->init();
+               module_->init_called = true;
+               module_->init();
             }
-            module->init_run = true;
+            module_->init_run = true;
          }
       }
 
       void check()
       {
-         if (module)
+         if (module_)
          {
-            assert(module->phase);
+            assert(module_->phase);
             // The Link phase and Postprop phase do not check initialization.
             // Linking may occur prior to initialization and is not ordered.
             // Postprop is not sequenced, as calculations may only be performed on propagated states
-            switch (*module->phase)
+            switch (*module_->phase)
             {
             case Phase::Init:
                check_init();
                return;
             case Phase::Update:
                check_init();
-               if (!module->update_run)
+               if (!module_->update_run)
                {
-                  if (module->update_called)
+                  if (module_->update_called)
                   {
                      throw std::runtime_error("Circular dependency for update operator(): " + to_string());
                   }
                   else
                   {
-                     module->update_called = true;
-                     module->operator()();
+                     module_->update_called = true;
+                     module_->operator()();
                   }
-                  module->update_run = true;
+                  module_->update_run = true;
                }
                return;
             case Phase::Postcalc:
@@ -109,9 +109,9 @@ namespace asc
       }
    };
 
-   template <class T> bool operator==(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module == ptr; }
-   template <class T> bool operator==(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module == ptr; }
+   template <class T> bool operator==(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module_ == ptr; }
+   template <class T> bool operator==(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module_ == ptr; }
 
-   template <class T> bool operator!=(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module != ptr; }
-   template <class T> bool operator!=(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module != ptr; }
+   template <class T> bool operator!=(const Link<T>& link, std::nullptr_t ptr) noexcept { return link.module_ != ptr; }
+   template <class T> bool operator!=(std::nullptr_t ptr, const Link<T>& link) noexcept { return link.module_ != ptr; }
 }

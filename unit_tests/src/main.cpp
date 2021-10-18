@@ -19,6 +19,8 @@
 #include "ascent/integrators_modular/PC233.h"
 #include "ascent/timing/Timing.h"
 
+#include <memory>
+
 using namespace asc;
 
 struct Airy
