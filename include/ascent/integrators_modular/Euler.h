@@ -16,6 +16,8 @@
 
 // Simple Euler integration.
 
+#include "ascent/modular/Module.h"
+#include "ascent/direct/State.h"
 #include "ascent/integrators_modular/ModularIntegrators.h"
 
 namespace asc
