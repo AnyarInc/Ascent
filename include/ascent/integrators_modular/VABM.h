@@ -19,6 +19,8 @@
 #include "ascent/integrators_modular/RK4.h"
 #include "ascent/timing/Timing.h"
 
+#include <cmath>
+
 // Variable step Adams-Bashforth-Moulton predictor corrector of configurable order.
 // This is based on Krogh's Variable Step Adams Formulas and the implementation in OrdinaryDiffEq.jl
 namespace asc
@@ -375,10 +377,10 @@ namespace asc
                   const auto phi_np1_a = &state.memory[propagator.phi_np1_i]; // Array length k+1
                   const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };
 
-                  value_t lte = abs((propagator.g[order] - propagator.g[order - 1]) * phi_np1(order));
+                  value_t lte = std::abs((propagator.g[order] - propagator.g[order - 1]) * phi_np1(order));
 
-                  //value_t e = lte / (abs_tol + rel_tol * (abs(x0) + 0.01 * abs(xd0)));
-                  value_t e = std::max(lte / abs_tol, lte / (rel_tol * abs(x0)));
+                  //value_t e = lte / (abs_tol + rel_tol * (std::abs(x0) + 0.01 * std::abs(xd0)));
+                  value_t e = std::max(lte / abs_tol, lte / (rel_tol * std::abs(x0)));
 
                   if (e > e_max)
                   {
@@ -404,7 +406,7 @@ namespace asc
 
             if (e_max > 1.0)
             {
-               dt *= std::max(0.9_v * pow(e_max, -cx(1.0 / (order + 1))), 0.2_v);
+               dt *= std::max(0.9_v * std::pow(e_max, -cx(1.0 / (order + 1))), 0.2_v);
 
                if (run_first) {
                   run_first->base_time_step(dt);
@@ -446,7 +448,7 @@ namespace asc
             if (e_max < 0.5_v)
             {
                e_max = std::max(1e-7, e_max);
-               dt *= std::min(0.9_v * pow(e_max, -cx(1.0 / (order + 1))), 5.0_v);
+               dt *= std::min(0.9_v * std::pow(e_max, -cx(1.0 / (order + 1))), 5.0_v);
 
                if (run_first) {
                   run_first->base_time_step(dt);
