@@ -17,6 +17,8 @@
 #include "ascent/integrators_modular/RK2.h"
 #include "ascent/integrators_modular/RK4.h"
 #include "ascent/integrators_modular/PC233.h"
+#include "ascent/integrators_modular/ABM4.h"
+#include "ascent/integrators_modular/VABM.h"
 #include "ascent/timing/Timing.h"
 
 #include <memory>
@@ -157,6 +159,32 @@ std::pair<double, double> exponential_test_mod(const double dt)
    return{ system->value, sim->t };
 }
 
+template <class Integrator>
+std::pair<double, double> exponential_test_mod_adaptive()
+{
+   Integrator integrator;
+   auto system = std::make_shared<ExponentialMod>();
+   auto sim = std::make_shared<asc::Timing<double>>();
+   auto settings = AdaptiveT<double>();
+   system->value = 1.0;
+   sim->t = 0.0;
+   sim->t_end = 10.0;
+   double dt = 0.001;
+   settings.abs_tol = 1e-9;
+   settings.rel_tol = 1e-5;
+   std::vector<asc::Module *> blocks{};
+   blocks.emplace_back(system.get());
+
+   system->init();
+
+   while (sim->t < sim->t_end)
+   {
+      integrator(blocks, sim->t, dt, settings);
+   }
+
+   return{ system->value, sim->t };
+}
+
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
@@ -222,6 +250,11 @@ TEST_CASE("Exponential PC233", "[exponential]") {
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-6));
 }
 
+TEST_CASE("Exponential ABM4", "[exponential]") {
+   auto result = exponential_test<ABM4>(0.001);
+   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
+}
+
 TEST_CASE("Exponential Modular RK4", "[exponential][modular]") {
    auto result = exponential_test_mod<modular::RK4<double>>(0.001);
    REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
@@ -235,4 +268,19 @@ TEST_CASE("Exponential Modular RK2", "[exponential][modular]") {
 TEST_CASE("Exponential Modular PC233", "[exponential][modular]") {
    auto result = exponential_test_mod<modular::PC233<double>>(0.001);
    REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-6));
+}
+
+TEST_CASE("Exponential Modular ABM4", "[exponential][modular]") {
+   auto result = exponential_test_mod<modular::ABM4<double>>(0.001);
+   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
+}
+
+TEST_CASE("Exponential Modular VABM", "[exponential][modular]") {
+   auto result = exponential_test_mod<modular::VABM<double>>(0.001);
+   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
+}
+
+TEST_CASE("Exponential Modular VABM adaptive", "[exponential][modular][adaptive]") {
+   auto result = exponential_test_mod_adaptive<modular::VABM<double>>();
+   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
 }

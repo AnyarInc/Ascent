@@ -28,6 +28,7 @@
 #include "ascent/integrators/DOPRI45.h"
 #include "ascent/integrators/RTAM4.h"
 #include "ascent/integrators/PC233.h"
+#include "ascent/integrators/ABM4.h"
 
 // Linear Algebra
 #include "ascent/ParamV.h"
@@ -59,6 +60,7 @@ namespace asc
    using RK4 = RK4T<state_t>;
    using DOPRI45 = DOPRI45T<state_t>;
    using PC233 = PC233T<state_t>;
+   using ABM4 = ABM4T<state_t>;
 
    // Linear Algebra
    using ParamV = ParamVT<value_t>;
