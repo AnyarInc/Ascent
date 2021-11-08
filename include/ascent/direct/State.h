@@ -22,7 +22,7 @@ namespace asc
    struct State
    {
       State() = default;
-      State(double& x, double& xd) noexcept : x(&x), xd(&xd) {}
+      State(double& _x, double& _xd) noexcept : x(&_x), xd(&_xd) {}
       State(const State&) = default;
       State(State&&) = default;
       State& operator=(const State&) = default;

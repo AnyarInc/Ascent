@@ -46,7 +46,7 @@ namespace asc
       }
 
       template <typename C>
-      ParamVT(C& c, const size_t n) : n(n)
+      ParamVT(C& c, const size_t _n) : n(_n)
       {
          ParamT<T>(c, T());
          data_ptr = c.data() + c.size() - 1;
@@ -74,7 +74,7 @@ namespace asc
       }
 
       // Constructor for selecting a specific section of allocated memory
-      ParamVT(const size_t i0, const size_t n, T* data) : i0(i0), n(n), data_ptr(data) {}
+      ParamVT(const size_t _i0, const size_t _n, T* data) : i0(_i0), n(_n), data_ptr(data) {}
 
       template <typename C>
       ParamVT operator()(C& xd) const

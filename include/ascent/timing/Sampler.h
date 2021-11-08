@@ -24,7 +24,7 @@ namespace asc
    template <typename T>
    struct SamplerT
    {
-      SamplerT(T& t, T& dt) noexcept : t(t), dt(dt), dt_base(dt) {}
+      SamplerT(T& _t, T& _dt) noexcept : t(_t), dt(_dt), dt_base(dt) {}
       SamplerT(const SamplerT& other) : t(other.t), dt(other.dt), dt_base(other.dt_base) {}
       SamplerT(SamplerT&&) = default;
       SamplerT& operator=(const SamplerT& other)
