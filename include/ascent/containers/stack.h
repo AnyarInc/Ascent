@@ -24,7 +24,7 @@ namespace asc
    template <class T, class stack_t>
    struct stack_iterator
    {
-      stack_iterator(const size_t i, stack_t& stack) noexcept : index(i % stack_t::block_size), slice(i / stack_t::block_size), stack(stack), ptr(stack.data(i)) {}
+      stack_iterator(const size_t i, stack_t& _stack) noexcept : index(i % stack_t::block_size), slice(i / stack_t::block_size), stack(_stack), ptr(_stack.data(i)) {}
 
       stack_iterator(const stack_iterator&) noexcept = default;
       stack_iterator(stack_iterator&&) noexcept = default;
@@ -51,7 +51,7 @@ namespace asc
          return ptr;
       }
 
-      const pointer operator->() const noexcept
+      pointer operator->() const noexcept
       {
          return ptr;
       }
@@ -93,7 +93,7 @@ namespace asc
    template <class T, class stack_t>
    struct const_stack_iterator
    {
-      const_stack_iterator(const size_t i, stack_t& stack) noexcept : index(i % stack_t::block_size), slice(i / stack_t::block_size), stack(stack), ptr(stack.data(i)) {}
+      const_stack_iterator(const size_t i, stack_t& _stack) noexcept : index(i % stack_t::block_size), slice(i / stack_t::block_size), stack(_stack), ptr(_stack.data(i)) {}
 
       const_stack_iterator(const const_stack_iterator&) noexcept = default;
       const_stack_iterator(const_stack_iterator&&) noexcept = default;
@@ -110,7 +110,7 @@ namespace asc
          return *ptr;
       }
 
-      const pointer operator->() const
+      pointer operator->() const
       {
          return ptr;
       }

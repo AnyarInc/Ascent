@@ -22,8 +22,8 @@ namespace asc
    using value_t = double; // float, double, etc.
    using state_t = std::vector<value_t>; // std::vector, std::deque, etc.
 
-   constexpr const value_t cx(long double v) { return static_cast<value_t>(v); }
-   constexpr const value_t operator"" _v(long double v) { return static_cast<value_t>(v); }
+   constexpr value_t cx(long double v) { return static_cast<value_t>(v); }
+   constexpr value_t operator"" _v(long double v) { return static_cast<value_t>(v); }
 
    struct AdaptiveIntegrator
    {

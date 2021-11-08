@@ -274,29 +274,29 @@ namespace asc
          const size_t n_columns = history.front().size();
          size_t capacity = n_columns * n_rows * 20;
          size_t size = 0;
-         char* buffer = (char*)malloc(capacity * sizeof(char));
+         char* chr_buffer = (char*)malloc(capacity * sizeof(char));
          for (auto& row : history) {
             bool isFirst = true;
             for (auto& item : row) {
                if (capacity - size < 258) {
                   capacity *= 2;
-                  buffer = (char*)realloc(buffer, capacity * sizeof(char));
+                  chr_buffer = (char*)realloc(chr_buffer, capacity * sizeof(char));
                }
                if (isFirst)
                   isFirst = false;
                else
-                  *(buffer + size++) = ',';
-               auto[p, err] = std::to_chars(buffer + size, buffer + capacity, item);
+                  *(chr_buffer + size++) = ',';
+               auto[p, err] = std::to_chars(chr_buffer + size, chr_buffer + capacity, item);
                if (err != std::errc())
-                  std::runtime_error("Recorder exceeded buffer length");
-               size = p - buffer;
+                  std::runtime_error("Recorder exceeded chr_buffer length");
+               size = p - chr_buffer;
             }
             //We could just allways add a comma after each item and overwrite the last comma with a newline so we dont need isFirst
-            *(buffer + size++) = '\n';
+            *(chr_buffer + size++) = '\n';
          }
-         *(buffer + size++) = 0;
-         file << buffer;
-         free(buffer);
+         *(chr_buffer + size++) = 0;
+         file << chr_buffer;
+         free(chr_buffer);
 
       }
       else
