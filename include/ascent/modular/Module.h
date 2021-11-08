@@ -167,12 +167,30 @@ namespace asc
       if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
       {
          for (auto& block : blocks) {
+            for (auto &state : block.second->states) {
+               if (propagator.pass == 0 && state.hist_len > 0) {
+                  state.x0_hist.push_back(*state.x);
+                  if (state.x0_hist.size() > state.hist_len) state.x0_hist.pop_front();
+
+                  state.xd0_hist.push_back(*state.xd);
+                  if (state.xd0_hist.size() > state.hist_len) state.x0_hist.pop_front();
+               }
+            }
             block.second->propagate(propagator, dt);
          }
       }
       else
       {
          for (auto& block : blocks) {
+            for (auto &state : block->states) {
+               if (propagator.pass == 0 && state.hist_len > 0) {
+                  state.x0_hist.push_back(*state.x);
+                  if (state.x0_hist.size() > state.hist_len) state.x0_hist.pop_front();
+
+                  state.xd0_hist.push_back(*state.xd);
+                  if (state.xd0_hist.size() > state.hist_len) state.x0_hist.pop_front();
+               }
+            }
             block->propagate(propagator, dt);
          }
       }

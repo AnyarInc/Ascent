@@ -170,8 +170,8 @@ std::pair<double, double> exponential_test_mod_adaptive()
    sim->t = 0.0;
    sim->t_end = 10.0;
    double dt = 0.001;
-   settings.abs_tol = 1e-9;
-   settings.rel_tol = 1e-5;
+   settings.abs_tol = 1e-16;
+   settings.rel_tol = 1e-16;
    std::vector<asc::Module *> blocks{};
    blocks.emplace_back(system.get());
 
@@ -280,7 +280,7 @@ TEST_CASE("Exponential Modular VABM", "[exponential][modular]") {
    REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
 }
 
-TEST_CASE("Exponential Modular VABM adaptive", "[exponential][modular][adaptive]") {
+TEST_CASE("Exponential Modular Adaptive VABM", "[exponential][modular][adaptive]") {
    auto result = exponential_test_mod_adaptive<modular::VABM<double>>();
    REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
 }

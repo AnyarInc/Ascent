@@ -15,6 +15,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 
 namespace asc
 {
@@ -32,6 +33,10 @@ namespace asc
       double* xd{};
 
       std::vector<double> memory;
+
+      size_t hist_len = 0;
+      std::deque<double> x0_hist;
+      std::deque<double> xd0_hist;
    };
 
    template <class states_t, class x_t, class xd_t>

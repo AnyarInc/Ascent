@@ -66,6 +66,8 @@ namespace asc
       const_iterator end() const noexcept { return vec.cend(); }
       const_iterator cend() const noexcept { return vec.cend(); }
 
+      size_t size() const noexcept { return vec.size(); }
+
    private:
       std::vector<std::pair<Key, Value>> vec;
    };
