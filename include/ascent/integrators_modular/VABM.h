@@ -174,7 +174,7 @@ namespace asc
 
          size_t order{};
          std::vector<value_t> beta;
-         std::vector<std::vector<value_t>> c; // Might want to flatten this.
+         std::vector<std::vector<value_t>> c;
       };
 
       template <class value_t>
@@ -195,7 +195,8 @@ namespace asc
 
       /// Variable step Adams-Bashforth-Moulton predictor corrector of configurable order.
       template <typename value_t, typename init_integrator = RK4<value_t>>
-      struct VABM : AdaptiveIntegrator
+      //struct VABM : AdaptiveIntegrator
+      struct VABM
       {
          VABM(size_t order = 4) : order(order), propagator(order) {};
 
@@ -209,55 +210,27 @@ namespace asc
                   initializer.run_first = run_first;
                }
 
-               // TODO: This is a bit is a bit weird and inefficient 
-               // state.xd may not be the derivitive at the current time after we run the initializer
-               // We need the derivitive at the current time so we call update once so we can grab xd before calling the initializer
-               update(blocks, run_first);
-               apply(blocks);
-
-               // Since running the initializer might overide the states we need to store them somewhere else until we have all the values
-               // NOTE: This assumes the container is ordered
-               if (xd_temp.size() < blocks.size()) {
-                  xd_temp.resize(blocks.size());
-               }
-               if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
-               {
-                  // Assign previous time step's derivative
-                  size_t i = 0;
-                  for (auto &block : blocks)
+               // Record full step state history
+               if (initialized == 0) {
+                  if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
                   {
-                     auto &temp = xd_temp[i];
-                     if (temp.size() < block.second->states.size()) {
-                        temp.resize(block.second->states.size());
-                     }
-                     size_t j = 0;
-                     for (auto &state : block.second->states)
+                     for (auto &block : blocks)
                      {
-                        temp[j].resize(order - 1);
-                        temp[j][initialized] = *state.xd;
-                        ++j;
+                        for (auto &state : block.second->states)
+                        {
+                           state.hist_len = order - 1;
+                        }
                      }
-                     ++i;
                   }
-               }
-               else
-               {
-                  // Assign previous time step's derivative
-                  size_t i = 0;
-                  for (auto &block : blocks)
+                  else
                   {
-                     auto &temp = xd_temp[i];
-                     if (temp.size() < block->states.size()) {
-                        temp.resize(block->states.size());
-                     }
-                     size_t j = 0;
-                     for (auto &state : block->states)
+                     for (auto &block : blocks)
                      {
-                        temp[j].resize(order - 1);
-                        temp[j][initialized] = *state.xd;
-                        ++j;
+                        for (auto &state : block->states)
+                        {
+                           state.hist_len = order - 1;
+                        }
                      }
-                     ++i;
                   }
                }
 
@@ -271,52 +244,39 @@ namespace asc
                if (initialized == (order - 1)) {
                   propagator.calc_beta(order);
 
-                  // Copy over stored history into state
-                  // NOTE: This assumes the container is ordered
+                  // calc_phi for past steps and store in the states memory
                   if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
                   {
-                     // Assign previous time step's derivative
-                     size_t i = 0;
                      for (auto &block : blocks)
                      {
-                        auto &block_store = xd_temp[i];
-                        size_t j = 0;
                         for (auto &state : block.second->states)
                         {
-                           auto &state_store = block_store[j];
                            if (state.memory.size() < propagator.memory_size) {
                               state.memory.resize(propagator.memory_size);
                            }
-                           for (size_t k = 0; k < state_store.size(); ++k) {
-                              propagator.calc_phi(state, state_store[k], k + 1);
+                           for (size_t k = 0; k < order - 1; ++k) {
+                              propagator.calc_phi(state, state.xd0_hist[k], k + 1);
                               propagator.swap_phi_star(state);
+                              state.hist_len = 0; // We dont need to track the history anymore
                            }
-                           ++j;
                         }
-                        ++i;
                      }
                   }
                   else
                   {
-                     // Assign previous time step's derivative
-                     size_t i = 0;
                      for (auto &block : blocks)
                      {
-                        auto &block_store = xd_temp[i];
-                        size_t j = 0;
                         for (auto &state : block->states)
                         {
-                           auto &state_store = block_store[j];
                            if (state.memory.size() < propagator.memory_size) {
                               state.memory.resize(propagator.memory_size);
                            }
-                           for (size_t k = 0; k < state_store.size(); ++k) {
-                              propagator.calc_phi(state, state_store[k], k + 1);
+                           for (size_t k = 0; k < order - 1; ++k) {
+                              propagator.calc_phi(state, state.xd0_hist[k], k + 1);
                               propagator.swap_phi_star(state);
+                              state.hist_len = 0; // We dont need to track the history anymore
                            }
-                           ++j;
                         }
-                        ++i;
                      }
                   }
                }
@@ -374,13 +334,16 @@ namespace asc
                   auto &xd = *state.xd;
                   auto &x0 = state.memory[propagator.x0_i];
                   auto &xd0 = state.memory[propagator.xd0_i];
-                  const auto phi_np1_a = &state.memory[propagator.phi_np1_i]; // Array length k+1
+                  const auto phi_np1_a = &state.memory[propagator.phi_np1_i];
                   const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };
 
                   value_t lte = std::abs((propagator.g[order] - propagator.g[order - 1]) * phi_np1(order));
+                  //value_t lte_m1 = std::abs((propagator.g[order - 1] - propagator.g[order - 2]) * phi_np1(order - 1));
+                  //std::cout << lte / lte_m1 << '\n';
 
                   //value_t e = lte / (abs_tol + rel_tol * (std::abs(x0) + 0.01 * std::abs(xd0)));
-                  value_t e = std::max(lte / abs_tol, lte / (rel_tol * std::abs(x0)));
+                  value_t e = lte / (abs_tol + rel_tol * (std::abs(x0)));
+                  //value_t e = std::max(lte / abs_tol, lte / (rel_tol * std::abs(x0)));
 
                   if (e > e_max)
                   {
@@ -406,7 +369,7 @@ namespace asc
 
             if (e_max > 1.0)
             {
-               dt *= std::max(0.9_v * std::pow(e_max, -cx(1.0 / (order + 1))), 0.2_v);
+               dt *= std::max(std::pow(2.0 * e_max, -cx(1.0 / (order + 1))), 0.5_v);
 
                if (run_first) {
                   run_first->base_time_step(dt);
@@ -445,10 +408,10 @@ namespace asc
                goto start_vabm_adaptive; // recompute the solution recursively
             }
 
-            if (e_max < 0.5_v)
+            if (e_max < 0.25_v)
             {
                e_max = std::max(1e-7, e_max);
-               dt *= std::min(0.9_v * std::pow(e_max, -cx(1.0 / (order + 1))), 5.0_v);
+               dt *= std::min(std::pow(2.0 * e_max, -cx(1.0 / (order + 1))), 1.5_v);
 
                if (run_first) {
                   run_first->base_time_step(dt);
@@ -464,7 +427,6 @@ namespace asc
          init_integrator initializer;
          VABMprop<value_t> propagator;
          VABMstepper<value_t> stepper;
-         std::vector<std::vector<std::vector<value_t>>> xd_temp; // Temp storage for initializer values;
       };
    }
 }

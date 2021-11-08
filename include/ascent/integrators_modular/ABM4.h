@@ -49,16 +49,18 @@ namespace asc
                xp = x;
                break;
             case 1:
-               x = x0 + c0 * dt * (9.0 * xd + 19.0 * xd0 - 5.0 * xd_1 + xd_2);
+               //x = x0 + c0 * dt * (9.0 * xd + 19.0 * xd0 - 5.0 * xd_1 + xd_2);
+               x = x0 + c1 * dt * (251.0 * xd + 646.0 * xd0 - 264.0 * xd_1 + 106.0 * xd_2 - 19.0 * xd_3);
                xd_3 = xd_2;
                xd_2 = xd_1;
-               xd_1 = x0;
+               xd_1 = xd0;
                break;
             }
          }
 
       private:
          static constexpr auto c0 = cx(1.0 / 24.0);
+         static constexpr auto c1 = cx(1.0 / 720.0);
       };
 
       template <class value_t>
@@ -95,106 +97,66 @@ namespace asc
                   initializer.run_first = run_first;
                }
 
-               // TODO: This is a bit is a bit weird and inefficient 
-               // state.xd may not be the derivitive at the current time after we run the initializer
-               // We need the derivitive at the current time so we call update once so we can grab xd before calling the initializer
-               update(blocks, run_first);
-               apply(blocks);
-
-               // Since running the initializer might overide the states we need to store them somewhere else until we have all the values
-               // TODO: This assumes the container is ordered
-               if (xd_temp.size() < blocks.size()) {
-                  xd_temp.resize(blocks.size());
-               }
-               if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
-               {
-                  // Assign previous time step's derivative
-                  size_t i = 0;
-                  for (auto &block : blocks)
-                  {   
-                     auto &temp = xd_temp[i];
-                     if (temp.size() < block.second->states.size()) {
-                        temp.resize(block.second->states.size());
-                     }
-                     size_t j = 0;
-                     for (auto &state : block.second->states)
+               // Record full step state history
+               if (initialized == 0) {
+                  if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
+                  {
+                     for (auto &block : blocks)
                      {
-                        temp[j][2 - initialized] = *state.xd;
-                        ++j;
+                        for (auto &state : block.second->states)
+                        {
+                           state.hist_len = 3;
+                        }
                      }
-                     ++i;
                   }
-               }
-               else
-               {
-                  // Assign previous time step's derivative
-                  size_t i = 0;
-                  for (auto &block : blocks)
-                  {   
-                     auto &temp = xd_temp[i];
-                     if (temp.size() < block->states.size()) {
-                        temp.resize(block->states.size());
-                     }
-                     size_t j = 0;
-                     for (auto &state : block->states)
+                  else
+                  {
+                     for (auto &block : blocks)
                      {
-                        temp[j][2 - initialized] = *state.xd;
-                        ++j;
+                        for (auto &state : block->states)
+                        {
+                           state.hist_len = 3;
+                        }
                      }
-                     ++i;
                   }
                }
 
                // Run initializer integrator
                initializer(blocks, t, dt);
-
                ++initialized;
 
                if (initialized == 3) {
-                  // Copy over stored history into state
-                  // TODO: This assumes the container is ordered
+                  // calc_phi for past steps and store in the states memory
                   if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
                   {
-                     // Assign previous time step's derivative
-                     size_t i = 0;
                      for (auto &block : blocks)
                      {
-                        auto &block_store = xd_temp[i];
-                        size_t j = 0;
                         for (auto &state : block.second->states)
                         {
-                           auto &state_store = block_store[j];
                            if (state.memory.size() < 6) {
                               state.memory.resize(6);
                            }
-                           for (size_t k = 0; k < state_store.size(); ++k) {
-                              state.memory[k + 3] = state_store[k];
+                           for (size_t k = 0; k < 3; ++k) {
+                              state.memory[5 - k] = state.xd0_hist[k];
+                              state.hist_len = 0; // We dont need to track the history anymore
                            }
-                           ++j;
                         }
-                        ++i;
                      }
                   }
                   else
                   {
-                     // Assign previous time step's derivative
-                     size_t i = 0;
                      for (auto &block : blocks)
                      {
-                        auto &block_store = xd_temp[i];
-                        size_t j = 0;
                         for (auto &state : block->states)
                         {
-                           auto &state_store = block_store[j];
                            if (state.memory.size() < 6) {
                               state.memory.resize(6);
                            }
-                           for (size_t k = 0; k < state_store.size(); ++k) {
-                              state.memory[k + 3] = state_store[k];
+                           for (size_t k = 0; k < 3; ++k) {
+                              state.memory[5 - k] = state.xd0_hist[k];
+                              state.hist_len = 0; // We dont need to track the history anymore
                            }
-                           ++j;
                         }
-                        ++i;
                      }
                   }
                }
@@ -220,7 +182,6 @@ namespace asc
 
          size_t initialized = 0;
          init_integrator initializer;
-         std::vector<std::vector<std::array<value_t, 3>>> xd_temp; // Temp storage for initializer values;
       };
    }
 }
