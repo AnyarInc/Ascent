@@ -27,16 +27,16 @@ int main()
    double dt = 0.01;
    double t_end = 1.5;
 
-   body_t b0(x);
-   body_t b1(x);
+   body_t b0{ x };
+   body_t b1{ x };
    b1.m = 1.0;
    b1.s = 1.0;
    b1.v = 40.0;
 
-   spring_t spring(b0, b1);
+   spring_t spring{ b0, b1 };
    spring.k = 2000.0;
 
-   damper_t damper(b0, b1);
+   damper_t damper{ b0, b1 };
    damper.c = 5.0;
 
    rk4_t<state_t> integrator;

@@ -16,10 +16,9 @@
 
 #include "body.hpp"
 
-struct spring_t
+struct spring_t final
 {
-   spring_t(body_t& b0, body_t& b1) : b0(b0), b1(b1)
-   {
+   spring_t(body_t& b0, body_t& b1) : b0(b0), b1(b1) {
       l0 = b1.s - b0.s;
    }
 
@@ -32,7 +31,7 @@ struct spring_t
    double f{}; // force
    
    template <class state_t>
-   void operator()(const state_t&, state_t&, const double)
+   void operator()(const state_t&, state_t&, const double) noexcept
    {
       ds = l0 + b0.s - b1.s;
       f = k*ds;

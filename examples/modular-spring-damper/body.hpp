@@ -16,7 +16,7 @@
 
 #include "ascent/ascent.hpp"
 
-struct body_t
+struct body_t final
 {
    template <class state_t>
    body_t(state_t& state) : s(state), v(state) {}

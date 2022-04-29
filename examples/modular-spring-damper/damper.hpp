@@ -16,10 +16,8 @@
 
 #include "body.hpp"
 
-struct damper_t
+struct damper_t final
 {
-   damper_t(body_t& b0, body_t& b1) : b0(b0), b1(b1) {}
-
    body_t& b0;
    body_t& b1;
 
@@ -28,7 +26,7 @@ struct damper_t
    double f{}; // force
    
    template <class state_t>
-   void operator()(const state_t&, state_t&, const double)
+   void operator()(const state_t&, state_t&, const double) noexcept
    {
       dv = b0.v - b1.v;
       f = c*dv;
