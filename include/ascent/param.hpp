@@ -20,7 +20,7 @@ namespace asc
 {
    namespace core
    {
-      template <typename C>
+      template <class C>
       inline typename C::value_type& emplace_back_ref(C& c, const typename C::value_type x0)
       {
          c.emplace_back(x0);
@@ -28,16 +28,16 @@ namespace asc
       }
    }
 
-   template <typename T>
-   struct ParamT
+   template <class T>
+   struct param_t
    {
-      template <typename C>
-      ParamT(C& c, const T x0 = T()) : index(c.size()), x(core::emplace_back_ref(c, x0)) {}
+      template <class C>
+      param_t(C& c, const T x0 = T()) : index(c.size()), x(core::emplace_back_ref(c, x0)) {}
 
-      ParamT(const ParamT&) = default;
-      ParamT(ParamT&&) = default;
-      ParamT& operator=(const ParamT&) = default;
-      ParamT& operator=(ParamT&&) = default;
+      param_t(const param_t&) = default;
+      param_t(param_t&&) = default;
+      param_t& operator=(const param_t&) = default;
+      param_t& operator=(param_t&&) = default;
 
       template <typename C>
       T& operator()(C& xd) const noexcept { return xd[index]; }
@@ -59,4 +59,7 @@ namespace asc
       const size_t index;
       T& x;
    };
+   
+   template <class C>
+   param_t(C& c, const typename C::value_type x0 = typename C::value_type()) -> param_t<typename C::value_type>;
 }

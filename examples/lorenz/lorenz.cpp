@@ -16,7 +16,9 @@
 
 using namespace asc;
 
-struct Lorenz
+using state_t = std::vector<double>;
+
+struct lorenz_t
 {
    void operator()(const state_t& x, state_t& xd, const double)
    {
@@ -37,10 +39,10 @@ int main()
    double dt = 0.01;
    double t_end = 10.0;
 
-   RK4 integrator;
-   Lorenz system;
+   rk4_t<state_t> integrator;
+   lorenz_t system;
 
-   Recorder recorder;
+   recorder_t<double> recorder;
 
    while (t < t_end)
    {

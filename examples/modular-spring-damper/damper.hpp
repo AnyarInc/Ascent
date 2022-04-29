@@ -14,27 +14,24 @@
 
 #pragma once
 
-#include "Body.h"
+#include "body.hpp"
 
-struct Spring
+struct damper_t
 {
-   Spring(Body& b0, Body& b1) : b0(b0), b1(b1)
-   {
-      l0 = b1.s - b0.s;
-   }
+   damper_t(body_t& b0, body_t& b1) : b0(b0), b1(b1) {}
 
-   Body& b0;
-   Body& b1;
+   body_t& b0;
+   body_t& b1;
 
-   double l0{}; // initial spring length (distance between masses)
-   double ds{}; // spring compression/extension
-   double k{}; // spring coefficient
+   double dv{}; // velocity difference
+   double c{}; // damping coefficient
    double f{}; // force
-
-   void operator()(const asc::state_t&, asc::state_t&, const double)
+   
+   template <class state_t>
+   void operator()(const state_t&, state_t&, const double)
    {
-      ds = l0 + b0.s - b1.s;
-      f = k*ds;
+      dv = b0.v - b1.v;
+      f = c*dv;
 
       b0.f -= f;
       b1.f += f;

@@ -14,26 +14,30 @@
 
 #pragma once
 
-#include "ascent/Ascent.h"
+#include "body.hpp"
 
-struct Body
+struct spring_t
 {
-   Body(asc::state_t& state) : s(state), v(state) {}
-
-   asc::Param s; // position
-   asc::Param v; // velocity
-   double m{}; // mass
-   double f{}; // force
-
-   void operator()(const asc::state_t&, asc::state_t& D, const double)
+   spring_t(body_t& b0, body_t& b1) : b0(b0), b1(b1)
    {
-      s(D) = v;
+      l0 = b1.s - b0.s;
+   }
 
-      if (m > 0.0)
-         v(D) = f / m;
-      else
-         v(D) = 0.0;
+   body_t& b0;
+   body_t& b1;
 
-      f = 0.0;
+   double l0{}; // initial spring length (distance between masses)
+   double ds{}; // spring compression/extension
+   double k{}; // spring coefficient
+   double f{}; // force
+   
+   template <class state_t>
+   void operator()(const state_t&, state_t&, const double)
+   {
+      ds = l0 + b0.s - b1.s;
+      f = k*ds;
+
+      b0.f -= f;
+      b1.f += f;
    }
 };

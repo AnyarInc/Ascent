@@ -14,25 +14,28 @@
 
 #pragma once
 
-#include "Body.h"
+#include "ascent/ascent.hpp"
 
-struct Damper
+struct body_t
 {
-   Damper(Body& b0, Body& b1) : b0(b0), b1(b1) {}
-
-   Body& b0;
-   Body& b1;
-
-   double dv{}; // velocity difference
-   double c{}; // damping coefficient
+   template <class state_t>
+   body_t(state_t& state) : s(state), v(state) {}
+   
+   asc::param_t<double> s; // position
+   asc::param_t<double> v; // velocity
+   double m{}; // mass
    double f{}; // force
-
-   void operator()(const asc::state_t&, asc::state_t&, const double)
+   
+   template <class state_t>
+   void operator()(const state_t&, state_t& D, const double)
    {
-      dv = b0.v - b1.v;
-      f = c*dv;
+      s(D) = v;
 
-      b0.f -= f;
-      b1.f += f;
+      if (m > 0.0)
+         v(D) = f / m;
+      else
+         v(D) = 0.0;
+
+      f = 0.0;
    }
 };

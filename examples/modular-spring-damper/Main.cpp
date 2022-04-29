@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Damper.h"
-#include "Spring.h"
+#include "damper.hpp"
+#include "spring.hpp"
 
 using namespace asc;
+
+using state_t = std::vector<double>;
 
 int main()
 {
@@ -25,22 +27,22 @@ int main()
    double dt = 0.01;
    double t_end = 1.5;
 
-   Body b0(x);
-   Body b1(x);
+   body_t b0(x);
+   body_t b1(x);
    b1.m = 1.0;
    b1.s = 1.0;
    b1.v = 40.0;
 
-   Spring spring(b0, b1);
+   spring_t spring(b0, b1);
    spring.k = 2000.0;
 
-   Damper damper(b0, b1);
+   damper_t damper(b0, b1);
    damper.c = 5.0;
 
-   RK4 integrator;
-   Recorder recorder;
+   rk4_t<state_t> integrator;
+   recorder_t<double> recorder;
 
-   auto system = [&](const asc::state_t& x, asc::state_t& D, const double t)
+   auto system = [&](const auto& x, auto& D, const double t)
    {
       // We must run the spring and damper before the body in order to accumulate forces
       spring(x, D, t);
