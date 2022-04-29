@@ -31,14 +31,14 @@ namespace asc
       /// 
       /// Steps the system a single time step (dt), internally advances time (t)
       ///
-      /// \tparam System The system object or function type. The system to be stepped must have a function syntax that takes \c (state_t, state_t, value_t) \c (x, xd, t).
+      /// \tparam system The system object or function type. The system to be stepped must have a function syntax that takes \c (state_t, state_t, value_t) \c (x, xd, t).
       /// The system can be a function, functor, or lambda expression.
       /// \param[in, out] system The \c System instance.
       /// \param[in, out] x The system's state vector.
       /// \param[in, out] t The current time, which will be advanced by c\ dt.
       /// \param[in] dt The time step for the input system to be advanced.
       template <class system_t>
-      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt)
+      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt) noexcept(noexcept(std::forward<system_t>(system)(std::declval<state_t&>(), std::declval<state_t&>(), std::declval<const value_type>())))
       {
          const auto t0 = t;
          const auto dt_2 = 0.5 * dt;

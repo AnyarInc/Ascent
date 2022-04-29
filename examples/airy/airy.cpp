@@ -18,9 +18,9 @@ using namespace asc;
 
 using state_t = std::vector<double>;
 
-struct Airy
+struct airy_t
 {
-   void operator()(const state_t& x, state_t& xd, const double t)
+   void operator()(const state_t& x, state_t& xd, const double t) const noexcept
    {
       xd[0] = x[1];
       xd[1] = -t*x[0];
@@ -35,7 +35,7 @@ int main()
    double t_end = 10.0;
 
    rk4_t<state_t> integrator;
-   Airy system;
+   airy_t system;
 
    recorder_t<double> recorder;
 

@@ -26,7 +26,7 @@ namespace asc
       using value_type = typename state_t::value_type;
 
       template <class system_t>
-      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt)
+      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt) noexcept(noexcept(std::forward<system_t>(system)(std::declval<state_t&>(), std::declval<state_t&>(), std::declval<const value_type>())))
       {
          const auto t0 = t;
          const auto dt_2 = 0.5 * dt;
