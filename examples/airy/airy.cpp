@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Anyar, Inc.
+// Copyright (c) 2016-2022 Anyar, Inc.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 using namespace asc;
 
+using state_t = std::vector<double>;
+
 struct Airy
 {
    void operator()(const state_t& x, state_t& xd, const double t)
@@ -32,10 +34,10 @@ int main()
    double dt = 0.1;
    double t_end = 10.0;
 
-   RK4 integrator;
+   rk4_t<state_t> integrator;
    Airy system;
 
-   Recorder recorder;
+   recorder_t<double> recorder;
 
    while (t < t_end)
    {

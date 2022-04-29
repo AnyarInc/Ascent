@@ -24,13 +24,13 @@
 
 namespace asc
 {
-   template <typename state_t, typename init_integrator = RK4T<state_t>>
+   template <typename state_t, typename init_integrator = rk4_t<state_t>>
    struct PC233T
    {
-      using value_t = typename state_t::value_type;
+      using value_type = typename state_t::value_type;
 
       template <typename System>
-      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
+      void operator()(System&& system, state_t& x, value_type& t, const value_type dt)
       {
          if (!initialized)
          {
@@ -40,8 +40,8 @@ namespace asc
             return;
          }
 
-         const value_t t0 = t;
-         const value_t dt_3 = cx(1.0 / 3.0)*dt;
+         const auto t0 = t;
+         const auto dt_3 = cx<value_type>(1.0 / 3.0)*dt;
 
          const size_t n = x.size();
          if (xd0.size() < n)
@@ -75,8 +75,8 @@ namespace asc
       state_t x0, xd0, xd_temp;
       state_t xd_1; // -1, previous time step derivative
 
-      static constexpr auto c0 = cx(1.0 / 18.0);
-      static constexpr auto c1 = cx(1.0 / 54.0);
-      static constexpr auto c2 = cx(1.0 / 4.0);
+      static constexpr auto c0 = cx<value_type>(1.0 / 18.0);
+      static constexpr auto c1 = cx<value_type>(1.0 / 54.0);
+      static constexpr auto c2 = cx<value_type>(1.0 / 4.0);
    };
 }

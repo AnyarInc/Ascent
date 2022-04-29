@@ -18,13 +18,9 @@
 
 namespace asc
 {
-   // User type definitions for ease of use
-   using value_t = double; // float, double, etc.
-   using state_t = std::vector<value_t>; // std::vector, std::deque, etc.
-
-   constexpr value_t cx(long double v) { return static_cast<value_t>(v); }
-   constexpr value_t operator"" _v(long double v) { return static_cast<value_t>(v); }
-
+   template <class value_t, class v_t>
+   inline constexpr auto cx(const v_t v) { return static_cast<value_t>(v); }
+   
    struct AdaptiveIntegrator
    {
       AdaptiveIntegrator() = default;

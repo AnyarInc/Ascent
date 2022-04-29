@@ -63,13 +63,13 @@ namespace asc
    /// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
    /// \paramt T The type to be recorded.
    template <class T, size_t block_size = 4096>
-   struct RecorderT
+   struct recorder_t
    {
-      RecorderT() = default;
-      RecorderT(const RecorderT&) = default;
-      RecorderT(RecorderT&&) = default;
-      RecorderT& operator=(const RecorderT&) = default;
-      RecorderT& operator=(RecorderT&&) = default;
+      recorder_t() = default;
+      recorder_t(const recorder_t&) = default;
+      recorder_t(recorder_t&&) = default;
+      recorder_t& operator=(const recorder_t&) = default;
+      recorder_t& operator=(recorder_t&&) = default;
 
       std::vector<T*> recording_pointers; //!< std::vector of pointers to data to be recorded on updat
       std::vector<std::function<void(std::vector<T>&)>> recording_functions; //!< std::vector of type erasing converters (std::functions) to enable user defined classes to be recorded.

@@ -37,31 +37,3 @@
 
 #include <deque>
 #include <string>
-
-// Type definitions for cleaner code
-
-namespace asc
-{
-   // Edits To The Following Types Are Not Reccommended
-   // ------------------------------------------------
-   using system_t = std::function<void(const state_t&, state_t&, const value_t)>;
-
-   using System = SystemT<state_t, system_t>;
-
-   using Recorder = RecorderT<value_t>;
-   using RecorderString = RecorderT<std::string>;
-   using Sampler = SamplerT<value_t>;
-   using Param = ParamT<value_t>;
-
-   // Integrators
-   using Euler = EulerT<state_t>;
-   using Midpoint = MidpointT<state_t>;
-   using RK2 = RK2T<state_t>;
-   using RK4 = RK4T<state_t>;
-   using DOPRI45 = DOPRI45T<state_t>;
-   using PC233 = PC233T<state_t>;
-   using ABM4 = ABM4T<state_t>;
-
-   // Linear Algebra
-   using ParamV = ParamVT<value_t>;
-}

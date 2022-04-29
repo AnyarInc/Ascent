@@ -20,31 +20,34 @@
 
 namespace asc
 {
-   template <typename state_t>
-   struct RK2T
+   template <class state_t>
+   struct rk2_t final
    {
-      using value_t = typename state_t::value_type;
+      using value_type = typename state_t::value_type;
 
-      template <typename System>
-      void operator()(System&& system, state_t& x, value_t& t, const value_t dt)
+      template <class system_t>
+      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt)
       {
-         const value_t t0 = t;
-         const value_t dt_2 = 0.5_v*dt;
+         const auto t0 = t;
+         const auto dt_2 = 0.5 * dt;
 
          const size_t n = x.size();
-         if (xd.size() < n)
+         if (xd.size() < n) {
             xd.resize(n);
+         }
 
          x0 = x;
          system(x0, xd, t);
          size_t i{};
-         for (; i < n; ++i)
+         for (; i < n; ++i) {
             x[i] = dt_2 * xd[i] + x0[i];
+         }
          t += dt_2;
 
          system(x, xd, t);
-         for (i = 0; i < n; ++i)
+         for (i = 0; i < n; ++i) {
             x[i] = dt * xd[i] + x0[i];
+         }
          t = t0 + dt;
       }
 
