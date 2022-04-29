@@ -14,17 +14,15 @@
 
 #pragma once
 
-// A Param is a reference to a memory location within the system's state
+// A param is a reference to a memory location within a system's state
 
 namespace asc
 {
    namespace core
    {
       template <class C>
-      inline typename C::value_type& emplace_back_ref(C& c, const typename C::value_type x0)
-      {
-         c.emplace_back(x0);
-         return c.back();
+      inline typename C::value_type& emplace_back_ref(C& c, const typename C::value_type x0) {
+         return c.emplace_back(x0);
       }
    }
 
@@ -40,15 +38,14 @@ namespace asc
       param_t& operator=(param_t&&) = default;
 
       template <typename C>
-      T& operator()(C& xd) const noexcept { return xd[index]; }
+      T& operator()(C& xd) const noexcept {
+         return xd[index];
+      }
 
       // Returns true if this State is within a given state array
       template <typename C>
-      bool within(const C& vec) const noexcept
-      {
-         if (&x == &vec[index])
-            return true;
-         return false;
+      bool within(const C& vec) const noexcept {
+         return &x == &vec[index];
       }
 
       operator T&() const noexcept { return x; }
