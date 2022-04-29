@@ -16,7 +16,7 @@
 
 // UNDER CONSTRUCTION
 
-#include "ascent/integrators/RK4.h"
+#include "ascent/integrators/rk4.hpp"
 
 namespace asc
 {

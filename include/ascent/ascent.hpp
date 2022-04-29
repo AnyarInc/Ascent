@@ -14,26 +14,26 @@
 
 #pragma once
 
-#include "ascent/Recorder.h"
-#include "ascent/Param.h"
+#include "ascent/recorder.hpp"
+#include "ascent/param.hpp"
 
 // Timing
-#include "ascent/timing/Sampler.h"
+#include "ascent/timing/sampler.hpp"
 
 // Integrators
-#include "ascent/integrators/Euler.h"
-#include "ascent/integrators/Midpoint.h"
-#include "ascent/integrators/RK2.h"
-#include "ascent/integrators/RK4.h"
-#include "ascent/integrators/DOPRI45.h"
-#include "ascent/integrators/RTAM4.h"
-#include "ascent/integrators/PC233.h"
-#include "ascent/integrators/ABM4.h"
+#include "ascent/integrators/euler.hpp"
+#include "ascent/integrators/midpoint.hpp"
+#include "ascent/integrators/rk2.hpp"
+#include "ascent/integrators/rk4.hpp"
+#include "ascent/integrators/dopri45.hpp"
+#include "ascent/integrators/rtam4.hpp"
+#include "ascent/integrators/pc233.hpp"
+#include "ascent/integrators/abm4.hpp"
 
 // Linear Algebra
-#include "ascent/ParamV.h"
+#include "ascent/param_v.hpp"
 
-#include "ascent/System.h"
+#include "ascent/system.hpp"
 
 #include <deque>
 #include <string>

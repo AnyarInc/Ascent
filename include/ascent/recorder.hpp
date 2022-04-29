@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "ascent/containers/stack.h"
+#include "ascent/containers/stack.hpp"
 
 #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L))
 #include <charconv>

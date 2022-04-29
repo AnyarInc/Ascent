@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "Param.h"
+#include "param.hpp"
 #include <initializer_list>
 #include <vector>
 
