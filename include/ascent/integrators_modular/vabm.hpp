@@ -14,10 +14,10 @@
 
 #pragma once
 
-#include "ascent/Utility.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
-#include "ascent/integrators_modular/RK4.h"
-#include "ascent/timing/Timing.h"
+#include "ascent/utility.hpp"
+#include "ascent/integrators_modular/modular_integrators.hpp"
+#include "ascent/integrators_modular/rk4.hpp"
+#include "ascent/timing/timing.hpp"
 
 #include <cmath>
 
@@ -369,7 +369,7 @@ namespace asc
 
             if (e_max > 1.0)
             {
-               dt *= std::max(std::pow(2.0 * e_max, -cx(1.0 / (order + 1))), 0.5_v);
+               dt *= std::max(std::pow(2.0 * e_max, -cx<value_t>(1.0 / (order + 1))), 0.5);
 
                if (run_first) {
                   run_first->base_time_step(dt);
@@ -408,10 +408,10 @@ namespace asc
                goto start_vabm_adaptive; // recompute the solution recursively
             }
 
-            if (e_max < 0.25_v)
+            if (e_max < 0.25)
             {
                e_max = std::max(1e-7, e_max);
-               dt *= std::min(std::pow(2.0 * e_max, -cx(1.0 / (order + 1))), 1.5_v);
+               dt *= std::min(std::pow(2.0 * e_max, -cx<value_t>(1.0 / (order + 1))), 1.5);
 
                if (run_first) {
                   run_first->base_time_step(dt);

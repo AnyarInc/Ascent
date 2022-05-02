@@ -14,9 +14,8 @@
 
 #pragma once
 
-//#include "ascent/Utility.h"
-#include "ascent/modular/Module.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
+#include "ascent/modular/module.hpp"
+#include "ascent/integrators_modular/modular_integrators.hpp"
 
 // Second order, two pass Runge Kutta.
 

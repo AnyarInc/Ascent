@@ -23,8 +23,8 @@ namespace asc
    /// Fourth order Adams-Bashforth-Moulton Predictor Corrector. Fixed step version (Must reinitialize if dt is changed).
    ///
    /// \tparam state_t The state type of the system to be integrated. I.e. a std::vector or std::deque.
-   template <typename state_t, typename init_integrator = rk4_t<state_t>>
-   struct ABM4T
+   template <class state_t, class init_integrator = rk4_t<state_t>>
+   struct abm4_t
    {
       using value_type = typename state_t::value_type;
 
@@ -38,8 +38,8 @@ namespace asc
       /// \param[in, out] x The system's state vector.
       /// \param[in, out] t The current time, which will be advanced by c\ dt.
       /// \param[in] dt The time step for the input system to be advanced.
-      template <typename System>
-      void operator()(System &&system, state_t &x, value_type &t, const value_type dt)
+      template <class system_t>
+      void operator()(system_t &&system, state_t &x, value_type &t, const value_type dt)
       {
          if (initialized < 3)
          {

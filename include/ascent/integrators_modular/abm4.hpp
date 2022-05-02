@@ -14,9 +14,9 @@
 
 #pragma once
 
-#include "ascent/Utility.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
-#include "ascent/integrators_modular/RK4.h"
+#include "ascent/utility.hpp"
+#include "ascent/integrators_modular/modular_integrators.hpp"
+#include "ascent/integrators_modular/rk4.hpp"
 
 // Fourth order Adams-Bashforth-Moulton Predictor Corrector. Fixed step version (Must reinitialize if dt is changed).
 namespace asc
@@ -59,8 +59,8 @@ namespace asc
          }
 
       private:
-         static constexpr auto c0 = cx(1.0 / 24.0);
-         static constexpr auto c1 = cx(1.0 / 720.0);
+         static constexpr auto c0 = cx<value_t>(1.0 / 24.0);
+         static constexpr auto c1 = cx<value_t>(1.0 / 720.0);
       };
 
       template <class value_t>

@@ -18,19 +18,19 @@
 #include <initializer_list>
 #include <vector>
 
-// The ParamV behaves like a std::vector of Params
+// The param_v_t acts on a contiguous array of data
 
 namespace asc
 {
    template <class T>
-   struct param_v
+   struct param_v_t
    {
       using iterator = typename std::vector<T>::iterator;
 
-      param_v(param_v&& other) : i0(std::move(other.i0)), n(std::move(other.n)), data_ptr(std::move(other.data_ptr)) {}
-      param_v(const param_v& other) : i0(other.i0), n(other.n), data_ptr(other.data_ptr) {}
+      param_v_t(param_v_t&& other) : i0(std::move(other.i0)), n(std::move(other.n)), data_ptr(std::move(other.data_ptr)) {}
+      param_v_t(const param_v_t& other) : i0(other.i0), n(other.n), data_ptr(other.data_ptr) {}
 
-      param_v& operator=(const param_v& v)
+      param_v_t& operator=(const param_v_t& v)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = v[i];
@@ -38,7 +38,7 @@ namespace asc
       }
 
       template <typename C>
-      param_v& operator=(const C& c)
+      param_v_t& operator=(const C& c)
       {
          for (size_t i = 0; i < n; ++i)
             this->operator[](i) = c[i];
@@ -46,7 +46,7 @@ namespace asc
       }
 
       template <typename C>
-      param_v(C& c, const size_t _n) : n(_n)
+      param_v_t(C& c, const size_t _n) : n(_n)
       {
          param_t<T>(c, T());
          data_ptr = c.data() + c.size() - 1;
@@ -57,7 +57,7 @@ namespace asc
       }
 
       template <typename C>
-      param_v(C& c, std::initializer_list<T>&& list) : n(list.size())
+      param_v_t(C& c, std::initializer_list<T>&& list) : n(list.size())
       {
          bool first_element{ true };
          for (T x : list)
@@ -74,12 +74,12 @@ namespace asc
       }
 
       // Constructor for selecting a specific section of allocated memory
-      param_v(const size_t _i0, const size_t _n, T* data) : i0(_i0), n(_n), data_ptr(data) {}
+      param_v_t(const size_t _i0, const size_t _n, T* data) : i0(_i0), n(_n), data_ptr(data) {}
 
       template <typename C>
-      param_v operator()(C& xd) const
+      param_v_t operator()(C& xd) const
       {
-         return param_v(i0, n, xd.data() + i0);
+         return param_v_t(i0, n, xd.data() + i0);
       }
 
       const T* begin() const noexcept { return data_ptr; }

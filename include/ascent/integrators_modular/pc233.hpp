@@ -14,9 +14,9 @@
 
 #pragma once
 
-#include "ascent/Utility.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
-#include "ascent/integrators_modular/RK4.h"
+#include "ascent/utility.hpp"
+#include "ascent/integrators_modular/modular_integrators.hpp"
+#include "ascent/integrators_modular/rk4.hpp"
 
 // P-2/PC-3/C-3 algorithm, which has the same error coefficient and order as the P-3/PC-3/C-3 predictor-corrector, but is more stable
 
@@ -63,9 +63,9 @@ namespace asc
          }
 
       private:
-         static constexpr auto c0 = cx(1.0 / 18.0);
-         static constexpr auto c1 = cx(1.0 / 54.0);
-         static constexpr auto c2 = cx(1.0 / 4.0);
+         static constexpr auto c0 = cx<value_t>(1.0 / 18.0);
+         static constexpr auto c1 = cx<value_t>(1.0 / 54.0);
+         static constexpr auto c2 = cx<value_t>(1.0 / 4.0);
       };
 
       template <class value_t>

@@ -14,10 +14,10 @@
 
 #pragma once
 
-#include "ascent/modular/Module.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
-#include "ascent/timing/Timing.h"
-#include "ascent/Utility.h"
+#include "ascent/modular/module.hpp"
+#include "ascent/integrators_modular/modular_integrators.hpp"
+#include "ascent/timing/timing.hpp"
+#include "ascent/utility.hpp"
 
 namespace asc
 {

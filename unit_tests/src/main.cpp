@@ -14,16 +14,18 @@
 
 #include "ascent/ascent.hpp"
 
-#include "ascent/integrators_modular/RK2.h"
-#include "ascent/integrators_modular/RK4.h"
-#include "ascent/integrators_modular/PC233.h"
-#include "ascent/integrators_modular/ABM4.h"
-#include "ascent/integrators_modular/VABM.h"
-#include "ascent/timing/Timing.h"
+#include "ascent/integrators_modular/rk2.hpp"
+#include "ascent/integrators_modular/rk4.hpp"
+#include "ascent/integrators_modular/pc233.hpp"
+#include "ascent/integrators_modular/abm4.hpp"
+#include "ascent/integrators_modular/vabm.hpp"
+#include "ascent/timing/timing.hpp"
 
 #include <memory>
 
 using namespace asc;
+
+using state_t = std::vector<double>;
 
 struct Airy
 {
@@ -191,23 +193,23 @@ std::pair<double, double> exponential_test_mod_adaptive()
 // bool test(const std::string& title, const double x, const double target, const double eps)
 
 TEST_CASE("Airy System RK4", "[airy]") {
-   auto x = airy_test<RK4>(0.001);
+   auto x = airy_test<rk4_t<state_t>>(0.001);
    REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
    REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
 }
 
 TEST_CASE("Airy System RK2", "[airy]") {
-   auto x = airy_test<RK2>(0.001);
+   auto x = airy_test<rk2_t<state_t>>(0.001);
    REQUIRE(x[0] == Approx(-0.200703911717).epsilon(1.0e-8));
    REQUIRE(x[1] == Approx(-1.49816435475).epsilon(1.0e-8));
 
-   x = airy_test<DOPRI45>(0.001);
+   x = airy_test<dopri45_t<state_t>>(0.001);
    REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
    REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
 }
 
 TEST_CASE("Airy System DOPRI45", "[airy]") {
-   auto x = airy_test<DOPRI45>(0.001);
+   auto x = airy_test<dopri45_t<state_t>>(0.001);
    REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
    REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
 }
@@ -231,27 +233,27 @@ TEST_CASE("Modular Airy System PC233", "[airy][modular]") {
 }
 
 TEST_CASE("Exponential RK4", "[exponential]") {
-   auto result = exponential_test<RK4>(0.001);
+   auto result = exponential_test<rk4_t<state_t>>(0.001);
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
 }
 
 TEST_CASE("Exponential RK2", "[exponential]") {
-   auto result = exponential_test<RK2>(0.001);
+   auto result = exponential_test<rk2_t<state_t>>(0.001);
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-5));
 }
 
 TEST_CASE("Exponential DOPRI45", "[exponential]") {
-   auto result = exponential_test<DOPRI45>(0.001);
+   auto result = exponential_test<dopri45_t<state_t>>(0.001);
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
 }
 
 TEST_CASE("Exponential PC233", "[exponential]") {
-   auto result = exponential_test<PC233>(0.001);
+   auto result = exponential_test<pc233_t<state_t>>(0.001);
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-6));
 }
 
 TEST_CASE("Exponential ABM4", "[exponential]") {
-   auto result = exponential_test<ABM4>(0.001);
+   auto result = exponential_test<abm4_t<state_t>>(0.001);
    REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
 }
 

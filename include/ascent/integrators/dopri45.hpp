@@ -20,13 +20,13 @@
 
 namespace asc
 {
-   template <typename state_t>
-   struct DOPRI45T
+   template <class state_t>
+   struct dopri45_t
    {
       using value_type = typename state_t::value_type;
 
-      template <typename System>
-      void operator()(System&& system, state_t& x, value_type& t, const value_type dt)
+      template <class system_t>
+      void operator()(system_t&& system, state_t& x, value_type& t, const value_type dt)
       {
          const auto t0 = t;
          const auto dt_5 = 0.2 * dt;

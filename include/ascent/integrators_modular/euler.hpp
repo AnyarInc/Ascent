@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2019 Anyar, Inc.
+// Copyright (c) 2016-2022 Anyar, Inc.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 // Simple Euler integration.
 
-#include "ascent/modular/Module.h"
+#include "ascent/modular/module.hpp"
 #include "ascent/direct/State.h"
-#include "ascent/integrators_modular/ModularIntegrators.h"
+#include "ascent/integrators_modular/modular_integrators.hpp"
 
 namespace asc
 {
