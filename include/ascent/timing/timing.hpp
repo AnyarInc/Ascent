@@ -1,16 +1,5 @@
-// Copyright (c) 2016-2022 Anyar, Inc.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//      http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Developed by Anyar, Inc.
+// Distributed under 0BSD (see LICENSE for details)
 
 #pragma once
 
@@ -21,62 +10,53 @@
 namespace asc
 {
    template <class value_t>
-   struct Timing : block_t
+   struct timing_t : block_t
    {
       value_t t{};
       value_t dt{ 0.01 };
       value_t t_end = std::numeric_limits<value_t>::max();
       value_t t_delta{};
-
+      
       value_t t_previous{};
       value_t eps = static_cast<value_t>(1.0e-8);
       bool time_advanced = false;
 
-      SamplerT<value_t> sampler{ t, dt };
+      sampler_t<value_t> sampler{ t, dt };
 
-      bool sample(const value_t sample_rate) const noexcept
-      {
+      bool sample(const value_t sample_rate) const noexcept {
          return sampler(sample_rate);
       }
 
-      bool event(const value_t event_time) noexcept
-      {
+      bool event(const value_t event_time) noexcept {
          return sampler.event(event_time);
       }
 
-      void base_time_step(const value_t base_dt)
-      {
+      void base_time_step(const value_t base_dt) {
          sampler.base_time_step(base_dt);
       }
-
-      value_t base_time_step() const noexcept
-      {
+      
+      auto base_time_step() const noexcept {
          return sampler.base_time_step();
       }
 
-      value_t delta_t() const noexcept
-      {
+      auto delta_t() const noexcept {
          return t_delta;
       }
-
-      void reset() noexcept
-      {
+      
+      void reset() noexcept {
          sampler.reset();
       }
 
-      void init() override
-      {
+      void init() override {
          t_previous = t;
       }
 
       void operator()() override
       {
-         if (t > t_previous + eps)
-         {
+         if (t > t_previous + eps) {
             time_advanced = true;
          }
-         else
-         {
+         else {
             time_advanced = false;
          }
          t_delta = t - t_previous;
