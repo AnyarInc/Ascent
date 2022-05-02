@@ -16,12 +16,12 @@
 
 #include <cmath>
 #include "ascent/timing/sampler.hpp"
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 
 namespace asc
 {
    template <class value_t>
-   struct Timing : Module
+   struct Timing : block_t
    {
       value_t t{};
       value_t dt{ 0.01 };

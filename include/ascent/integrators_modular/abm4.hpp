@@ -24,7 +24,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct ABM4prop : public Propagator<value_t>
+      struct ABM4prop : public propagator_t<value_t>
       {
          void operator()(State &state, const value_t dt) override
          {
@@ -40,7 +40,7 @@ namespace asc
             auto &xd_2 = state.memory[4];
             auto &xd_3 = state.memory[5];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -82,7 +82,7 @@ namespace asc
       template <typename value_t, typename init_integrator = RK4<value_t>>
       struct ABM4
       {
-         asc::Module *run_first{};
+         asc::block_t *run_first{};
 
          ABM4prop<value_t> propagator;
          ABM4stepper<value_t> stepper;

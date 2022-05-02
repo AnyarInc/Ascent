@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
 namespace asc
@@ -22,7 +22,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct MidpointProp : public Propagator<value_t>
+      struct MidpointProp : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {

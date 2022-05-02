@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
 // Non-confluent RK4 method ( "3/8th's Rule" )
@@ -24,7 +24,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct NCRK4prop : public Propagator<value_t>
+      struct NCRK4prop : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -37,7 +37,7 @@ namespace asc
             auto& xd2 = state.memory[3];
             auto& xd3 = state.memory[4];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -90,7 +90,7 @@ namespace asc
       {
          static constexpr size_t n_substeps = 4;
          
-         asc::Module* run_first{};
+         asc::block_t* run_first{};
 		 
          NCRK4prop<value_t> propagator;
          NCRK4stepper<value_t> stepper;

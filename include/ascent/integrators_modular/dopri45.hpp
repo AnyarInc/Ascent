@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 #include "ascent/timing/timing.hpp"
 #include "ascent/utility.hpp"
@@ -24,7 +24,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct DOPRI45prop : public Propagator<value_t>
+      struct DOPRI45prop : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -44,7 +44,7 @@ namespace asc
             auto& xd4 = state.memory[5];
             auto& xd6 = state.memory[6];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;

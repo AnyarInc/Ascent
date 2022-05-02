@@ -15,6 +15,7 @@
 #pragma once
 
 #include "ascent/utility.hpp"
+#include <cmath> // for std::pow
 
 // Runge Kutta Dormand Prince 45
 
@@ -80,7 +81,7 @@ namespace asc
       }
 
       template <typename System>
-      void operator()(System&& system, state_t& x, value_type& t, value_type& dt, const AdaptiveT<value_type>& settings)
+      void operator()(System&& system, state_t& x, value_type& t, value_type& dt, const adaptive_t<value_type>& settings)
       {
          const auto abs_tol = settings.abs_tol;
          const auto rel_tol = settings.rel_tol;

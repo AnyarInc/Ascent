@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
 // Third order, Three stage Runge Kutta (Heun's 3rd Order).
@@ -24,7 +24,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct RK3prop : public Propagator<value_t>
+      struct RK3prop : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -36,7 +36,7 @@ namespace asc
             auto& xd1 = state.memory[2];
             auto& xd2 = state.memory[3];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -85,7 +85,7 @@ namespace asc
       {
          static constexpr size_t n_substeps = 3;
          
-         asc::Module* run_first{};
+         asc::block_t* run_first{};
 
          RK3prop<value_t> propagator;
          RK3stepper<value_t> stepper;

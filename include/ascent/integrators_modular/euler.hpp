@@ -16,7 +16,7 @@
 
 // Simple Euler integration.
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/direct/State.h"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
@@ -25,7 +25,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct EulerProp : public Propagator<value_t>
+      struct EulerProp : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -38,7 +38,7 @@ namespace asc
       {
          static constexpr size_t n_substeps = 1;
          
-         asc::Module* run_first{};
+         asc::block_t* run_first{};
 
          EulerProp<value_t> propagator;
 

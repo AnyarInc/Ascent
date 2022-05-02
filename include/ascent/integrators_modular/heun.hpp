@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
 // Heun's Method
@@ -24,7 +24,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct Heunprop : public Propagator<value_t>
+      struct Heunprop : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -34,7 +34,7 @@ namespace asc
             auto& x0 = state.memory[0];
             auto& xd0 = state.memory[1];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -75,7 +75,7 @@ namespace asc
       {
          static constexpr size_t n_substeps = 2;
          
-         asc::Module* run_first{};
+         asc::block_t* run_first{};
 
          Heunprop<value_t> propagator;
          Heunstepper<value_t> stepper;

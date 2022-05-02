@@ -20,19 +20,9 @@ namespace asc
 {
    template <class value_t, class v_t>
    inline constexpr auto cx(const v_t v) { return static_cast<value_t>(v); }
-   
-   struct AdaptiveIntegrator
-   {
-      AdaptiveIntegrator() = default;
-      AdaptiveIntegrator(const AdaptiveIntegrator&) = default;
-      AdaptiveIntegrator(AdaptiveIntegrator&&) = default;
-      AdaptiveIntegrator& operator=(const AdaptiveIntegrator&) = default;
-      AdaptiveIntegrator& operator=(AdaptiveIntegrator&&) = default;
-      virtual ~AdaptiveIntegrator() = default;
-   };
 
    template <typename T>
-   struct AdaptiveT
+   struct adaptive_t
    {
       T abs_tol = static_cast<T>(1.0); // absolute tolerance
       T rel_tol = static_cast<T>(1.0); // relative tolerance

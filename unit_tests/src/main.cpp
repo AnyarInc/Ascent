@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ascent/ascent.hpp"
+#include "ascent/integrators/rk2.hpp"
+#include "ascent/integrators/rk4.hpp"
+#include "ascent/integrators/dopri45.hpp"
+#include "ascent/integrators/abm4.hpp"
+#include "ascent/integrators/pc233.hpp"
 
 #include "ascent/integrators_modular/rk2.hpp"
 #include "ascent/integrators_modular/rk4.hpp"
@@ -36,7 +40,7 @@ struct Airy
    }
 };
 
-struct AiryMod : asc::Module
+struct AiryMod : asc::block_t
 {
    double a{};
    double a_d{};
@@ -64,7 +68,7 @@ struct Exponential
       xd[0] = x[0];
    }
 }; 
-struct ExponentialMod : asc::Module
+struct ExponentialMod : asc::block_t
 {
    double value{};
    double deriv{};
@@ -107,7 +111,7 @@ std::vector<double> airy_test_mod(const double dt)
    system->b = 0.0;
    system->sim->t = 0.0;
    system->sim->t_end = 10.0;
-   std::vector<asc::Module*> blocks{};
+   std::vector<asc::block_t*> blocks{};
    blocks.emplace_back(system.get());
 
    system->init();
@@ -148,7 +152,7 @@ std::pair<double, double> exponential_test_mod(const double dt)
    system->value = 1.0;
    sim->t = 0.0;
    sim->t_end = 10.0;
-   std::vector<asc::Module*> blocks{};
+   std::vector<asc::block_t*> blocks{};
    blocks.emplace_back(system.get());
 
    system->init();
@@ -167,14 +171,14 @@ std::pair<double, double> exponential_test_mod_adaptive()
    Integrator integrator;
    auto system = std::make_shared<ExponentialMod>();
    auto sim = std::make_shared<asc::Timing<double>>();
-   auto settings = AdaptiveT<double>();
+   auto settings = adaptive_t<double>();
    system->value = 1.0;
    sim->t = 0.0;
    sim->t_end = 10.0;
    double dt = 0.001;
    settings.abs_tol = 1e-16;
    settings.rel_tol = 1e-16;
-   std::vector<asc::Module *> blocks{};
+   std::vector<asc::block_t *> blocks{};
    blocks.emplace_back(system.get());
 
    system->init();

@@ -28,21 +28,21 @@ namespace asc
    constexpr bool is_pair_v = is_pair<T>::value;
 
    template <class value_t>
-   struct Propagator
+   struct propagator_t
    {
-      Propagator() = default;
-      Propagator(const Propagator&) = default;
-      Propagator(Propagator&&) = default;
-      Propagator& operator=(const Propagator&) = default;
-      Propagator& operator=(Propagator&&) = default;
-      virtual ~Propagator() {}
+      propagator_t() = default;
+      propagator_t(const propagator_t&) = default;
+      propagator_t(propagator_t&&) = default;
+      propagator_t& operator=(const propagator_t&) = default;
+      propagator_t& operator=(propagator_t&&) = default;
+      virtual ~propagator_t() {}
 
       virtual void operator()(State&, const double) = 0; // inputs: state, dt (time step)
 
       size_t pass{};
    };
 
-   enum struct Phase
+   enum struct phase_t
    {
       Link,
       Init,
@@ -51,14 +51,14 @@ namespace asc
       Postcalc
    };
 
-   struct Module
+   struct block_t
    {
-      Module() = default;
-      Module(const Module&) = default;
-      Module(Module&&) = default;
-      Module& operator=(const Module&) = default;
-      Module& operator=(Module&&) = default;
-      virtual ~Module() = default;
+      block_t() = default;
+      block_t(const block_t&) = default;
+      block_t(block_t&&) = default;
+      block_t& operator=(const block_t&) = default;
+      block_t& operator=(block_t&&) = default;
+      virtual ~block_t() = default;
 
       std::vector<State> states;
 
@@ -98,7 +98,7 @@ namespace asc
       virtual void init() {} // initialization
       virtual void operator()() {} // derivative accumulation
       virtual void apply() {} // apply accumulations
-      virtual void propagate(Propagator<double>& propagator, const double dt)
+      virtual void propagate(propagator_t<double>& propagator, const double dt)
       {
          for (auto& state : states) {
             propagator(state, dt);
@@ -123,7 +123,7 @@ namespace asc
       }
    }
 
-   template <void(Module::* func)(), class modules_t>
+   template <void(block_t::* func)(), class modules_t>
    void call_loop(modules_t& blocks)
    {
       if constexpr (is_pair_v<typename std::iterator_traits<typename modules_t::iterator>::value_type>)
@@ -143,11 +143,11 @@ namespace asc
    template <class modules_t>
    void update(modules_t& blocks)
    {
-      call_loop<&Module::operator()>(blocks);
+      call_loop<&block_t::operator()>(blocks);
    }
 
    template <class modules_t>
-   void update(modules_t& blocks, asc::Module* run_first)
+   void update(modules_t& blocks, asc::block_t* run_first)
    {
       if (run_first) {
          (*run_first)();
@@ -158,7 +158,7 @@ namespace asc
    template <class modules_t>
    void apply(modules_t& blocks)
    {
-      call_loop<&Module::apply>(blocks);
+      call_loop<&block_t::apply>(blocks);
    }
 
    template <class modules_t, class propagator_t, class value_t>
@@ -199,13 +199,13 @@ namespace asc
    template <class modules_t>
    void postprop(modules_t& blocks)
    {
-      call_loop<&Module::postprop>(blocks);
+      call_loop<&block_t::postprop>(blocks);
    }
 
    template <class modules_t>
    inline void postcalc(modules_t& blocks)
    {
-      call_loop<&Module::postcalc>(blocks);
+      call_loop<&block_t::postcalc>(blocks);
    }
 
    template <class states_t, class ptr_t>

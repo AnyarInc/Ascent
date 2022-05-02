@@ -28,7 +28,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct VABMprop : public Propagator<value_t>
+      struct VABMprop : public propagator_t<value_t>
       {
          VABMprop(size_t order = 4)
          {
@@ -123,7 +123,7 @@ namespace asc
             const auto phi_star_nm1 = [&](size_t i) -> auto &{return *(phi_star_nm1_a + i); };
             const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -195,7 +195,6 @@ namespace asc
 
       /// Variable step Adams-Bashforth-Moulton predictor corrector of configurable order.
       template <typename value_t, typename init_integrator = RK4<value_t>>
-      //struct VABM : AdaptiveIntegrator
       struct VABM
       {
          VABM(size_t order = 4) : order(order), propagator(order) {};
@@ -309,7 +308,7 @@ namespace asc
          }
 
          template <class modules_t>
-         void operator()(modules_t &blocks, value_t &t, value_t &dt, const AdaptiveT<value_t> &settings)
+         void operator()(modules_t &blocks, value_t &t, value_t &dt, const adaptive_t<value_t> &settings)
          {
             const value_t abs_tol = settings.abs_tol;
             const value_t rel_tol = settings.rel_tol;

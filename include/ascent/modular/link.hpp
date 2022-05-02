@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 
 #include <memory>
 
@@ -76,10 +76,10 @@ namespace asc
             // Postprop is not sequenced, as calculations may only be performed on propagated states
             switch (*module_->phase)
             {
-            case Phase::Init:
+            case phase_t::Init:
                check_init();
                return;
-            case Phase::Update:
+            case phase_t::Update:
                check_init();
                if (!module_->update_run)
                {
@@ -95,7 +95,7 @@ namespace asc
                   module_->update_run = true;
                }
                return;
-            case Phase::Postcalc:
+            case phase_t::Postcalc:
                check_init();
                return;
             case default:

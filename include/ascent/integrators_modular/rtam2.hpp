@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ascent/modular/module.hpp"
+#include "ascent/modular/block.hpp"
 #include "ascent/integrators_modular/modular_integrators.hpp"
 
 // Second order, two pass Real Time (RT) Adams Moulton predictor-corrector integrator
@@ -26,7 +26,7 @@ namespace asc
    namespace modular
    {
       template <class value_t>
-      struct RTAM2prop : public Propagator<value_t>
+      struct RTAM2prop : public propagator_t<value_t>
       {
          void operator()(State& state, const value_t dt) override
          {
@@ -39,7 +39,7 @@ namespace asc
             auto& x0 = state.memory[0];
             auto& xd1 = state.memory[1];
 
-            switch (Propagator<value_t>::pass)
+            switch (propagator_t<value_t>::pass)
             {
             case 0:
                x0 = x;
@@ -80,7 +80,7 @@ namespace asc
       {
          static constexpr size_t n_substeps = 2;
          
-         asc::Module* run_first{};
+         asc::block_t* run_first{};
 
          RTAM2prop<value_t> propagator;
          RTAM2stepper<value_t> stepper;
