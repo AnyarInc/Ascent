@@ -20,7 +20,7 @@ using state_t = std::vector<double>;
 
 struct lorenz_t
 {
-   void operator()(const state_t& x, state_t& xd, const double)
+   void operator()(const state_t& x, state_t& xd, const double) const noexcept
    {
       static constexpr double sigma = 10.0;
       static constexpr double R = 28.0;
