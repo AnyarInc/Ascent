@@ -17,21 +17,10 @@ namespace asc
    {
       using value_type = typename state_t::value_type;
 
-      /// \brief Integration step operation
-      /// 
-      /// Steps the system a single time step (dt), internally advances time (t)
-      ///
-      /// \tparam System The system object or function type. The system to be stepped must have a function syntax that takes \c (state_t, state_t, value_t) \c (x, xd, t).
-      /// The system can be a function, functor, or lambda expression. Taken as an rvalue reference.
-      /// \param[in, out] system The \c System instance.
-      /// \param[in, out] x The system's state vector.
-      /// \param[in, out] t The current time, which will be advanced by c\ dt.
-      /// \param[in] dt The time step for the input system to be advanced.
       template <class system_t>
       void operator()(system_t &&system, state_t &x, value_type &t, const value_type dt)
       {
-         if (initialized < 3)
-         {
+         if (initialized < 3) {
             const auto index = 2 - initialized;
             xd_prev[index].resize(x.size());
             system(x, xd_prev[index], t);
@@ -41,8 +30,7 @@ namespace asc
          }
 
          const size_t n = x.size();
-         if (xd0.size() < n)
-         {
+         if (xd0.size() < n) {
             xd0.resize(n);
             xd_temp.resize(n);
          }
@@ -50,8 +38,9 @@ namespace asc
          x0 = x;
          system(x, xd0, t);
          size_t i{};
-         for (; i < n; ++i)
+         for (; i < n; ++i) {
             x[i] = x0[i] + c0 * dt * (55.0 * xd0[i] - 59.0 * xd_prev[0][i] + 37.0 * xd_prev[1][i] - 9.0 * xd_prev[2][i]);
+         }
          t += dt;
 
          system(x, xd_temp, t);

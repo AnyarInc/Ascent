@@ -8,7 +8,7 @@
 namespace asc
 {
    template <typename state_t>
-   struct MidpointT
+   struct midpoint_t
    {
       using value_t = typename state_t::value_type;
 

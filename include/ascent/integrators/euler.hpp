@@ -8,7 +8,7 @@
 namespace asc
 {
    template <typename state_t>
-   struct EulerT
+   struct euler_t
    {
       using value_t = typename state_t::value_type;
 
@@ -20,8 +20,7 @@ namespace asc
             xd.resize(n);
 
          system(x, xd, t);
-         for (size_t i = 0; i < n; ++i)
-         {
+         for (size_t i = 0; i < n; ++i) {
             x[i] += dt * xd[i];
          }
          t += dt;
