@@ -57,7 +57,7 @@ struct AiryMod : asc::Module
 
 struct Exponential
 {
-   void operator()(const state_t& x, state_t& xd, const double t)
+   void operator()(const state_t& x, state_t& xd, const double)
    {
       xd[0] = x[0];
    }

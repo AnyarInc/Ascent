@@ -104,7 +104,7 @@ namespace asc
             }
          }
 
-         void operator()(State &state, const value_t dt) override
+         void operator()(State &state, const value_t /*dt*/) override
          {
             auto &x = *state.x;
             auto &xd = *state.xd;
@@ -118,7 +118,7 @@ namespace asc
             const auto phi_star_n_a = &state.memory[phi_star_n_i]; // Array length k
             const auto phi_star_nm1_a = &state.memory[phi_star_nm1_i]; // Array length k
             const auto phi_np1_a = &state.memory[phi_np1_i]; // Array length k+1
-            const auto phi_n = [&](size_t i) -> auto &{return *(phi_n_a + i); };
+            [[maybe_unused]] const auto phi_n = [&](size_t i) -> auto &{return *(phi_n_a + i); };
             const auto phi_star_n = [&](size_t i) -> auto &{return *(phi_star_n_a + i); };
             const auto phi_star_nm1 = [&](size_t i) -> auto &{return *(phi_star_nm1_a + i); };
             const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };

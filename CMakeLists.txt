@@ -5,10 +5,6 @@ project("ascent"
 		HOMEPAGE_URL "https://github.com/AnyarInc/Ascent"
 		LANGUAGES CXX)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(-Wno-unused-variable)
-endif()
-
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CPack)
