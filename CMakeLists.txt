@@ -6,7 +6,7 @@ project("ascent"
 		LANGUAGES CXX)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS "-Wno-unused-variable")
+        add_compile_options(-Wno-unused-variable)
 endif()
 
 include(GNUInstallDirs)
