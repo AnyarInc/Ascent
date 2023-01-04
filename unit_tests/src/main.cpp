@@ -185,102 +185,116 @@ std::pair<double, double> exponential_test_mod_adaptive()
    return{ system->value, sim->t };
 }
 
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.hpp"
+#include <boost/ut.hpp>
 
-// bool test(const std::string& title, const double x, const double target, const double eps)
+using namespace boost::ut;
 
-TEST_CASE("Airy System RK4", "[airy]") {
-   auto x = airy_test<RK4>(0.001);
-   REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
+inline bool approx(const auto& x, const auto near, const double epsilon = 1.0e-8) {
+   return (x <= (near + epsilon)) && (x >= (near - epsilon));
 }
 
-TEST_CASE("Airy System RK2", "[airy]") {
-   auto x = airy_test<RK2>(0.001);
-   REQUIRE(x[0] == Approx(-0.200703911717).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49816435475).epsilon(1.0e-8));
+suite airy_system = []
+{
+   "airy_rk4"_test = [] {
+      auto x = airy_test<RK4>(0.001);
+      boost::ut::
+      expect(approx(x[0], -0.200693641142)) << x[0];
+      expect(approx(x[1], -1.49817601143)) << x[1];
+   };
+   
+   "airy_rk2"_test = [] {
+      auto x = airy_test<RK2>(0.001);
+      expect(approx(x[0], -0.200703911717)) << x[0];
+      expect(approx(x[1], -1.49816435475)) << x[1];
+   };
+   
+   "airy_dopri45"_test = [] {
+      auto x = airy_test<DOPRI45>(0.001);
+      expect(approx(x[0], -0.200693641142)) << x[0];
+      expect(approx(x[1], -1.49817601143)) << x[1];
+   };
+};
 
-   x = airy_test<DOPRI45>(0.001);
-   REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
-}
+suite airy_modular = []
+{
+   "airy_modular_rk4"_test = [] {
+      auto x = airy_test_mod<modular::RK4<double>>(0.001);
+      expect(approx(x[0], -0.200693641142)) << x[0];
+      expect(approx(x[1], -1.49817601143)) << x[1];
+   };
+   
+   "airy_modular_rk2"_test = [] {
+      auto x = airy_test_mod<modular::RK2<double>>(0.001);
+      expect(approx(x[0], -0.200703911717)) << x[0];
+      expect(approx(x[1], -1.49816435475)) << x[1];
+   };
+   
+   "airy_modular_pc233"_test = [] {
+      auto x = airy_test_mod<modular::PC233<double>>(0.001);
+      expect(approx(x[0], -0.200693641142)) << x[0];
+      expect(approx(x[1], -1.49817601143)) << x[1];
+   };
+};
 
-TEST_CASE("Airy System DOPRI45", "[airy]") {
-   auto x = airy_test<DOPRI45>(0.001);
-   REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
-}
+suite exponential = []
+{
+   "exp_rk4"_test = [] {
+      auto result = exponential_test<RK4>(0.001);
+      expect(approx(result.first[0], std::exp(result.second)));
+   };
+   
+   "exp_rk2"_test = [] {
+      auto result = exponential_test<RK2>(0.001);
+      expect(approx(result.first[0], std::exp(result.second), 1.0e-1));
+   };
+   
+   "exp_dopri45"_test = [] {
+      auto result = exponential_test<DOPRI45>(0.001);
+      expect(approx(result.first[0], std::exp(result.second)));
+   };
+   
+   "exp_pc233"_test = [] {
+      auto result = exponential_test<PC233>(0.001);
+      expect(approx(result.first[0], std::exp(result.second), 1.0e-2));
+   };
+   
+   "exp_abm4"_test = [] {
+      auto result = exponential_test<ABM4>(0.001);
+      expect(approx(result.first[0], std::exp(result.second)));
+   };
+};
 
-TEST_CASE("Modular Airy System RK4", "[airy][modular]") {
-   auto x = airy_test_mod<modular::RK4<double>>(0.001);
-   REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
-}
+suite exp_modular = []
+{
+   "exp_modular_rk4"_test = [] {
+      auto result = exponential_test_mod<modular::RK4<double>>(0.001);
+      expect(approx(result.first, std::exp(result.second)));
+   };
+   
+   "exp_modular_rk2"_test = [] {
+      auto result = exponential_test_mod<modular::RK2<double>>(0.001);
+      expect(approx(result.first, std::exp(result.second), 1.0e-1));
+   };
+   
+   "exp_modular_pc233"_test = [] {
+      auto result = exponential_test_mod<modular::PC233<double>>(0.001);
+      expect(approx(result.first, std::exp(result.second), 1.0e-2));
+   };
+   
+   "exp_modular_abm4"_test = [] {
+      auto result = exponential_test_mod<modular::ABM4<double>>(0.001);
+      expect(approx(result.first, std::exp(result.second)));
+   };
+   
+   "exp_modular_vabm"_test = [] {
+      auto result = exponential_test_mod<modular::VABM<double>>(0.001);
+      expect(approx(result.first, std::exp(result.second)));
+   };
+   
+   "exp_modular_adaptive_vabm"_test = [] {
+      auto result = exponential_test_mod_adaptive<modular::VABM<double>>();
+      expect(approx(result.first, std::exp(result.second)));
+   };
+};
 
-TEST_CASE("Modular Airy System RK2", "[airy][modular]") {
-   auto x = airy_test_mod<modular::RK2<double>>(0.001);
-   REQUIRE(x[0] == Approx(-0.200703911717).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49816435475).epsilon(1.0e-8));
-}
-
-TEST_CASE("Modular Airy System PC233", "[airy][modular]") {
-   auto x = airy_test_mod<modular::PC233<double>>(0.001);
-   REQUIRE(x[0] == Approx(-0.200693641142).epsilon(1.0e-8));
-   REQUIRE(x[1] == Approx(-1.49817601143).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential RK4", "[exponential]") {
-   auto result = exponential_test<RK4>(0.001);
-   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential RK2", "[exponential]") {
-   auto result = exponential_test<RK2>(0.001);
-   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-5));
-}
-
-TEST_CASE("Exponential DOPRI45", "[exponential]") {
-   auto result = exponential_test<DOPRI45>(0.001);
-   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential PC233", "[exponential]") {
-   auto result = exponential_test<PC233>(0.001);
-   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-6));
-}
-
-TEST_CASE("Exponential ABM4", "[exponential]") {
-   auto result = exponential_test<ABM4>(0.001);
-   REQUIRE(result.first[0] == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential Modular RK4", "[exponential][modular]") {
-   auto result = exponential_test_mod<modular::RK4<double>>(0.001);
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential Modular RK2", "[exponential][modular]") {
-   auto result = exponential_test_mod<modular::RK2<double>>(0.001);
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-5));
-}
-
-TEST_CASE("Exponential Modular PC233", "[exponential][modular]") {
-   auto result = exponential_test_mod<modular::PC233<double>>(0.001);
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-6));
-}
-
-TEST_CASE("Exponential Modular ABM4", "[exponential][modular]") {
-   auto result = exponential_test_mod<modular::ABM4<double>>(0.001);
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential Modular VABM", "[exponential][modular]") {
-   auto result = exponential_test_mod<modular::VABM<double>>(0.001);
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
-}
-
-TEST_CASE("Exponential Modular Adaptive VABM", "[exponential][modular][adaptive]") {
-   auto result = exponential_test_mod_adaptive<modular::VABM<double>>();
-   REQUIRE(result.first == Approx(exp(result.second)).epsilon(1.0e-8));
-}
+int main() {}

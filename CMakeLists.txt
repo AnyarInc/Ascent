@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.18)
 project("ascent"
 		VERSION 0.5.0
 		DESCRIPTION "An extremely fast and flexible C++ simulation engine and differential equation solver."
