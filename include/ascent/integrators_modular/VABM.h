@@ -120,7 +120,7 @@ namespace asc
             const auto phi_np1_a = &state.memory[phi_np1_i]; // Array length k+1
             [[maybe_unused]] const auto phi_n = [&](size_t i) -> auto &{return *(phi_n_a + i); };
             const auto phi_star_n = [&](size_t i) -> auto &{return *(phi_star_n_a + i); };
-            const auto phi_star_nm1 = [&](size_t i) -> auto &{return *(phi_star_nm1_a + i); };
+            [[maybe_unused]] const auto phi_star_nm1 = [&](size_t i) -> auto &{return *(phi_star_nm1_a + i); };
             const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };
 
             switch (Propagator<value_t>::pass)
@@ -313,7 +313,7 @@ namespace asc
          {
             const value_t abs_tol = settings.abs_tol;
             const value_t rel_tol = settings.rel_tol;
-            const value_t safety_factor = settings.safety_factor;
+            [[maybe_unused]] const value_t safety_factor = settings.safety_factor;
 
             const value_t t0 = t;
 
@@ -330,10 +330,10 @@ namespace asc
             {
                auto solve = [&](auto &state)
                {
-                  auto &x = *state.x;
-                  auto &xd = *state.xd;
+                  [[maybe_unused]] auto &x = *state.x;
+                  [[maybe_unused]] auto &xd = *state.xd;
                   auto &x0 = state.memory[propagator.x0_i];
-                  auto &xd0 = state.memory[propagator.xd0_i];
+                  [[maybe_unused]] auto &xd0 = state.memory[propagator.xd0_i];
                   const auto phi_np1_a = &state.memory[propagator.phi_np1_i];
                   const auto phi_np1 = [&](size_t i) -> auto &{return *(phi_np1_a + i); };
 
