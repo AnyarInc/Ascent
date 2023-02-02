@@ -95,10 +95,10 @@ state_t airy_test(const double dt)
    return x;
 }
 
-template <class Integrator>
+template <template<class> class Integrator>
 std::vector<double> airy_test_mod(const double dt)
 {
-   Integrator integrator;
+   Integrator<double> integrator;
    auto system = std::make_shared<AiryMod>();
    system->sim = std::make_shared<asc::Timing<double>>(); 
    system->a = 1.0;

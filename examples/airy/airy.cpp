@@ -18,24 +18,24 @@ using namespace asc;
 
 struct Airy
 {
-   void operator()(const state_t& x, state_t& xd, const double t)
+   void operator()(const auto& x, auto& xd, const auto t)
    {
       xd[0] = x[1];
-      xd[1] = -t*x[0];
+      xd[1] = -t * x[0];
    }
 };
 
 int main()
 {
-   state_t x = { 1.0, 0.0 };
+   std::vector x = { 1.0, 0.0 };
    double t = 0.0;
    double dt = 0.1;
    double t_end = 10.0;
 
-   RK4 integrator;
+   RK4<std::vector<double>> integrator;
    Airy system;
 
-   Recorder recorder;
+   Recorder<double> recorder;
 
    while (t < t_end)
    {

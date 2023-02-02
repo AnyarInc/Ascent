@@ -16,7 +16,7 @@
 
 // UNDER CONSTRUCTION
 
-#include "ascent/integrators/RK4.hpp"
+#include "ascent/integrators/rk4.hpp"
 
 namespace asc
 {
@@ -66,7 +66,7 @@ namespace asc
    private:
       bool initialized{};
 
-      RK4T<state_t> initializer;
+      RK4<state_t> initializer;
 
       static constexpr auto c0 = cx(297.0 / 384.0);
       static constexpr auto c1 = cx(-187.0 / 384.0);

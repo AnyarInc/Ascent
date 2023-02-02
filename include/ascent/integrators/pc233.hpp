@@ -15,7 +15,7 @@
 #pragma once
 
 #include "ascent/utility.hpp"
-#include "ascent/integrators/RK2.hpp"
+#include "ascent/integrators/rk2.hpp"
 
 // P-2/PC-3/C-3 algorithm, which has the same error coefficient and order as the P-3/PC-3/C-3 predictor-corrector, but is more stable
 
@@ -24,7 +24,7 @@
 
 namespace asc
 {
-   template <typename state_t, typename init_integrator = RK4T<state_t>>
+   template <class State, typename init_integrator = RK4<State>>
    struct PC233T
    {
       using value_t = typename state_t::value_type;

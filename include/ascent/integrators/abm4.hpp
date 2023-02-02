@@ -22,8 +22,8 @@ namespace asc
 {
    /// Fourth order Adams-Bashforth-Moulton Predictor Corrector. Fixed step version (Must reinitialize if dt is changed).
    ///
-   /// \tparam state_t The state type of the system to be integrated. I.e. a std::vector or std::deque.
-   template <typename state_t, typename init_integrator = RK4T<state_t>>
+   /// \tparam State The state type of the system to be integrated. I.e. a std::vector or std::deque.
+   template <class State, typename init_integrator = RK4<State>>
    struct ABM4T
    {
       using value_t = typename state_t::value_type;
