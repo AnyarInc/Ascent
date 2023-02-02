@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ascent/Ascent.h"
+#include "ascent/ascent.hpp"
 
 using namespace asc;
 

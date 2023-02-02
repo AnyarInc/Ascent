@@ -1,2 +1,2 @@
 add_executable(airy airy.cpp)
-target_link_libraries(airy ascent)
+target_link_libraries(airy ascent::ascent)
