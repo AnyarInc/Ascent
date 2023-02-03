@@ -62,7 +62,7 @@ namespace asc
    ///
    /// The Recorder class permits variable width rows of data that can be populated by passing in initializer lists (preferred) or std::vectors
    /// \paramt T The type to be recorded.
-   template <class T, size_t block_size = 4096>
+   template <class T = double, size_t block_size = 4096>
    struct Recorder
    {
       Recorder() = default;

@@ -14,9 +14,7 @@
 
 #include "ascent/ascent.hpp"
 
-using namespace asc;
-
-struct Airy
+struct airy
 {
    void operator()(const auto& x, auto& xd, const auto t)
    {
@@ -32,10 +30,10 @@ int main()
    double dt = 0.1;
    double t_end = 10.0;
 
-   RK4<std::vector<double>> integrator;
-   Airy system;
+   asc::rk4 integrator;
+   airy system;
 
-   Recorder<double> recorder;
+   asc::Recorder recorder;
 
    while (t < t_end)
    {

@@ -22,8 +22,8 @@ namespace asc
    ///
    /// Designed for optimum speed and minimal memory load. We use one additional multiplication to reduce memory cost by 25%.
    /// \tparam State The state type of the system to be integrated. I.e. a std::vector or std::deque.
-   template <class State>
-   struct RK4
+   template <class State = std::vector<double>>
+   struct rk4
    {
       using value_type = typename State::value_type;
 
@@ -51,8 +51,9 @@ namespace asc
          x0 = x;
          system(x0, xd, t);
          size_t i{};
-         for (; i < n; ++i)
+         for (; i < n; ++i) {
             x[i] = dt_2 * xd[i] + x0[i];
+         }
          t += dt_2;
 
          system(x, xd_temp, t);
