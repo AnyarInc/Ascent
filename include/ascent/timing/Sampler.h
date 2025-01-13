@@ -18,10 +18,13 @@
 
 namespace asc
 {
+   struct def_eps {
+      static constexpr double eps = 1e-8;
+   };
    // A Sampler resets the base time step when it goes out of scope. In this manner it can be used as a short-lived object within the simulation loop.
    // If the Sampler is to exist long term, then the reset() must be called after time is incremented within the simulation loop.
    // Note that keeping the Sampler around longer maintains a consistent base time step.
-   template <typename T>
+   template <typename T, class Eps = def_eps>
    struct SamplerT
    {
       SamplerT(T& _t, T& _dt) noexcept : t(_t), dt(_dt), dt_base(dt) {}
@@ -77,7 +80,7 @@ namespace asc
       }
 
    private:
-      static constexpr T eps = static_cast<T>(1.0e-8);
+      static constexpr T eps = static_cast<T>(Eps::eps);
       T& t;
       T& dt;
       T dt_base;

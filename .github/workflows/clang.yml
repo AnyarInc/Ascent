@@ -3,35 +3,39 @@ name: clang
 on:
   push:
     branches:
-    - main
-    - feature/*
+      - main
+      - feature/*
     paths-ignore:
-    - '**.md'
+      - '**/*.md'
+      - 'docs/**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths-ignore:
-    - '**.md'
+      - '**/*.md'
+      - 'docs/**'
+  workflow_dispatch:
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
 
 jobs:
   build:
-    runs-on: macos-12
+    runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Set Apple Clang 14 as the compiler
-      run: |
-        echo "CC=$(brew --prefix llvm@14)/bin/clang" >> "$GITHUB_ENV"
-        echo "CXX=$(brew --prefix llvm@14)/bin/clang++" >> "$GITHUB_ENV"
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      run: cmake --build build --config ${{env.BUILD_TYPE}} -j 2
+      run: cmake --build build --config ${{env.BUILD_TYPE}} -j 3
 
     - name: Test
       working-directory: build
-      run: ctest -C ${{env.BUILD_TYPE}} -j 2 --output-on-failure
+      run: ctest -C ${{env.BUILD_TYPE}} -j 3 --output-on-failure
